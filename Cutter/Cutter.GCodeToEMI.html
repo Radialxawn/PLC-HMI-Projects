@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<label>
+  Select GCode file:
+  <input type="file" id="file-selector" style="visibility: hidden;"/>
+</label>
+<label id="selected-file-name">...</label>
+
+<form action="/action_page.php">
+  <label for="extended-memory-selector">Select extended memory address:</label>
+  <select id="extended-memory-selector"></select>
+</form>
+
+<button onclick="generate()">Generate and download</button>
+
+<p id="result">Result</p>
+
+<script>
+let gcodeStr = "";
+if (window.FileList && window.File && window.FileReader) {
+   document.getElementById('file-selector').addEventListener('change', event => {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.addEventListener('load', event => {
+         gcodeStr = event.target.result;
+         document.getElementById('selected-file-name').textContent = file.name;
+      });
+      reader.readAsText(file);
+   });
+}
+
+function fillExtendedMemoryList() {
+   var select = document.getElementById('extended-memory-selector'); 
+
+   for(var i = 0; i < 10; i++) {
+      var elm = document.createElement('option');
+      elm.textContent = 'EM' + i;
+      elm.value = 'em' + i;
+      select.appendChild(elm);
+   }
+}
+fillExtendedMemoryList();
+
+function download(filename, text) {
+   var pom = document.createElement('a');
+   pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+   pom.setAttribute('download', filename);
+
+   if (document.createEvent) {
+      var event = document.createEvent('MouseEvents');
+      event.initEvent('click', true, true);
+      pom.dispatchEvent(event);
+   } else {
+      pom.click();
+   }
+}
+
+function generate() {
+   let gcodeLines = gcodeStr.match(/[^\r\n]+/g);
+   gcodeLines.unshift(gcodeLines.length.toString());
+   var resultStr = '';
+   for (i = 0; i < gcodeLines.length; i++) {
+      let line = gcodeLines[i];
+      line = line.trim();
+  	  resultStr += line.concat('\xa0'.repeat(80 - line.length));
+   }
+   let result = document.getElementById('result');
+   result.innerHTML = resultStr;
+   var name = document.getElementById('extended-memory-selector').value;
+   download(name + '.emi', resultStr);
+}
+</script>
+
+</body>
+</html>
