@@ -1,77 +1,89 @@
 <!DOCTYPE html>
 <html>
+
 <body>
+   <button id="file-selector-button" onclick="selectFile()">Select GCode file</button>
+   <label id="selected-file-name">...</label>
+   <input type="file" id="file-selector" style="visibility: hidden;" />
 
-<label>
-  Select GCode file:
-  <input type="file" id="file-selector" style="visibility: hidden;"/>
-</label>
-<label id="selected-file-name">...</label>
+   <form action="/action_page.php">
+      <label for="extended-memory-selector">Select extended memory address:</label>
+      <select id="extended-memory-selector"></select>
+   </form>
 
-<form action="/action_page.php">
-  <label for="extended-memory-selector">Select extended memory address:</label>
-  <select id="extended-memory-selector"></select>
-</form>
+   <form action="/action_page.php">
+      <label for="words-per-line">Select number of word per line:</label>
+      <input type="number" id="words-per-line" name="quantity" min="32" max="256" value="80">
+   </form>
 
-<button onclick="generate()">Generate and download</button>
+   <button onclick="generate()">Generate</button>
+   <button onclick="download()">Download</button>
 
-<p id="result">Result</p>
+   <p id="result">Result:</p>
 
-<script>
-let gcodeStr = "";
-if (window.FileList && window.File && window.FileReader) {
-   document.getElementById('file-selector').addEventListener('change', event => {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.addEventListener('load', event => {
-         gcodeStr = event.target.result;
-         document.getElementById('selected-file-name').textContent = file.name;
-      });
-      reader.readAsText(file);
-   });
-}
+   <script>
+      function selectFile() {
+         document.getElementById('file-selector').click();
+      }
 
-function fillExtendedMemoryList() {
-   var select = document.getElementById('extended-memory-selector'); 
+      let gcodeStr = '';
+      if (window.FileList && window.File && window.FileReader) {
+         document.getElementById('file-selector').addEventListener('change', event => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.addEventListener('load', event => {
+               gcodeStr = event.target.result;
+               document.getElementById('selected-file-name').textContent = file.name;
+            });
+            reader.readAsText(file);
+         });
+      }
 
-   for(var i = 0; i < 10; i++) {
-      var elm = document.createElement('option');
-      elm.textContent = 'EM' + i;
-      elm.value = 'em' + i;
-      select.appendChild(elm);
-   }
-}
-fillExtendedMemoryList();
+      function fillExtendedMemoryList() {
+         var select = document.getElementById('extended-memory-selector');
 
-function download(filename, text) {
-   var pom = document.createElement('a');
-   pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-   pom.setAttribute('download', filename);
+         for (var i = 0; i < 10; i++) {
+            var elm = document.createElement('option');
+            elm.textContent = 'EM' + i;
+            elm.value = 'em' + i;
+            select.appendChild(elm);
+         }
+      }
+      fillExtendedMemoryList();
 
-   if (document.createEvent) {
-      var event = document.createEvent('MouseEvents');
-      event.initEvent('click', true, true);
-      pom.dispatchEvent(event);
-   } else {
-      pom.click();
-   }
-}
+      var resultStr = '';
+      function generate() {
+         resultStr = '';
+         let gcodeLines = gcodeStr.match(/[^\r\n]+/g);
+         gcodeLines.unshift(gcodeLines.length.toString());
+         var wordsPerLine = document.getElementById('words-per-line').value;
+         for (i = 0; i < gcodeLines.length; i++) {
+            let line = gcodeLines[i];
+            line = line.trim();
+            resultStr += line.concat('\xa0'.repeat(wordsPerLine - line.length));
+         }
+         let result = document.getElementById('result');
+         result.innerHTML = resultStr;
+      }
 
-function generate() {
-   let gcodeLines = gcodeStr.match(/[^\r\n]+/g);
-   gcodeLines.unshift(gcodeLines.length.toString());
-   var resultStr = '';
-   for (i = 0; i < gcodeLines.length; i++) {
-      let line = gcodeLines[i];
-      line = line.trim();
-  	  resultStr += line.concat('\xa0'.repeat(80 - line.length));
-   }
-   let result = document.getElementById('result');
-   result.innerHTML = resultStr;
-   var name = document.getElementById('extended-memory-selector').value;
-   download(name + '.emi', resultStr);
-}
-</script>
+      function download() {
+         var filename = document.getElementById('extended-memory-selector').value + '.emi';
+         var text = resultStr;
+
+         var pom = document.createElement('a');
+         pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+         pom.setAttribute('download', filename);
+
+         if (document.createEvent) {
+            var event = document.createEvent('MouseEvents');
+            event.initEvent('click', true, true);
+            pom.dispatchEvent(event);
+         } else {
+            pom.click();
+         }
+      }
+   </script>
 
 </body>
+
 </html>
