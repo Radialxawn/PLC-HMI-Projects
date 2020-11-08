@@ -27,13 +27,15 @@
       }
 
       let gcodeStr = '';
+      var selectedFileName = '';
       if (window.FileList && window.File && window.FileReader) {
          document.getElementById('file-selector').addEventListener('change', event => {
             const file = event.target.files[0];
             const reader = new FileReader();
             reader.addEventListener('load', event => {
                gcodeStr = event.target.result;
-               document.getElementById('selected-file-name').textContent = file.name;
+               selectedFileName = file.name;
+               document.getElementById('selected-file-name').textContent = selectedFileName;
             });
             reader.readAsText(file);
          });
@@ -55,7 +57,7 @@
       function generate() {
          resultStr = '';
          let gcodeLines = gcodeStr.match(/[^\r\n]+/g);
-         gcodeLines.unshift(gcodeLines.length.toString());
+         gcodeLines.unshift(gcodeLines.length + ' LINES FROM ' + selectedFileName);
          var wordsPerLine = document.getElementById('words-per-line').value;
          for (i = 0; i < gcodeLines.length; i++) {
             let line = gcodeLines[i];
