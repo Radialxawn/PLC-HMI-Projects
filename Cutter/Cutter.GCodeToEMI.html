@@ -62,7 +62,7 @@
          for (i = 0; i < gcodeLines.length; i++) {
             let line = gcodeLines[i];
             line = line.trim();
-            resultStr += line.concat('\xa0'.repeat(wordsPerLine - line.length));
+            resultStr += line.concat('\x20'.repeat(wordsPerLine - line.length));
          }
          let result = document.getElementById('result');
          result.innerHTML = resultStr;
