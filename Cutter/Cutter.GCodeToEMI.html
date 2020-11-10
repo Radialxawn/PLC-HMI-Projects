@@ -54,7 +54,8 @@
       fillExtendedMemoryList();
 
       function formatLine(line, wordsPerLine) {
-         line = line.trim().replace(/[^()](?=([^()]*\([^()]*\))*[^()]*$)/g, t => t.toUpperCase());
+         line = line.trim().replace(/\s+/g, ' ');
+         line = line.replace(/[^()](?=([^()]*\([^()]*\))*[^()]*$)/g, t => t.toUpperCase());
          if (line.length > wordsPerLine) {
             line = line.substring(0, wordsPerLine);
          } else {
@@ -67,7 +68,7 @@
       function generate() {
          resultStr = '';
          let gcodeLines = gcodeStr.match(/[^\r\n]+/g);
-         gcodeLines.unshift(`${gcodeLines.length} LINES FROM (${selectedFileName})`);
+         gcodeLines.unshift(`${'0'.repeat(5).concat(gcodeLines.length).slice(-5)} LINES FROM (${selectedFileName})`);
          var wordsPerLine = document.getElementById('words-per-line').value;
          for (i = 0; i < gcodeLines.length; i++) {
             resultStr += formatLine(gcodeLines[i], wordsPerLine);
