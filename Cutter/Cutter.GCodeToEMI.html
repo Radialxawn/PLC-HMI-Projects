@@ -53,16 +53,24 @@
       }
       fillExtendedMemoryList();
 
+      function formatLine(line, wordsPerLine) {
+         line = line.trim().replace(/[^()](?=([^()]*\([^()]*\))*[^()]*$)/g, t => t.toUpperCase());
+         if (line.length > wordsPerLine) {
+            line = line.substring(0, wordsPerLine);
+         } else {
+            line = line.concat('\x20'.repeat(wordsPerLine - line.length));
+         }
+         return line;
+      }
+
       var resultStr = '';
       function generate() {
          resultStr = '';
          let gcodeLines = gcodeStr.match(/[^\r\n]+/g);
-         gcodeLines.unshift(gcodeLines.length + ' LINES FROM ' + selectedFileName);
+         gcodeLines.unshift(`${gcodeLines.length} LINES FROM (${selectedFileName})`);
          var wordsPerLine = document.getElementById('words-per-line').value;
          for (i = 0; i < gcodeLines.length; i++) {
-            let line = gcodeLines[i];
-            line = line.trim();
-            resultStr += line.concat('\x20'.repeat(wordsPerLine - line.length));
+            resultStr += formatLine(gcodeLines[i], wordsPerLine);
          }
          let result = document.getElementById('result');
          result.innerHTML = resultStr;
