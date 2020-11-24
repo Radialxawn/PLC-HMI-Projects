@@ -85,10 +85,11 @@
 
       const pulsePerMillimeter = 100, inchToMillimeter = 25.4;
       var unitMultiplier = 1, isRelativeMode = true;
-      var preTargetX, preTargetY, preFeedSpeedX, preFeedSpeedY, preFeedSpeed;
-      var targetX, targetY, feedSpeedX, feedSpeedY, AcDcTimeX, AcDcTimeY, feedSpeed;
-      var commandLtArray, commandNbArray, targetXArray, targetYArray, feedSpeedXArray, feedSpeedYArray, AcDcTimeXArray, AcDcTimeYArray;
+      var preTargetX = 0, preTargetY = 0, preFeedSpeedX = 0, preFeedSpeedY = 0, preFeedSpeed = 0;
+      var targetX = 0, targetY = 0, feedSpeedX = 0, feedSpeedY = 0, feedSpeed = 0, AcDcTime = 0;
+      var commandLtArray = '', commandNbArray = '', targetXArray = '', targetYArray = '', feedSpeedXArray = '', feedSpeedYArray = '', AcDcTimeArray = '';
       function readGCodeLines() {
+         var test = '';
          for (i = 1; i < gcodeLines.length; i++) {
             var line = gcodeLines[i];
             var parts = line.match(/[A-Za-z][+-]?([0-9]*[.])?[0-9]+/g);
@@ -154,14 +155,27 @@
             var deltaX = targetX - preTargetX;
             var deltaY = targetY - preTargetY;
             var deltaD = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            deltaD = deltaD == 0 ? 1 : deltaD;
 
             feedSpeedX = Math.abs(feedSpeed * deltaX / deltaD);
             feedSpeedY = Math.abs(feedSpeed * deltaY / deltaD);
+
+            var biggerFeedSpeed = Math.max(feedSpeedX, feedSpeedY);
+            AcDcTime = biggerFeedSpeed * 0.1;
+            //||||||||||||||||||||||||||||||||||||||\\
+            var TX = Math.round(targetX * pulsePerMillimeter);
+            var TY = Math.round(targetY * pulsePerMillimeter);
+            var FSX = Math.round(feedSpeedX * pulsePerMillimeter);
+            var FSY = Math.round(feedSpeedY * pulsePerMillimeter);
+            var ADT = Math.round(AcDcTime);
+
+            test += `TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}, ADT=${ADT}---------------------------`;
 
             preTargetX = targetX;
             preTargetY = targetY;
             feedSpeed = preFeedSpeed;
          }
+         return test;
       }
 
       function formatLine(line, wordsPerLine) {
@@ -187,7 +201,7 @@
             resultStr += formatLine(gcodeLines[i], wordsPerLineField.value);
          }
 
-         readGCodeLines();
+         resultStr += readGCodeLines();
 
          let result = document.getElementById('result');
          result.innerHTML = resultStr;
