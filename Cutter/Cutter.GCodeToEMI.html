@@ -17,8 +17,14 @@
    </form>
 
    <form action="/action_page.php">
+      <label for="pulse-per-millimeter">Select pulse per millimeter:</label>
+      <input type="number" id="pulse-per-millimeter" name="quantity" min="100" max="500" value="100">
+   </form>
+
+   <form action="/action_page.php">
       <label for="max-feed-speed">Select max feed speed:</label>
       <input type="number" id="max-feed-speed" name="quantity" min="100" max="2000" value="1000">
+      <label type="text">mm/s</label>
    </form>
 
    <button onclick="generate()">Generate</button>
@@ -29,6 +35,7 @@
    <script>
       let wordsPerLineField = document.getElementById('words-per-line');
       let maxFeedSpeedField = document.getElementById('max-feed-speed');
+      let pulsePerMillimeterField = document.getElementById('pulse-per-millimeter');
 
       function selectFile() {
          document.getElementById('file-selector').click();
@@ -83,7 +90,7 @@
          return word;
       }
 
-      const pulsePerMillimeter = 100, inchToMillimeter = 25.4;
+      const inchToMillimeter = 25.4;
       var unitMultiplier = 1, isRelativeMode = true;
       var preTargetX = 0, preTargetY = 0, preFeedSpeedX = 0, preFeedSpeedY = 0, preFeedSpeed = 0;
       var targetX = 0, targetY = 0, feedSpeedX = 0, feedSpeedY = 0, feedSpeed = 0, AcDcTime = 0;
@@ -109,11 +116,11 @@
                         case 1:  // controlled motion
                            feedSpeed = preFeedSpeed;
                            break;
-                        case 20: // inches
+                        case 20: // inch
                            unitMultiplier = inchToMillimeter;
                            break;
-                        case 21: // millimeters
-                           isUsingInch = 1;
+                        case 21: // millimeter
+                           unitMultiplier = 1;
                            break;
                         case 28: // homing
                            targetX = targetY = 0;
@@ -163,10 +170,10 @@
             var biggerFeedSpeed = Math.max(feedSpeedX, feedSpeedY);
             AcDcTime = biggerFeedSpeed * 0.1;
             //||||||||||||||||||||||||||||||||||||||\\
-            var TX = Math.round(targetX * pulsePerMillimeter);
-            var TY = Math.round(targetY * pulsePerMillimeter);
-            var FSX = Math.round(feedSpeedX * pulsePerMillimeter);
-            var FSY = Math.round(feedSpeedY * pulsePerMillimeter);
+            var TX = Math.round(targetX * pulsePerMillimeterField.value);
+            var TY = Math.round(targetY * pulsePerMillimeterField.value);
+            var FSX = Math.round(feedSpeedX * pulsePerMillimeterField.value);
+            var FSY = Math.round(feedSpeedY * pulsePerMillimeterField.value);
             var ADT = Math.round(AcDcTime);
 
             test += `TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}, ADT=${ADT}---------------------------`;
