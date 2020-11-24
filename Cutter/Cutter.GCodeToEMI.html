@@ -16,24 +16,32 @@
       <input type="number" id="words-per-line" name="quantity" min="32" max="256" value="80">
    </form>
 
+   <form action="/action_page.php">
+      <label for="max-feed-speed">Select max feed speed:</label>
+      <input type="number" id="max-feed-speed" name="quantity" min="100" max="2000" value="1000">
+   </form>
+
    <button onclick="generate()">Generate</button>
    <button onclick="download()">Download</button>
 
    <p id="result">Result:</p>
 
    <script>
+      let wordsPerLineField = document.getElementById('words-per-line');
+      let maxFeedSpeedField = document.getElementById('max-feed-speed');
+
       function selectFile() {
          document.getElementById('file-selector').click();
       }
 
-      let gcodeStr = '';
+      let gcodeLines = {};
       var selectedFileName = '';
       if (window.FileList && window.File && window.FileReader) {
          document.getElementById('file-selector').addEventListener('change', event => {
             const file = event.target.files[0];
             const reader = new FileReader();
             reader.addEventListener('load', event => {
-               gcodeStr = event.target.result;
+               gcodeLines = event.target.result.match(/[^\r\n]+/g);
                selectedFileName = file.name;
                document.getElementById('selected-file-name').textContent = selectedFileName;
             });
@@ -53,6 +61,109 @@
       }
       fillExtendedMemoryList();
 
+      function intToWord(value) {
+         var hex = '';
+         var word = '';
+         value += value < 0 ? 0xFFFF + 1 : 0;
+         hex = ('0000' + value.toString(16)).slice(-4);
+         word += String.fromCharCode(parseInt(hex.substring(2, 4), 16));
+         word += String.fromCharCode(parseInt(hex.substring(0, 2), 16));
+         return word;
+      }
+
+      function intToDWord(value) {
+         var hex = '';
+         var word = '';
+         value += value < 0 ? 0xFFFFFFFF + 1 : 0;
+         hex = ('00000000' + value.toString(16)).slice(-8);
+         word += String.fromCharCode(parseInt(hex.substring(6, 8), 16));
+         word += String.fromCharCode(parseInt(hex.substring(4, 6), 16));
+         word += String.fromCharCode(parseInt(hex.substring(2, 4), 16));
+         word += String.fromCharCode(parseInt(hex.substring(0, 2), 16));
+         return word;
+      }
+
+      const pulsePerMillimeter = 100, inchToMillimeter = 25.4;
+      var unitMultiplier = 1, isRelativeMode = true;
+      var preTargetX, preTargetY, preFeedSpeedX, preFeedSpeedY, preFeedSpeed;
+      var targetX, targetY, feedSpeedX, feedSpeedY, AcDcTimeX, AcDcTimeY, feedSpeed;
+      var commandLtArray, commandNbArray, targetXArray, targetYArray, feedSpeedXArray, feedSpeedYArray, AcDcTimeXArray, AcDcTimeYArray;
+      function readGCodeLines() {
+         for (i = 1; i < gcodeLines.length; i++) {
+            var line = gcodeLines[i];
+            var parts = line.match(/[A-Za-z][+-]?([0-9]*[.])?[0-9]+/g);
+
+            for (j = 0; j < parts.length; j++) {
+               var part = parts[j];
+               var letter = part[0].toUpperCase();
+               var number = parseFloat(part.substring(1, part.length));
+
+               var isCommand = false;
+               switch (letter) {
+                  case 'G':
+                     switch (number) {
+                        case 0:  // rapid motion
+                           feedSpeed = maxFeedSpeedField.value;
+                           break;
+                        case 1:  // controlled motion
+                           feedSpeed = preFeedSpeed;
+                           break;
+                        case 20: // inches
+                           unitMultiplier = inchToMillimeter;
+                           break;
+                        case 21: // millimeters
+                           isUsingInch = 1;
+                           break;
+                        case 28: // homing
+                           targetX = targetY = 0;
+                           break;
+                        case 90: // absolute mode
+                           isRelativeMode = false;
+                           break;
+                        case 91: // relative mode
+                           isRelativeMode = true;
+                           break;
+                     }
+                     isCommand = true;
+                     break;
+                  case 'X':
+                     targetX = number * unitMultiplier + (isRelativeMode ? preTargetX : 0);
+                     break;
+                  case 'Y':
+                     targetY = number * unitMultiplier + (isRelativeMode ? preTargetY : 0);
+                     break;
+                  case 'M':   // 2: end program, 3: spindle on, 5: spindle off, 30: end program
+                     isCommand = true;
+                     break;
+                  case 'F':
+                     feedSpeed = number * unitMultiplier;
+                     preFeedSpeed = feedSpeed;
+                     break;
+               }
+
+               if (j == 0) {
+                  if (isCommand) {
+                     commandLtArray += letter.charCodeAt(0);
+                     commandNbArray += intToWord(number);
+                  } else {
+                     commandLtArray += '\x20'.repeat(2);
+                  }
+               }
+            }
+            //||||||||||||||||||||||||||||||||||||||\\
+            var deltaX = targetX - preTargetX;
+            var deltaY = targetY - preTargetY;
+            var deltaD = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            feedSpeedX = Math.abs(feedSpeed * deltaX / deltaD);
+            feedSpeedY = Math.abs(feedSpeed * deltaY / deltaD);
+
+            preTargetX = targetX;
+            preTargetY = targetY;
+            feedSpeed = preFeedSpeed;
+         }
+      }
+
       function formatLine(line, wordsPerLine) {
          line = line.trim().replace(/\s+/g, ' ');
          line = line.replace(/[^()](?=([^()]*\([^()]*\))*[^()]*$)/g, t => t.toUpperCase());
@@ -67,12 +178,17 @@
       var resultStr = '';
       function generate() {
          resultStr = '';
-         let gcodeLines = gcodeStr.match(/[^\r\n]+/g);
-         gcodeLines.unshift(`${'0'.repeat(5).concat(gcodeLines.length).slice(-5)} LINES FROM (${selectedFileName})`);
-         var wordsPerLine = document.getElementById('words-per-line').value;
+
+         var lineCount = '0'.repeat(6).concat(gcodeLines.length).slice(-6);
+         var lineZero = formatLine(`${lineCount}/${lineCount} LINES FROM (${selectedFileName})`, wordsPerLineField.value);
+         gcodeLines.unshift(lineZero);
+
          for (i = 0; i < gcodeLines.length; i++) {
-            resultStr += formatLine(gcodeLines[i], wordsPerLine);
+            resultStr += formatLine(gcodeLines[i], wordsPerLineField.value);
          }
+
+         readGCodeLines();
+
          let result = document.getElementById('result');
          result.innerHTML = resultStr;
       }
