@@ -33,6 +33,7 @@
    <p id="result">Result:</p>
 
    <script>
+      var fileBytes, file;
       let wordsPerLineField = document.getElementById('words-per-line');
       let maxFeedSpeedField = document.getElementById('max-feed-speed');
       let pulsePerMillimeterField = document.getElementById('pulse-per-millimeter');
@@ -196,39 +197,39 @@
          return line;
       }
 
-      var resultStr = '';
+      var reader = new FileReader();
       function generate() {
-         resultStr = '';
+         fileBytes = new Array();
 
          var lineCount = '0'.repeat(6).concat(gcodeLines.length).slice(-6);
          var lineZero = formatLine(`${lineCount}/${lineCount} LINES FROM (${selectedFileName})`, wordsPerLineField.value);
          gcodeLines.unshift(lineZero);
 
          for (i = 0; i < gcodeLines.length; i++) {
-            resultStr += formatLine(gcodeLines[i], wordsPerLineField.value);
+            var formattedLine = formatLine(gcodeLines[i], wordsPerLineField.value);
+            for (j = 0; j < formattedLine.length; j++) {
+               fileBytes.push(formattedLine.charCodeAt(j));
+            }
          }
 
-         resultStr += readGCodeLines();
+         var fileBytesUint8 = new Uint8Array(fileBytes);
+         file = new File([fileBytesUint8], "hexfile.bin", {type: "application/octet-stream"});
 
-         let result = document.getElementById('result');
-         result.innerHTML = resultStr;
+         reader.onload = function () {
+            document.getElementById('result').innerHTML = reader.result;
+         }
+
+         reader.readAsText(file);
       }
 
       function download() {
          var filename = document.getElementById('extended-memory-selector').value + '.emi';
-         var text = resultStr;
-
-         var pom = document.createElement('a');
-         pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-         pom.setAttribute('download', filename);
-
-         if (document.createEvent) {
-            var event = document.createEvent('MouseEvents');
-            event.initEvent('click', true, true);
-            pom.dispatchEvent(event);
-         } else {
-            pom.click();
-         }
+         var elem = window.document.createElement('a');
+         elem.href = window.URL.createObjectURL(file);
+         elem.download = filename;
+         document.body.appendChild(elem);
+         elem.click();
+         document.body.removeChild(elem);
       }
    </script>
 
