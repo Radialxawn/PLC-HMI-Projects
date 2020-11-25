@@ -70,34 +70,42 @@
       fillExtendedMemoryList();
 
       function intToWord(value) {
-         var hex = '';
-         var word = '';
-         value += value < 0 ? 0xFFFF + 1 : 0;
-         hex = ('0000' + value.toString(16)).slice(-4);
-         word += String.fromCharCode(parseInt(hex.substring(2, 4), 16));
-         word += String.fromCharCode(parseInt(hex.substring(0, 2), 16));
-         return word;
+         var chars = new Array();
+         value += value < 0 ? 0xFFFFFFFF + 1 : 0;
+         var hex = ('0000' + value.toString(16)).slice(-4);
+         for (i = 2; i >= 0; i -= 2) {
+            chars.push(parseInt(hex.substring(i, i + 2), 16));
+         }
+         return chars;
       }
 
       function intToDWord(value) {
-         var hex = '';
-         var word = '';
+         var chars = new Array();
          value += value < 0 ? 0xFFFFFFFF + 1 : 0;
-         hex = ('00000000' + value.toString(16)).slice(-8);
-         word += String.fromCharCode(parseInt(hex.substring(6, 8), 16));
-         word += String.fromCharCode(parseInt(hex.substring(4, 6), 16));
-         word += String.fromCharCode(parseInt(hex.substring(2, 4), 16));
-         word += String.fromCharCode(parseInt(hex.substring(0, 2), 16));
-         return word;
+         var hex = ('00000000' + value.toString(16)).slice(-8);
+         for (i = 6; i >= 0; i -= 2) {
+            chars.push(parseInt(hex.substring(i, i + 2), 16));
+         }
+         return chars;
       }
 
       const inchToMillimeter = 25.4;
-      var unitMultiplier = 1, isRelativeMode = true;
-      var preTargetX = 0, preTargetY = 0, preFeedSpeedX = 0, preFeedSpeedY = 0, preFeedSpeed = 0;
-      var targetX = 0, targetY = 0, feedSpeedX = 0, feedSpeedY = 0, feedSpeed = 0, AcDcTime = 0;
-      var commandLtArray = '', commandNbArray = '', targetXArray = '', targetYArray = '', feedSpeedXArray = '', feedSpeedYArray = '', AcDcTimeArray = '';
+      var commandLtArray, commandNbArray, targetXArray, targetYArray, feedSpeedXArray, feedSpeedYArray, AcDcTimeArray;
       function readGCodeLines() {
          var test = '';
+         var unitMultiplier = 1, isRelativeMode = true;
+         var preTargetX = 0, preTargetY = 0, preFeedSpeedX = 0, preFeedSpeedY = 0, preFeedSpeed = 0;
+         var targetX = 0, targetY = 0, feedSpeedX = 0, feedSpeedY = 0, feedSpeed = 0, AcDcTime = 0;
+         var isFirstMove = false, isFirstMoveLatch = false;
+
+         commandLtArray = new Array();
+         commandNbArray = new Array();
+         targetXArray = new Array();
+         targetYArray = new Array();
+         feedSpeedXArray = new Array();
+         feedSpeedYArray = new Array();
+         AcDcTimeArray = new Array();
+
          for (i = 1; i < gcodeLines.length; i++) {
             var line = gcodeLines[i];
             var parts = line.match(/[A-Za-z][+-]?([0-9]*[.])?[0-9]+/g);
@@ -113,9 +121,11 @@
                      switch (number) {
                         case 0:  // rapid motion
                            feedSpeed = maxFeedSpeedField.value;
+                           if (!isFirstMove) { isFirstMoveLatch = true; isFirstMove = true; }
                            break;
                         case 1:  // controlled motion
                            feedSpeed = preFeedSpeed;
+                           if (!isFirstMove) { isFirstMoveLatch = true; isFirstMove = true; }
                            break;
                         case 20: // inch
                            unitMultiplier = inchToMillimeter;
@@ -152,10 +162,11 @@
 
                if (j == 0) {
                   if (isCommand) {
-                     commandLtArray += letter.charCodeAt(0);
-                     commandNbArray += intToWord(number);
+                     commandLtArray.push.apply(commandLtArray, intToWord(letter.charCodeAt(0)));
+                     commandNbArray.push.apply(commandNbArray, intToWord(number));
                   } else {
-                     commandLtArray += '\x20'.repeat(2);
+                     commandLtArray.push(0, 0);
+                     commandNbArray.push(0, 0);
                   }
                }
             }
@@ -167,6 +178,10 @@
 
             feedSpeedX = Math.abs(feedSpeed * deltaX / deltaD);
             feedSpeedY = Math.abs(feedSpeed * deltaY / deltaD);
+            if (isFirstMoveLatch && feedSpeed == 0) {
+               feedSpeedX = feedSpeedY = maxFeedSpeedField.value;
+               isFirstMoveLatch = false;
+            }
 
             var biggerFeedSpeed = Math.max(feedSpeedX, feedSpeedY);
             AcDcTime = biggerFeedSpeed * 0.1;
@@ -177,7 +192,13 @@
             var FSY = Math.round(feedSpeedY * pulsePerMillimeterField.value);
             var ADT = Math.round(AcDcTime);
 
-            test += `TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}, ADT=${ADT}---------------------------`;
+            targetXArray.push.apply(targetXArray, intToDWord(TX));
+            targetYArray.push.apply(targetYArray, intToDWord(TX));
+            feedSpeedXArray.push.apply(feedSpeedXArray, intToDWord(TX));
+            feedSpeedYArray.push.apply(feedSpeedYArray, intToDWord(TX));
+            AcDcTimeArray.push.apply(AcDcTimeArray, intToDWord(TX));
+
+            test += `►TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}, ADT=${ADT}◄`;
 
             preTargetX = targetX;
             preTargetY = targetY;
@@ -212,8 +233,10 @@
             }
          }
 
+         readGCodeLines();
+
          var fileBytesUint8 = new Uint8Array(fileBytes);
-         file = new File([fileBytesUint8], "hexfile.bin", {type: "application/octet-stream"});
+         file = new File([fileBytesUint8], "hexfile.bin", { type: "application/octet-stream" });
 
          reader.onload = function () {
             document.getElementById('result').innerHTML = reader.result;
