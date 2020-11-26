@@ -73,9 +73,8 @@
          var chars = new Array();
          value += value < 0 ? 0xFFFFFFFF + 1 : 0;
          var hex = ('0000' + value.toString(16)).slice(-4);
-         for (i = 2; i >= 0; i -= 2) {
-            chars.push(parseInt(hex.substring(i, i + 2), 16));
-         }
+         chars.push(parseInt(hex.substring(2, 4), 16));
+         chars.push(parseInt(hex.substring(0, 2), 16));
          return chars;
       }
 
@@ -83,16 +82,17 @@
          var chars = new Array();
          value += value < 0 ? 0xFFFFFFFF + 1 : 0;
          var hex = ('00000000' + value.toString(16)).slice(-8);
-         for (i = 6; i >= 0; i -= 2) {
-            chars.push(parseInt(hex.substring(i, i + 2), 16));
-         }
+         chars.push(parseInt(hex.substring(6, 8), 16));
+         chars.push(parseInt(hex.substring(4, 6), 16));
+         chars.push(parseInt(hex.substring(2, 4), 16));
+         chars.push(parseInt(hex.substring(0, 2), 16));
          return chars;
       }
 
       const inchToMillimeter = 25.4;
       var commandLtArray, commandNbArray, targetXArray, targetYArray, feedSpeedXArray, feedSpeedYArray, AcDcTimeArray;
       function readGCodeLines() {
-         var test = '';
+         var testResult = '';
          var unitMultiplier = 1, isRelativeMode = false;
          var preTargetX = 0, preTargetY = 0, preFeedSpeedX = 0, preFeedSpeedY = 0, baseFeedSpeed = 0;
          var targetX = 0, targetY = 0, feedSpeedX = 0, feedSpeedY = 0, feedSpeed = 0, AcDcTime = 0;
@@ -156,15 +156,15 @@
                      break;
                }
 
-               /*if (j == 0) {
+               if (j == 0) {
                   if (isCommand) {
-                     commandLtArray.push.apply(commandLtArray, intToWord(letter.charCodeAt(0)));
-                     commandNbArray.push.apply(commandNbArray, intToWord(number));
+                     commandLtArray = commandLtArray.concat(intToWord(letter.charCodeAt(0)));
+                     commandNbArray = commandNbArray.concat(intToWord(number));  // need to round the number ?
                   } else {
                      commandLtArray.push(0, 0);
                      commandNbArray.push(0, 0);
                   }
-               }*/
+               }
             }
             //||||||||||||||||||||||||||||||||||||||\\
             var deltaX = targetX - preTargetX;
@@ -188,20 +188,28 @@
             var FSY = Math.round(feedSpeedY * pulsePerMillimeterField.value);
             var ADT = Math.round(AcDcTime);
 
-            /*targetXArray.push.apply(targetXArray, intToDWord(TX));
-            targetYArray.push.apply(targetYArray, intToDWord(TX));
-            feedSpeedXArray.push.apply(feedSpeedXArray, intToDWord(FSX));
-            feedSpeedYArray.push.apply(feedSpeedYArray, intToDWord(FSY));
-            AcDcTimeArray.push.apply(AcDcTimeArray, intToWord(ADT));*/
+            targetXArray = targetXArray.concat(intToDWord(TX));
+            targetYArray = targetYArray.concat(intToDWord(TY));
+            feedSpeedXArray = feedSpeedXArray.concat(intToDWord(FSX));
+            feedSpeedYArray = feedSpeedYArray.concat(intToDWord(FSY));
+            AcDcTimeArray = AcDcTimeArray.concat(intToWord(ADT));
 
-            test += `◄[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}, ADT=${ADT}`;
+            testResult += `<br>${('000000' + i).slice(-6)}►[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}, ADT=${ADT}`;
 
             preTargetX = targetX;
             preTargetY = targetY;
             feedSpeed = baseFeedSpeed;
          }
 
-         return test;
+         fileBytes = fileBytes.concat(commandLtArray);
+         fileBytes = fileBytes.concat(commandNbArray);
+         fileBytes = fileBytes.concat(targetXArray);
+         fileBytes = fileBytes.concat(targetYArray);
+         fileBytes = fileBytes.concat(feedSpeedXArray);
+         fileBytes = fileBytes.concat(feedSpeedYArray);
+         fileBytes = fileBytes.concat(AcDcTimeArray);
+
+         return testResult;
       }
 
       function formatLine(line, wordsPerLine) {
@@ -215,7 +223,7 @@
          return line;
       }
 
-      var testStr;
+      var testString;
       var reader = new FileReader();
       function generate() {
          fileBytes = new Array();
@@ -227,17 +235,17 @@
          for (i = 0; i < gcodeLines.length; i++) {
             var formattedLine = formatLine(gcodeLines[i], wordsPerLineField.value);
             for (j = 0; j < formattedLine.length; j++) {
-               fileBytes.push(formattedLine.charCodeAt(j));
+               fileBytes.push(Math.min(formattedLine.charCodeAt(j), 255));
             }
          }
 
-         testStr = readGCodeLines();
+         testString = readGCodeLines();
 
          var fileBytesUint8 = new Uint8Array(fileBytes);
          file = new File([fileBytesUint8], "hexfile.bin", { type: "application/octet-stream" });
 
          reader.onload = function () {
-            document.getElementById('result').innerHTML = reader.result + testStr;
+            document.getElementById('result').innerHTML = reader.result + testString;
          }
 
          reader.readAsText(file);
