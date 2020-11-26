@@ -93,10 +93,9 @@
       var commandLtArray, commandNbArray, targetXArray, targetYArray, feedSpeedXArray, feedSpeedYArray, AcDcTimeArray;
       function readGCodeLines() {
          var test = '';
-         var unitMultiplier = 1, isRelativeMode = true;
-         var preTargetX = 0, preTargetY = 0, preFeedSpeedX = 0, preFeedSpeedY = 0, preFeedSpeed = 0;
+         var unitMultiplier = 1, isRelativeMode = false;
+         var preTargetX = 0, preTargetY = 0, preFeedSpeedX = 0, preFeedSpeedY = 0, baseFeedSpeed = 0;
          var targetX = 0, targetY = 0, feedSpeedX = 0, feedSpeedY = 0, feedSpeed = 0, AcDcTime = 0;
-         var isFirstMove = false, isFirstMoveLatch = false;
 
          commandLtArray = new Array();
          commandNbArray = new Array();
@@ -121,11 +120,9 @@
                      switch (number) {
                         case 0:  // rapid motion
                            feedSpeed = maxFeedSpeedField.value;
-                           if (!isFirstMove) { isFirstMoveLatch = true; isFirstMove = true; }
                            break;
                         case 1:  // controlled motion
-                           feedSpeed = preFeedSpeed;
-                           if (!isFirstMove) { isFirstMoveLatch = true; isFirstMove = true; }
+                           feedSpeed = baseFeedSpeed;
                            break;
                         case 20: // inch
                            unitMultiplier = inchToMillimeter;
@@ -155,12 +152,11 @@
                      isCommand = true;
                      break;
                   case 'F':
-                     feedSpeed = number * unitMultiplier;
-                     preFeedSpeed = feedSpeed;
+                     baseFeedSpeed = feedSpeed = number * unitMultiplier;
                      break;
                }
 
-               if (j == 0) {
+               /*if (j == 0) {
                   if (isCommand) {
                      commandLtArray.push.apply(commandLtArray, intToWord(letter.charCodeAt(0)));
                      commandNbArray.push.apply(commandNbArray, intToWord(number));
@@ -168,7 +164,7 @@
                      commandLtArray.push(0, 0);
                      commandNbArray.push(0, 0);
                   }
-               }
+               }*/
             }
             //||||||||||||||||||||||||||||||||||||||\\
             var deltaX = targetX - preTargetX;
@@ -178,32 +174,33 @@
 
             feedSpeedX = Math.abs(feedSpeed * deltaX / deltaD);
             feedSpeedY = Math.abs(feedSpeed * deltaY / deltaD);
-            if (isFirstMoveLatch && feedSpeed == 0) {
-               feedSpeedX = feedSpeedY = maxFeedSpeedField.value;
-               isFirstMoveLatch = false;
+            if (deltaX == 0 && deltaY == 0) {
+               feedSpeedX = feedSpeedY = feedSpeed;
             }
 
             var biggerFeedSpeed = Math.max(feedSpeedX, feedSpeedY);
             AcDcTime = biggerFeedSpeed * 0.1;
             //||||||||||||||||||||||||||||||||||||||\\
+
             var TX = Math.round(targetX * pulsePerMillimeterField.value);
             var TY = Math.round(targetY * pulsePerMillimeterField.value);
             var FSX = Math.round(feedSpeedX * pulsePerMillimeterField.value);
             var FSY = Math.round(feedSpeedY * pulsePerMillimeterField.value);
             var ADT = Math.round(AcDcTime);
 
-            targetXArray.push.apply(targetXArray, intToDWord(TX));
+            /*targetXArray.push.apply(targetXArray, intToDWord(TX));
             targetYArray.push.apply(targetYArray, intToDWord(TX));
-            feedSpeedXArray.push.apply(feedSpeedXArray, intToDWord(TX));
-            feedSpeedYArray.push.apply(feedSpeedYArray, intToDWord(TX));
-            AcDcTimeArray.push.apply(AcDcTimeArray, intToDWord(TX));
+            feedSpeedXArray.push.apply(feedSpeedXArray, intToDWord(FSX));
+            feedSpeedYArray.push.apply(feedSpeedYArray, intToDWord(FSY));
+            AcDcTimeArray.push.apply(AcDcTimeArray, intToWord(ADT));*/
 
-            test += `►TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}, ADT=${ADT}◄`;
+            test += `◄[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}, ADT=${ADT}`;
 
             preTargetX = targetX;
             preTargetY = targetY;
-            feedSpeed = preFeedSpeed;
+            feedSpeed = baseFeedSpeed;
          }
+
          return test;
       }
 
@@ -218,6 +215,7 @@
          return line;
       }
 
+      var testStr;
       var reader = new FileReader();
       function generate() {
          fileBytes = new Array();
@@ -233,13 +231,13 @@
             }
          }
 
-         readGCodeLines();
+         testStr = readGCodeLines();
 
          var fileBytesUint8 = new Uint8Array(fileBytes);
          file = new File([fileBytesUint8], "hexfile.bin", { type: "application/octet-stream" });
 
          reader.onload = function () {
-            document.getElementById('result').innerHTML = reader.result;
+            document.getElementById('result').innerHTML = reader.result + testStr;
          }
 
          reader.readAsText(file);
