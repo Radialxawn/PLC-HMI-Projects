@@ -13,37 +13,35 @@
 
    <form action="/action_page.php">
       <label for="words-per-line">Select number of word per line:</label>
-      <input type="number" id="words-per-line" name="quantity" min="32" max="256" value="80">
+      <input type="number" id="words-per-line" name="quantity" min="32" max="256" value="80" disabled>
    </form>
 
    <form action="/action_page.php">
       <label for="pulse-per-millimeter">Select pulse per millimeter:</label>
-      <input type="number" id="pulse-per-millimeter" name="quantity" min="100" max="500" value="100">
+      <input type="number" id="pulse-per-millimeter" name="quantity" min="100" max="500" value="100" disabled>
    </form>
 
    <form action="/action_page.php">
       <label for="max-feed-speed">Select max feed speed:</label>
-      <input type="number" id="max-feed-speed" name="quantity" min="100" max="2000" value="1000">
+      <input type="number" id="max-feed-speed" name="quantity" min="100" max="2000" value="500">
       <label type="text">mm/s</label>
    </form>
 
    <form action="/action_page.php">
-      <label for="accel-decel-ratio">Select accel/decel ratio:</label>
-      <input type="number" id="accel-decel-ratio" name="quantity" min="0" max="0.1" value="0", step="0.01">
-      <label type="text">mm/s</label>
+      <textarea id="gcode-generated" rows="16" style="width: 49.4%;resize: none;" placeholder="Generated"></textarea>
+      <textarea id="gcode-formatted" rows="16" style="width: 49.4%;resize: none;" onclick="this.select()"
+         placeholder="Formatted"></textarea>
+      <br><textarea id="gcode-debugger" rows="16" style="width: 99.55%;resize: none;" placeholder="Debugger"></textarea>
    </form>
 
    <button onclick="generate()">Generate</button>
    <button onclick="download()">Download</button>
-
-   <p id="result">Result:</p>
 
    <script>
       var fileBytes, file;
       let wordsPerLineField = document.getElementById('words-per-line');
       let maxFeedSpeedField = document.getElementById('max-feed-speed');
       let pulsePerMillimeterField = document.getElementById('pulse-per-millimeter');
-      let accelDecelRatioField = document.getElementById('accel-decel-ratio');
 
       function selectFile() {
          document.getElementById('file-selector').click();
@@ -56,7 +54,9 @@
             const file = event.target.files[0];
             const reader = new FileReader();
             reader.addEventListener('load', event => {
-               gcodeLines = event.target.result.match(/[^\r\n]+/g);
+               gcodeLines = event.target.result
+                  .replace(/\([^)]*\)*/g, '')   // Delete all comments.
+                  .match(/[^\r\n]+/g);
                selectedFileName = file.name;
                document.getElementById('selected-file-name').textContent = selectedFileName;
             });
@@ -97,12 +97,12 @@
       }
 
       const inchToMillimeter = 25.4;
-      var commandLtArray, commandNbArray, targetXArray, targetYArray, feedSpeedXArray, feedSpeedYArray, AcDcTimeArray;
+      var commandLtArray, commandNbArray, targetXArray, targetYArray, feedSpeedXArray, feedSpeedYArray;
       function readGCodeLines() {
-         var testResult = '';
+         var gcodeFormatted = '', gcodeDebugger = '';
          var unitMultiplier = 1, isRelativeMode = false;
          var preTargetX = 0, preTargetY = 0, preFeedSpeedX = 0, preFeedSpeedY = 0, baseFeedSpeed = 0;
-         var targetX = 0, targetY = 0, feedSpeedX = 0, feedSpeedY = 0, feedSpeed = 0, AcDcTime = 0;
+         var targetX = 0, targetY = 0, feedSpeedX = 0, feedSpeedY = 0, feedSpeed = 0;
 
          commandLtArray = new Array();
          commandNbArray = new Array();
@@ -186,22 +186,20 @@
             }
 
             var biggerFeedSpeed = Math.max(feedSpeedX, feedSpeedY);
-            AcDcTime = biggerFeedSpeed * accelDecelRatioField.value;
             //||||||||||||||||||||||||||||||||||||||\\
 
             var TX = Math.round(targetX * pulsePerMillimeterField.value);
             var TY = Math.round(targetY * pulsePerMillimeterField.value);
             var FSX = Math.round(feedSpeedX * pulsePerMillimeterField.value);
             var FSY = Math.round(feedSpeedY * pulsePerMillimeterField.value);
-            var ADT = Math.round(AcDcTime);
 
             targetXArray = targetXArray.concat(intToDWord(TX));
             targetYArray = targetYArray.concat(intToDWord(TY));
             feedSpeedXArray = feedSpeedXArray.concat(intToDWord(FSX));
             feedSpeedYArray = feedSpeedYArray.concat(intToDWord(FSY));
-            AcDcTimeArray = AcDcTimeArray.concat(intToWord(ADT));
 
-            testResult += `<br>${('000000' + i).slice(-6)}►[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}, ADT=${ADT}`;
+            gcodeFormatted += String.fromCharCode(13, 10) + gcodeLines[i];
+            gcodeDebugger += `${String.fromCharCode(13, 10)}${('000000' + i).slice(-6)}►[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}`;
 
             preTargetX = targetX;
             preTargetY = targetY;
@@ -214,14 +212,15 @@
          fileBytes = fileBytes.concat(targetYArray);
          fileBytes = fileBytes.concat(feedSpeedXArray);
          fileBytes = fileBytes.concat(feedSpeedYArray);
-         fileBytes = fileBytes.concat(AcDcTimeArray);
 
-         return testResult;
+         document.getElementById('gcode-formatted').value = gcodeFormatted;
+         document.getElementById('gcode-debugger').value = gcodeDebugger;
       }
 
       function formatLine(line, wordsPerLine) {
-         line = line.trim().replace(/\s+/g, ' ');
-         line = line.replace(/[^()](?=([^()]*\([^()]*\))*[^()]*$)/g, t => t.toUpperCase());
+         line = line.trim().replace(/\s+/g, ' ');  // 'G    0 X   0' to 'G 0 X 0'
+         line = line.replace(/[A-Za-z][ ]*?[+-]?([0-9]*[.])?[0-9]+/g, function (r) { return r.replace(/\s/g, ''); });   // 'G 0 X 0' to 'G0 X0'
+         //line = line.replace(/[^()](?=([^()]*\([^()]*\))*[^()]*$)/g, t => t.toUpperCase());   // 'abc (Wtf)' to 'ABC (Wtf)'
          if (line.length > wordsPerLine) {
             line = line.substring(0, wordsPerLine);
          } else {
@@ -230,10 +229,13 @@
          return line;
       }
 
-      var testString;
       var reader = new FileReader();
       function generate() {
          fileBytes = new Array();
+
+         gcodeLines = gcodeLines.filter(function (line) {
+            return line.indexOf(';') != 0;
+         });
 
          var lineCount = '0'.repeat(6).concat(gcodeLines.length).slice(-6);
          var lineZero = formatLine(`${lineCount}/${lineCount} LINES FROM (${selectedFileName})`, wordsPerLineField.value);
@@ -241,18 +243,19 @@
 
          for (i = 0; i < gcodeLines.length; i++) {
             var formattedLine = formatLine(gcodeLines[i], wordsPerLineField.value);
+            gcodeLines[i] = formattedLine;
             for (j = 0; j < formattedLine.length; j++) {
                fileBytes.push(Math.min(formattedLine.charCodeAt(j), 255));
             }
          }
 
-         testString = readGCodeLines();
+         readGCodeLines();
 
          var fileBytesUint8 = new Uint8Array(fileBytes);
          file = new File([fileBytesUint8], "hexfile.bin", { type: "application/octet-stream" });
 
          reader.onload = function () {
-            document.getElementById('result').innerHTML = reader.result + testString;
+            document.getElementById('gcode-generated').innerHTML = reader.result;
          }
 
          reader.readAsText(file);
