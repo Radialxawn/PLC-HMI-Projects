@@ -96,8 +96,8 @@
          return chars;
       }
 
-      const inchToMillimeter = 25.4;
-      var commandArray, targetXArray, targetYArray, feedSpeedXArray, feedSpeedYArray;
+      const inchToMillimeter = 25.4, feedSpeedFactor = 5;
+      var commandArray, targetXArray, targetYArray, feedSpeedArray;
       function readGCodeLines() {
          var gcodeFormatted = '', gcodeDebugger = '';
          var unitMultiplier = 1, isRelativeMode = false;
@@ -107,8 +107,7 @@
          commandArray = new Array();
          targetXArray = new Array();
          targetYArray = new Array();
-         feedSpeedXArray = new Array();
-         feedSpeedYArray = new Array();
+         feedSpeedArray = new Array();
 
          for (i = 1; i < gcodeLines.length; i++) {
             var line = gcodeLines[i];
@@ -163,7 +162,8 @@
 
                if (j == 0) {
                   if (isCommand) {
-                     commandArray = commandArray.concat(intToWord(letter.charCodeAt(0) * 256 + number)); // need to round the number ?
+                     var commandCombined = letter.charCodeAt(0) * 256 + number;
+                     commandArray = commandArray.concat(intToWord(commandCombined)); // need to round the number ?
                   } else {
                      commandArray.push(0, 0);
                   }
@@ -184,16 +184,16 @@
 
             var TX = Math.round(targetX * pulsePerMillimeterField.value);
             var TY = Math.round(targetY * pulsePerMillimeterField.value);
-            var FSX = Math.ceil(feedSpeedX * pulsePerMillimeterField.value / 5);
-            var FSY = Math.ceil(feedSpeedY * pulsePerMillimeterField.value / 5);
+            var FSX = Math.ceil(feedSpeedX * pulsePerMillimeterField.value / feedSpeedFactor);
+            var FSY = Math.ceil(feedSpeedY * pulsePerMillimeterField.value / feedSpeedFactor);
 
             targetXArray = targetXArray.concat(intToDWord(TX));
             targetYArray = targetYArray.concat(intToDWord(TY));
-            feedSpeedXArray = feedSpeedXArray.concat(intToWord(FSX));
-            feedSpeedYArray = feedSpeedYArray.concat(intToWord(FSY));
+            var feedSpeedCombined = FSX * 32768 + FSY;
+            feedSpeedArray = feedSpeedArray.concat(intToDWord(feedSpeedCombined));
 
             gcodeFormatted += String.fromCharCode(13, 10) + gcodeLines[i];
-            gcodeDebugger += `${String.fromCharCode(13, 10)}${('000000' + i).slice(-6)}►[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}`;
+            gcodeDebugger += `${String.fromCharCode(13, 10)}${('000000' + i).slice(-6)}►[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX * feedSpeedFactor}, FSY=${FSY * feedSpeedFactor}`;
 
             preTargetX = targetX;
             preTargetY = targetY;
@@ -203,8 +203,7 @@
          fileBytes = fileBytes.concat(commandArray);
          fileBytes = fileBytes.concat(targetXArray);
          fileBytes = fileBytes.concat(targetYArray);
-         fileBytes = fileBytes.concat(feedSpeedXArray);
-         fileBytes = fileBytes.concat(feedSpeedYArray);
+         fileBytes = fileBytes.concat(feedSpeedArray);
 
          document.getElementById('gcode-formatted').value = gcodeFormatted;
          document.getElementById('gcode-debugger').value = gcodeDebugger;
