@@ -193,7 +193,7 @@
             feedSpeedArray = feedSpeedArray.concat(intToDWord(feedSpeedCombined));
 
             gcodeFormatted += String.fromCharCode(13, 10) + gcodeLines[i];
-            gcodeDebugger += `${String.fromCharCode(13, 10)}${('000000' + i).slice(-6)}►[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX * feedSpeedFactor}, FSY=${FSY * feedSpeedFactor}`;
+            gcodeDebugger += `${String.fromCharCode(13, 10)}${('000000' + i).slice(-6)}►[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX * feedSpeedFactor}, FSY=${FSY * feedSpeedFactor}, FSC=${feedSpeedCombined}`;
 
             preTargetX = targetX;
             preTargetY = targetY;
