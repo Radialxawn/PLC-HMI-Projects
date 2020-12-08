@@ -97,20 +97,18 @@
       }
 
       const inchToMillimeter = 25.4;
-      var commandLtArray, commandNbArray, targetXArray, targetYArray, feedSpeedXArray, feedSpeedYArray;
+      var commandArray, targetXArray, targetYArray, feedSpeedXArray, feedSpeedYArray;
       function readGCodeLines() {
          var gcodeFormatted = '', gcodeDebugger = '';
          var unitMultiplier = 1, isRelativeMode = false;
          var preTargetX = 0, preTargetY = 0, preFeedSpeedX = 0, preFeedSpeedY = 0, baseFeedSpeed = 0;
          var targetX = 0, targetY = 0, feedSpeedX = 0, feedSpeedY = 0, feedSpeed = 0;
 
-         commandLtArray = new Array();
-         commandNbArray = new Array();
+         commandArray = new Array();
          targetXArray = new Array();
          targetYArray = new Array();
          feedSpeedXArray = new Array();
          feedSpeedYArray = new Array();
-         AcDcTimeArray = new Array();
 
          for (i = 1; i < gcodeLines.length; i++) {
             var line = gcodeLines[i];
@@ -165,11 +163,9 @@
 
                if (j == 0) {
                   if (isCommand) {
-                     commandLtArray = commandLtArray.concat(intToWord(letter.charCodeAt(0)));
-                     commandNbArray = commandNbArray.concat(intToWord(number));  // need to round the number ?
+                     commandArray = commandArray.concat(intToWord(letter.charCodeAt(0) * 256 + number)); // need to round the number ?
                   } else {
-                     commandLtArray.push(0, 0);
-                     commandNbArray.push(0, 0);
+                     commandArray.push(0, 0);
                   }
                }
             }
@@ -206,8 +202,7 @@
             feedSpeed = baseFeedSpeed;
          }
 
-         fileBytes = fileBytes.concat(commandLtArray);
-         fileBytes = fileBytes.concat(commandNbArray);
+         fileBytes = fileBytes.concat(commandArray);
          fileBytes = fileBytes.concat(targetXArray);
          fileBytes = fileBytes.concat(targetYArray);
          fileBytes = fileBytes.concat(feedSpeedXArray);
