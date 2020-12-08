@@ -177,22 +177,20 @@
 
             feedSpeedX = Math.abs(feedSpeed * deltaX / deltaD);
             feedSpeedY = Math.abs(feedSpeed * deltaY / deltaD);
-            if (deltaX == 0 && deltaY == 0) {
-               feedSpeedX = feedSpeedY = feedSpeed;
-            }
+            if (deltaX == 0 && deltaY == 0) { feedSpeedX = feedSpeedY = feedSpeed; }
 
             var biggerFeedSpeed = Math.max(feedSpeedX, feedSpeedY);
             //||||||||||||||||||||||||||||||||||||||\\
 
             var TX = Math.round(targetX * pulsePerMillimeterField.value);
             var TY = Math.round(targetY * pulsePerMillimeterField.value);
-            var FSX = Math.round(feedSpeedX * pulsePerMillimeterField.value);
-            var FSY = Math.round(feedSpeedY * pulsePerMillimeterField.value);
+            var FSX = Math.ceil(feedSpeedX * pulsePerMillimeterField.value / 5);
+            var FSY = Math.ceil(feedSpeedY * pulsePerMillimeterField.value / 5);
 
             targetXArray = targetXArray.concat(intToDWord(TX));
             targetYArray = targetYArray.concat(intToDWord(TY));
-            feedSpeedXArray = feedSpeedXArray.concat(intToDWord(FSX));
-            feedSpeedYArray = feedSpeedYArray.concat(intToDWord(FSY));
+            feedSpeedXArray = feedSpeedXArray.concat(intToWord(FSX));
+            feedSpeedYArray = feedSpeedYArray.concat(intToWord(FSY));
 
             gcodeFormatted += String.fromCharCode(13, 10) + gcodeLines[i];
             gcodeDebugger += `${String.fromCharCode(13, 10)}${('000000' + i).slice(-6)}►[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX}, FSY=${FSY}`;
