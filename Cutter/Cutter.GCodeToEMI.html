@@ -112,6 +112,7 @@
          for (i = 1; i < gcodeLines.length; i++) {
             var line = gcodeLines[i];
             var parts = line.match(/[A-Za-z][+-]?([0-9]*[.])?[0-9]+/g);
+            var commandCombined = 0;
 
             for (j = 0; j < parts.length; j++) {
                var part = parts[j];
@@ -162,10 +163,7 @@
 
                if (j == 0) {
                   if (isCommand) {
-                     var commandCombined = letter.charCodeAt(0) * 256 + number;
-                     commandArray = commandArray.concat(intToWord(commandCombined)); // need to round the number ?
-                  } else {
-                     commandArray.push(0, 0);
+                     var commandCombined = letter.charCodeAt(0) * 256 + number;  // need to round the number ?
                   }
                }
             }
@@ -187,13 +185,14 @@
             var FSX = Math.ceil(feedSpeedX * pulsePerMillimeterField.value / feedSpeedFactor);
             var FSY = Math.ceil(feedSpeedY * pulsePerMillimeterField.value / feedSpeedFactor);
 
+            commandArray = commandArray.concat(intToWord(commandCombined));
             targetXArray = targetXArray.concat(intToDWord(TX));
             targetYArray = targetYArray.concat(intToDWord(TY));
             var feedSpeedCombined = FSX * 32768 + FSY;
             feedSpeedArray = feedSpeedArray.concat(intToDWord(feedSpeedCombined));
 
             gcodeFormatted += String.fromCharCode(13, 10) + gcodeLines[i];
-            gcodeDebugger += `${String.fromCharCode(13, 10)}${('000000' + i).slice(-6)}►[${line}]►TX=${TX}, TY=${TY}, FSX=${FSX * feedSpeedFactor}, FSY=${FSY * feedSpeedFactor}, FSC=${feedSpeedCombined}`;
+            gcodeDebugger += `${String.fromCharCode(13, 10)}${('000000' + i).slice(-6)}►[${line}]►CM=${commandCombined}, TX=${TX}, TY=${TY}, FS=${feedSpeedCombined}=[X=${FSX}, Y=${FSY}]F=${feedSpeedFactor}`;
 
             preTargetX = targetX;
             preTargetY = targetY;
