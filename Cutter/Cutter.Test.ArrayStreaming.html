@@ -1,123 +1,125 @@
 <!DOCTYPE html>
 <html>
 <style>
-p.a {
-  font-family: Consolas, Times, serif;
-}
+  p.a {
+    font-family: Consolas, Times, serif;
+  }
 </style>
+
 <body>
 
-<form action="/action_page.php">
-  <label for="pLineIndexField">P Line Index</label>
-  <input type="number" id="pLineIndexField" min="0" value="0" onChange="get()">
-</form>
+  <form action="/action_page.php">
+    <label for="pLineIndexField">P Line Index</label>
+    <input type="number" id="pLineIndexField" min="0" value="0" onChange="get()">
+  </form>
 
-<form action="/action_page.php">
-  <label for="pLineIndexLimitField">P Line Index Limit</label>
-  <input id="pLineIndexLimitField"  min="0" value="0">
-</form>
+  <form action="/action_page.php">
+    <label for="pLineIndexLimitField">P Line Index Limit</label>
+    <input id="pLineIndexLimitField" min="0" value="0">
+  </form>
 
-<form action="/action_page.php">
-  <label for="pLineIndexMaxField">P Line Index Max</label>
-  <input id="pLineIndexMaxField" min="0" value="0" disabled>
-</form>
+  <form action="/action_page.php">
+    <label for="pLineIndexMaxField">P Line Index Max</label>
+    <input id="pLineIndexMaxField" min="0" value="0" disabled>
+  </form>
 
-<form action="/action_page.php">
-  <label for="pArrayIndexField">P Array Index</label>
-  <input id="pArrayIndexField" min="0" value="0" disabled>
-</form>
+  <form action="/action_page.php">
+    <label for="pArrayIndexField">P Array Index</label>
+    <input id="pArrayIndexField" min="0" value="0" disabled>
+  </form>
 
-<form action="/action_page.php">
-  <label for="pArrayValueField">P Array Value</label>
-  <input id="pArrayValueField" min="0" value="0" disabled>
-</form>
+  <form action="/action_page.php">
+    <label for="pArrayValueField">P Array Value</label>
+    <input id="pArrayValueField" min="0" value="0" disabled>
+  </form>
 
-<br>
+  <br>
 
-<form action="/action_page.php">
-  <label for="lineIndexField">Line Index</label>
-  <input type="number" id="lineIndexField" min="0" value="0">
-</form>
+  <form action="/action_page.php">
+    <label for="lineIndexField">Line Index</label>
+    <input type="number" id="lineIndexField" min="0" value="0">
+  </form>
 
-<form action="/action_page.php">
-  <label for="lineCountField">Line Count</label>
-  <input id="lineCountField" disabled>
-</form>
+  <form action="/action_page.php">
+    <label for="lineCountField">Line Count</label>
+    <input id="lineCountField" disabled>
+  </form>
 
-<button onclick="start()">Start</button>
-<button onclick="update()">Update</button>
+  <button onclick="start()">Start</button>
+  <button onclick="update()">Update</button>
 
-<p id="demo" class="a">Result</p>
+  <p id="demo" class="a">Result</p>
 
-<script>
-var lines = new Array();
-var arr = new Array();
-function init() {
-  for (i = 0; i < 254; i++) {
-  	lines.push(i);
-  }
-  for (i = 0; i < 100; i++) {
-  	arr.push(0);
-  }
-}
-init();
-
-let pLineIndex = document.getElementById('pLineIndexField');
-let pLineIndexLimit = document.getElementById('pLineIndexLimitField');
-let pLineIndexMax = document.getElementById('pLineIndexMaxField');
-let pArrayIndex = document.getElementById('pArrayIndexField');
-let pArrayValue = document.getElementById('pArrayValueField');
-
-let lineIndex = document.getElementById('lineIndexField');
-let lineCount = document.getElementById('lineCountField');
-var blockLength, blockLengthMax = 80;
-
-function start() {
-  lineCount.value = lines.length - 1;
-  pLineIndexMax.value = lineCount.value;
-  
-  lineIndex.value = Math.max(1, lineIndex.value);
-  pLineIndex.value = lineIndex.value;
-  pLineIndexLimit.value = lineIndex.value;
-}
-start();
-
-function update() {
-  var spaceLeft = arr.length - pLineIndexLimit.value + parseInt(pLineIndex.value);
-  
-  if (spaceLeft == 0) { return; }
-  var arrayIndexStart = (pLineIndexLimit.value - 1) % arr.length;
-  var arrayIndexEnd = (pLineIndex.value - 1) % arr.length;
-  
-  blockLength = Math.min(lineCount.value - lineIndex.value + 1, blockLengthMax);
-  blockLength = Math.min(blockLength, spaceLeft);
-  
-  if (arrayIndexStart + blockLength <= arr.length) {
-  	for (i = 0; i < blockLength; i++) {
-  	  arr[arrayIndexStart + i] = lines[parseInt(lineIndex.value) + i]; 
-  	}
-  } else {
-    var fLen = arr.length - arrayIndexStart;
-    for (i = 0; i < fLen; i++) {
-  	  arr[arrayIndexStart + i] = lines[parseInt(lineIndex.value) + i]; 
-  	}
-    var lLen = blockLength - fLen;
-    for (i = 0; i < lLen; i++) {
-      arr[i] = lines[parseInt(lineIndex.value) + fLen + i];
+  <script>
+    var lines = new Array();
+    var arr = new Array();
+    function init() {
+      for (i = 0; i < 254; i++) {
+        lines.push(i);
+      }
+      for (i = 0; i < 100; i++) {
+        arr.push(0);
+      }
     }
-  }
-  
-  lineIndex.value = parseInt(lineIndex.value) + blockLength;
-  pLineIndexLimit.value = lineIndex.value;
-  
-  document.getElementById('demo').innerHTML = `${lines}<br>${arr}`;
-}
+    init();
 
-function get() {
-  pArrayIndex.value = (pLineIndex.value - 1) % arr.length;
-  pArrayValue.value = arr[pArrayIndex.value];
-}
-</script>
+    let pLineIndex = document.getElementById('pLineIndexField');
+    let pLineIndexLimit = document.getElementById('pLineIndexLimitField');
+    let pLineIndexMax = document.getElementById('pLineIndexMaxField');
+    let pArrayIndex = document.getElementById('pArrayIndexField');
+    let pArrayValue = document.getElementById('pArrayValueField');
+
+    let lineIndex = document.getElementById('lineIndexField');
+    let lineCount = document.getElementById('lineCountField');
+    var blockLength, blockLengthMax = 80;
+
+    function start() {
+      lineCount.value = lines.length - 1;
+      pLineIndexMax.value = lineCount.value;
+
+      lineIndex.value = Math.max(1, lineIndex.value);
+      pLineIndex.value = lineIndex.value;
+      pLineIndexLimit.value = lineIndex.value;
+    }
+    start();
+
+    function update() {
+      var spaceLeft = arr.length - pLineIndexLimit.value + parseInt(pLineIndex.value);
+
+      if (spaceLeft == 0) { return; }
+      var arrayIndexStart = (pLineIndexLimit.value - 1) % arr.length;
+      var arrayIndexEnd = (pLineIndex.value - 1) % arr.length;
+
+      blockLength = Math.min(lineCount.value - lineIndex.value + 1, blockLengthMax);
+      blockLength = Math.min(blockLength, spaceLeft);
+
+      if (arrayIndexStart + blockLength <= arr.length) {
+        for (i = 0; i < blockLength; i++) {
+          arr[arrayIndexStart + i] = lines[parseInt(lineIndex.value) + i];
+        }
+      } else {
+        var fLen = arr.length - arrayIndexStart;
+        for (i = 0; i < fLen; i++) {
+          arr[arrayIndexStart + i] = lines[parseInt(lineIndex.value) + i];
+        }
+        var lLen = blockLength - fLen;
+        for (i = 0; i < lLen; i++) {
+          arr[i] = lines[parseInt(lineIndex.value) + fLen + i];
+        }
+      }
+
+      lineIndex.value = parseInt(lineIndex.value) + blockLength;
+      pLineIndexLimit.value = lineIndex.value;
+
+      document.getElementById('demo').innerHTML = `${lines}<br>${arr}`;
+    }
+
+    function get() {
+      pArrayIndex.value = (pLineIndex.value - 1) % arr.length;
+      pArrayValue.value = arr[pArrayIndex.value];
+    }
+  </script>
 
 </body>
+
 </html>
