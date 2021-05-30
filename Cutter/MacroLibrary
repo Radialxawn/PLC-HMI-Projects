@@ -1,0 +1,25 @@
+22 serialization::archive 9 1048576 0  4 20038 3 3 Max 6 2 6 6 80 80 sub int Max(int a, int b)
+	if (a > b) then
+		return a
+	end if
+	return b
+end sub
+ 0 0  5 5 Clamp 6 3 6 6 6 125 125 sub int Clamp(int x, int a, int b)
+	if (x < a) then
+		return a
+	end if
+	if (x > b) then
+		return b
+	end if
+	return x
+end sub
+ 0 0  6 6 Module 6 2 6 6 61 61 sub int Module(int a, int b)
+	return a - ((a / b) * b)
+end sub
+ 0 0  3 3 Min 6 2 6 6 80 80 sub int Min(int a, int b)
+	if (a < b) then
+		return a
+	end if
+	return b
+end sub
+ 0 0 
