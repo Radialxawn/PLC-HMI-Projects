@@ -12,14 +12,16 @@
 		function setById(id, value) { document.getElementById(id).innerHTML = value; }
 		function getById(id) { return document.getElementById(id); }
 
-		let HMITags = {};
-		let HMITagsString = '';
-		let PLCTags = {};
-		let PLCTagsString = '';
-		let errorString = '';
+		const AllDevicesUsed = '-AllDevicesUsed-';
 		const PLC1 = 'PLC1', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW';
 		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y';
 		const XAxis = 'XX', YAxis = 'YY';
+		const Auto = -1;
+		let PLCTags = { [AllDevicesUsed]: { M: [], D: [] } };
+		let PLCTagsString = '';
+		let HMITags = { [AllDevicesUsed]: { LB: [], LW: [] } };
+		let HMITagsString = '';
+		let errorString = '';
 
 		function generate() {
 			generatePLCTags();
@@ -32,15 +34,15 @@
 		function generatePLCTags() {
 			PLCTagsString += `"HingeCutter"\n`;
 			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
-			newPLCTag('IsOn', BOOL, M, 0, true);
-			newPLCTag('RunButton', BOOL, M, 1, true);
+			newPLCTag('IsOn', BOOL, M, Auto, true);
+			newPLCTag('RunButton', BOOL, M, Auto, true);
 			newPLCTag('RunButtonRisingLatch', BOOL);
 			newPLCTag('RunButtonFallingLatch', BOOL);
-			newPLCTag('StopButton', BOOL, M, 2, true);
-			newPLCTag('ResetButton', BOOL, M, 3, true);
-			newPLCTag('SetButton', BOOL, M, 4, true);
-			newPLCTag('OriginButton', BOOL, M, 5, true);
-			newPLCTag('FeedSpeed', DINT, D, 0, true);
+			newPLCTag('StopButton', BOOL, M, Auto, true);
+			newPLCTag('ResetButton', BOOL, M, Auto, true);
+			newPLCTag('SetButton', BOOL, M, Auto, true);
+			newPLCTag('OriginButton', BOOL, M, Auto, true);
+			newPLCTag('FeedSpeed', DINT, D, Auto, true);
 
 			newPLCTag('OnOffResetStop', 'OnOffResetStop');
 			newPLCTag('PositionUpdater', 'PositionUpdater');
@@ -50,15 +52,15 @@
 			newPLCTag('PulseOutAndLimit', 'PulseOutAndLimit');
 			newPLCTag('OriginSetMove', 'OriginSetMove');
 
-			newPLCTag('FoilBlocker', BOOL, M, 14);
-			newPLCTag('FoilClamper', BOOL, M, 15);
-			newPLCTag('Cutter1A', BOOL, M, 16);
-			newPLCTag('Cutter1B', BOOL, M, 17);
-			newPLCTag('Cutter2A', BOOL, M, 20);
-			newPLCTag('Cutter2B', BOOL, M, 21);
-			newPLCTag('Cutter3A', BOOL, M, 22);
-			newPLCTag('Cutter3B', BOOL, M, 23);
-			newPLCTag('Cutter3Pos', BOOL, M, 24);
+			newPLCTag('FoilBlocker', BOOL, M, Auto);
+			newPLCTag('FoilClamper', BOOL, M, Auto);
+			newPLCTag('Cutter1A', BOOL, M, Auto);
+			newPLCTag('Cutter1B', BOOL, M, Auto);
+			newPLCTag('Cutter2A', BOOL, M, Auto);
+			newPLCTag('Cutter2B', BOOL, M, Auto);
+			newPLCTag('Cutter3A', BOOL, M, Auto);
+			newPLCTag('Cutter3B', BOOL, M, Auto);
+			newPLCTag('Cutter3Pos', BOOL, M, Auto);
 			newPLCTag('OFoilBlocker', BOOL, Y, 4);
 			newPLCTag('OFoilClamper', BOOL, Y, 5);
 			newPLCTag('OCutter1A', BOOL, Y, 6);
@@ -69,39 +71,80 @@
 			newPLCTag('OCutter3B', BOOL, Y, 13);
 			newPLCTag('OCutter3Pos', BOOL, Y, 14);
 
-			newPLCTag('AutoNextLine', BOOL, M, 10, true);
-			newPLCTag('FileEnded', BOOL, M, 11, true);
-			newPLCTag('CommandLt', INT, D, 20, true);
-			newPLCTag('CommandNb', INT, D, 21, true);
-			newPLCTag('ArrayIndex', DINT, D, 22, true);
-			newPLCTag('ArrayIndexLimit', DINT, D, 24, true);
-			newPLCTag('ArrayIndexMax', DINT, D, 26, true);
-			newPLCTag('ArrayLength', DINT, D, 28, true);
-			newPLCTag('CommandLtArray', ARRAY(INT, 100), D, 100);
-			newPLCTag('CommandNbArray', ARRAY(INT, 100), D, 200);
-			newPLCTag('TargetArrayX', ARRAY(DINT, 100), D, 300);
-			newPLCTag('TargetArrayY', ARRAY(DINT, 100), D, 500);
-			newPLCTag('FeedSpeedArrayX', ARRAY(DINT, 100), D, 700);
-			newPLCTag('FeedSpeedArrayY', ARRAY(DINT, 100), D, 900);
+			newPLCTag('AutoNextLine', BOOL, M, Auto, true);
+			newPLCTag('FileEnded', BOOL, M, Auto, true);
+			newPLCTag('CommandLt', INT, D, Auto, true);
+			newPLCTag('CommandNb', INT, D, Auto, true);
+			newPLCTag('ArrayIndex', DINT, D, Auto, true);
+			newPLCTag('ArrayIndexLimit', DINT, D, Auto, true);
+			newPLCTag('ArrayIndexMax', DINT, D, Auto, true);
+			newPLCTag('ArrayLength', DINT, D, Auto, true);
+			newPLCTag('CommandLtArray', new ARRAY(INT, 100), D, 100);
+			newPLCTag('CommandNbArray', new ARRAY(INT, 100), D, 200);
+			newPLCTag('TargetArrayX', new ARRAY(DINT, 100), D, 300);
+			newPLCTag('TargetArrayY', new ARRAY(DINT, 100), D, 500);
+			newPLCTag('FeedSpeedArrayX', new ARRAY(DINT, 100), D, 700);
+			newPLCTag('FeedSpeedArrayY', new ARRAY(DINT, 100), D, 900);
 
 			generatePLCTagsAxis(XAxis);
 			generatePLCTagsAxis(YAxis);
 		}
 
+		class ARRAY {
+			constructor(type, length) {
+				this.type = type;
+				this.length = length;
+			}
+
+			toString() { return `ARRAY [0..${this.length - 1}] OF ${this.type}`; }
+		}
+
+		function PLCTagsAutoIndex(deviceName) {
+			let devicesUsed = PLCTags[AllDevicesUsed][deviceName];
+			for (i = 0; i < 100; i++) {
+				if (devicesUsed.includes(i)) { continue; }
+				return i;
+			}
+			return 0;
+		}
+
+		function PLCTagsCheck(deviceName, deviceIndex) {
+			let allDevicesUsed = PLCTags[AllDevicesUsed];
+			if (allDevicesUsed.hasOwnProperty(deviceName) == false) { return; }
+			let devicesUsed = allDevicesUsed[deviceName];
+			if (devicesUsed.includes(deviceIndex)) {
+				errorString += `PLCTags overlap device ${deviceName}${deviceIndex}\n`;
+			}
+			devicesUsed.push(deviceIndex);
+		}
+
 		function newPLCTag(name, type, deviceName, deviceIndex, syncHMI) {
 			deviceName = deviceName == undefined ? '' : deviceName;
 			deviceIndex = deviceIndex == undefined ? '' : deviceIndex;
+			let wordCount = type == DINT ? 2 : 1;
+			/*auto index*/
+			if (deviceIndex == Auto) {
+				deviceIndex = PLCTagsAutoIndex(deviceName);
+			}
+			/*auto index*/
+			/*check*/
 			if (PLCTags.hasOwnProperty(name)) { errorString += `PLCTags already has ${name}\n`; }
+			if (type instanceof ARRAY) {
+				for (i = 0; i < type.length * wordCount; i++) {
+					let j = deviceIndex + i;
+					PLCTagsCheck(deviceName, j);
+				}
+			} else {
+				for (i = 0; i < wordCount; i++) {
+					PLCTagsCheck(deviceName, deviceIndex + i);
+				}
+			}
+			/*check*/
 			PLCTags[name] = { name: name, type: type, deviceName: deviceName, deviceIndex: deviceIndex }
 			PLCTagsString += `"VAR_GLOBAL"	"${name}"	"${type}"	""	"${deviceName}${deviceIndex}"	""	""	""	""	""	""\n`;
-
 			if (syncHMI == true) {
 				newHMITag(`-${name}`, PLC1, deviceName, deviceIndex);
 			}
-		}
-
-		function ARRAY(type, length) {
-			return `ARRAY [0..${length - 1}] OF ${type}`;
 		}
 
 		function generatePLCTagsAxis(name) {
@@ -111,13 +154,13 @@
 			newPLCTag(lb('DirInt'), DINT);
 			newPLCTag(lb('DirInstruction'), BOOL);
 			newPLCTag(lb('LimitR'), BOOL);
-			newPLCTag(lb('CurPos'), DINT, D, xy(2, 6), true);
+			newPLCTag(lb('CurPos'), DINT, D, Auto, true);
 			newPLCTag(lb('CurPosP'), DINT, D, xy(8140, 8142));
-			newPLCTag(lb('TarPos'), DINT, D, xy(4, 8), true);
-			newPLCTag(lb('CurFS'), DINT, D, xy(18, 20), true);
+			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
+			newPLCTag(lb('CurFS'), DINT, D, Auto, true);
 			newPLCTag(lb('TarR'), BOOL);
-			newPLCTag(lb('ManualN'), BOOL, M, xy(8, 7), true);
-			newPLCTag(lb('ManualP'), BOOL, M, xy(9, 6), true);
+			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
+			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
 			newPLCTag(lb('Manual'), BOOL);
 			newPLCTag(lb('ILimitN'), BOOL, X, xy(10, 30));
 			newPLCTag(lb('ILimitP'), BOOL, X, xy(11, 31));
@@ -147,7 +190,9 @@
 		}
 
 		function newHMITag(name, plcName, deviceName, deviceIndex) {
+			/**/
 			if (HMITags.hasOwnProperty(name)) { errorString += `HMITags already has ${name}\n`; }
+			/**/
 			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
 			HMITagsString += `${name},${plcName},${deviceName},${deviceIndex}\n`;
 		}
