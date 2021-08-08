@@ -18,7 +18,8 @@
 		let PLCTagsString = '';
 		let errorString = '';
 		const PLC1 = 'PLC1', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW';
-		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', Y = 'Y';
+		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y';
+		const XAxis = 'XX', YAxis = 'YY';
 
 		function generate() {
 			generatePLCTags();
@@ -31,15 +32,15 @@
 		function generatePLCTags() {
 			PLCTagsString += `"HingeCutter"\n`;
 			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
-			newPLCTag('IsOn', BOOL, M, 0);
-			newPLCTag('RunButton', BOOL, M, 1);
+			newPLCTag('IsOn', BOOL, M, 0, true);
+			newPLCTag('RunButton', BOOL, M, 1, true);
 			newPLCTag('RunButtonRisingLatch', BOOL);
 			newPLCTag('RunButtonFallingLatch', BOOL);
-			newPLCTag('StopButton', BOOL, M, 2);
-			newPLCTag('ResetButton', BOOL, M, 3);
-			newPLCTag('SetButton', BOOL, M, 4);
-			newPLCTag('OriginButton', BOOL, M, 5);
-			newPLCTag('FeedSpeed', DINT, D, 0);
+			newPLCTag('StopButton', BOOL, M, 2, true);
+			newPLCTag('ResetButton', BOOL, M, 3, true);
+			newPLCTag('SetButton', BOOL, M, 4, true);
+			newPLCTag('OriginButton', BOOL, M, 5, true);
+			newPLCTag('FeedSpeed', DINT, D, 0, true);
 
 			newPLCTag('OnOffResetStop', 'OnOffResetStop');
 			newPLCTag('PositionUpdater', 'PositionUpdater');
@@ -68,60 +69,67 @@
 			newPLCTag('OCutter3B', BOOL, Y, 13);
 			newPLCTag('OCutter3Pos', BOOL, Y, 14);
 
-			newPLCTag('AutoNextLine', BOOL, M, 10);
-			newPLCTag('FileEnded', BOOL, M, 11);
-			newPLCTag('CommandLt', INT, D, 20);
-			newPLCTag('CommandNb', INT, D, 21);
-			newPLCTag('ArrayIndex', DINT, D, 22);
-			newPLCTag('ArrayIndexLimit', DINT, D, 24);
-			newPLCTag('ArrayIndexMax', DINT, D, 26);
-			newPLCTag('ArrayLength', DINT, D, 28);
+			newPLCTag('AutoNextLine', BOOL, M, 10, true);
+			newPLCTag('FileEnded', BOOL, M, 11, true);
+			newPLCTag('CommandLt', INT, D, 20, true);
+			newPLCTag('CommandNb', INT, D, 21, true);
+			newPLCTag('ArrayIndex', DINT, D, 22, true);
+			newPLCTag('ArrayIndexLimit', DINT, D, 24, true);
+			newPLCTag('ArrayIndexMax', DINT, D, 26, true);
+			newPLCTag('ArrayLength', DINT, D, 28, true);
 			newPLCTag('CommandLtArray', ARRAY(INT, 100), D, 100);
 			newPLCTag('CommandNbArray', ARRAY(INT, 100), D, 200);
 			newPLCTag('TargetArrayX', ARRAY(DINT, 100), D, 300);
 			newPLCTag('TargetArrayY', ARRAY(DINT, 100), D, 500);
 			newPLCTag('FeedSpeedArrayX', ARRAY(DINT, 100), D, 700);
 			newPLCTag('FeedSpeedArrayY', ARRAY(DINT, 100), D, 900);
+
+			generatePLCTagsAxis(XAxis);
+			generatePLCTagsAxis(YAxis);
 		}
 
-		function newPLCTag(name, type, deviceName, deviceIndex) {
+		function newPLCTag(name, type, deviceName, deviceIndex, syncHMI) {
 			deviceName = deviceName == undefined ? '' : deviceName;
 			deviceIndex = deviceIndex == undefined ? '' : deviceIndex;
 			if (PLCTags.hasOwnProperty(name)) { errorString += `PLCTags already has ${name}\n`; }
 			PLCTags[name] = { name: name, type: type, deviceName: deviceName, deviceIndex: deviceIndex }
 			PLCTagsString += `"VAR_GLOBAL"	"${name}"	"${type}"	""	"${deviceName}${deviceIndex}"	""	""	""	""	""	""\n`;
+
+			if (syncHMI == true) {
+				newHMITag(`-${name}`, PLC1, deviceName, deviceIndex);
+			}
 		}
 
 		function ARRAY(type, length) {
 			return `ARRAY [0..${length - 1}] OF ${type}`;
 		}
 
+		function generatePLCTagsAxis(name) {
+			let lb = function (n) { return `${name}${n}`; }
+			let xy = function (x, y) { return name == XAxis ? x : y; }
+			newPLCTag(lb('Dir'), BOOL);
+			newPLCTag(lb('DirInt'), DINT);
+			newPLCTag(lb('DirInstruction'), BOOL);
+			newPLCTag(lb('LimitR'), BOOL);
+			newPLCTag(lb('CurPos'), DINT, D, xy(2, 6), true);
+			newPLCTag(lb('CurPosP'), DINT, D, xy(8140, 8142));
+			newPLCTag(lb('TarPos'), DINT, D, xy(4, 8), true);
+			newPLCTag(lb('CurFS'), DINT, D, xy(18, 20), true);
+			newPLCTag(lb('TarR'), BOOL);
+			newPLCTag(lb('ManualN'), BOOL, M, xy(8, 7), true);
+			newPLCTag(lb('ManualP'), BOOL, M, xy(9, 6), true);
+			newPLCTag(lb('Manual'), BOOL);
+			newPLCTag(lb('ILimitN'), BOOL, X, xy(10, 30));
+			newPLCTag(lb('ILimitP'), BOOL, X, xy(11, 31));
+			newPLCTag(lb('OOnOff'), BOOL, Y, xy(24, 26));
+			newPLCTag(lb('OReset'), BOOL, Y, xy(25, 27));
+			newPLCTag(lb('OPulse'), BOOL, Y, xy(0, 1));
+			newPLCTag(lb('ODirection'), BOOL, Y, xy(2, 3));
+			newPLCTag(lb('RunLatch'), BOOL);
+			newPLCTag(lb('RunLatchFalling'), BOOL);
+		}
+
 		function generateHMITags() {
-			newHMITag('-CurrentX', PLC1, D, 0);
-			newHMITag('-CurrentY', PLC1, D, 2);
-			newHMITag('-TargetX', PLC1, D, 4);
-			newHMITag('-TargetY', PLC1, D, 6);
-			newHMITag('-FeedSpeedX', PLC1, D, 8);
-			newHMITag('-FeedSpeedY', PLC1, D, 10);
-			newHMITag('-FeedSpeed', PLC1, D, 12);
-			newHMITag('-CommandLt', PLC1, D, 13);
-			newHMITag('-CommandNb', PLC1, D, 14);
-			newHMITag('-ArrayIndex', PLC1, D, 20);
-			newHMITag('-ArrayIndexLimit', PLC1, D, 22);
-			newHMITag('-ArrayIndexMax', PLC1, D, 24);
-			newHMITag('-ArrayLength', PLC1, D, 26);
-			newHMITag('-IsOn, PLC1', M, 0);
-			newHMITag('-RunButton', PLC1, M, 1);
-			newHMITag('-StopButton', PLC1, M, 2);
-			newHMITag('-ResetButton', PLC1, M, 3);
-			newHMITag('-SetButton', PLC1, M, 4);
-			newHMITag('-OriginButton', PLC1, M, 5);
-			newHMITag('-UpButton', PLC1, M, 6);
-			newHMITag('-DownButton', PLC1, M, 7);
-			newHMITag('-LeftButton', PLC1, M, 8);
-			newHMITag('-RightButton', PLC1, M, 9);
-			newHMITag('-AutoNextLine', PLC1, M, 10);
-			newHMITag('-FileEnded', PLC1, M, 11);
 			newHMITag('FileIndexChanged', Self, LB, 0);
 			newHMITag('PageIndexChanged', Self, LB, 1);
 			newHMITag('ArrayIndexChanged', Self, LB, 2);
