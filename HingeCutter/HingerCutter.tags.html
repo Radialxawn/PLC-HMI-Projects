@@ -121,7 +121,6 @@
 		function newPLCTag(name, type, deviceName, deviceIndex, syncHMI) {
 			deviceName = deviceName == undefined ? '' : deviceName;
 			deviceIndex = deviceIndex == undefined ? '' : deviceIndex;
-			let wordCount = type == DINT ? 2 : 1;
 			/*auto index*/
 			if (deviceIndex == Auto) {
 				deviceIndex = PLCTagsAutoIndex(deviceName);
@@ -129,10 +128,10 @@
 			/*auto index*/
 			/*check*/
 			if (PLCTags.hasOwnProperty(name)) { errorString += `PLCTags already has ${name}\n`; }
+			let wordCount = type == DINT || type.type == DINT ? 2 : 1;
 			if (type instanceof ARRAY) {
 				for (i = 0; i < type.length * wordCount; i++) {
-					let j = deviceIndex + i;
-					PLCTagsCheck(deviceName, j);
+					PLCTagsCheck(deviceName, deviceIndex + i);
 				}
 			} else {
 				for (i = 0; i < wordCount; i++) {
