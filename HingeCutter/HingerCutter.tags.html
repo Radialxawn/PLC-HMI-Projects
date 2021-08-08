@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+	<p id="error" style="white-space: pre;color: crimson;"></p>
+	<button onclick="copy(PLCTagsString)">Copy</button>
+	<p id="plc-tags" style="white-space: pre;"></p>
+	<button onclick="copy(HMITagsString)">Copy</button>
+	<p id="hmi-tags" style="white-space: pre;"></p>
+
+	<script>
+		function setById(id, value) { document.getElementById(id).innerHTML = value; }
+		function getById(id) { return document.getElementById(id); }
+
+		let HMITags = {};
+		let HMITagsString = '';
+		let PLCTags = {};
+		let PLCTagsString = '';
+		let errorString = '';
+		const PLC1 = 'PLC1', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW';
+		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', Y = 'Y';
+
+		function generate() {
+			generatePLCTags();
+			setById('plc-tags', PLCTagsString);
+			generateHMITags();
+			setById('hmi-tags', HMITagsString);
+			setById('error', errorString);
+		}
+
+		function generatePLCTags() {
+			PLCTagsString += `"HingeCutter"\n`;
+			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
+			newPLCTag('IsOn', BOOL, M, 0);
+			newPLCTag('RunButton', BOOL, M, 1);
+			newPLCTag('RunButtonRisingLatch', BOOL);
+			newPLCTag('RunButtonFallingLatch', BOOL);
+			newPLCTag('StopButton', BOOL, M, 2);
+			newPLCTag('ResetButton', BOOL, M, 3);
+			newPLCTag('SetButton', BOOL, M, 4);
+			newPLCTag('OriginButton', BOOL, M, 5);
+			newPLCTag('FeedSpeed', DINT, D, 0);
+
+			newPLCTag('OnOffResetStop', 'OnOffResetStop');
+			newPLCTag('PositionUpdater', 'PositionUpdater');
+			newPLCTag('ManualHandler', 'ManualHandler');
+			newPLCTag('AutoHandler', 'AutoHandler');
+			newPLCTag('CommandHandler', 'CommandHandler');
+			newPLCTag('PulseOutAndLimit', 'PulseOutAndLimit');
+			newPLCTag('OriginSetMove', 'OriginSetMove');
+
+			newPLCTag('FoilBlocker', BOOL, M, 14);
+			newPLCTag('FoilClamper', BOOL, M, 15);
+			newPLCTag('Cutter1A', BOOL, M, 16);
+			newPLCTag('Cutter1B', BOOL, M, 17);
+			newPLCTag('Cutter2A', BOOL, M, 20);
+			newPLCTag('Cutter2B', BOOL, M, 21);
+			newPLCTag('Cutter3A', BOOL, M, 22);
+			newPLCTag('Cutter3B', BOOL, M, 23);
+			newPLCTag('Cutter3Pos', BOOL, M, 24);
+			newPLCTag('OFoilBlocker', BOOL, Y, 4);
+			newPLCTag('OFoilClamper', BOOL, Y, 5);
+			newPLCTag('OCutter1A', BOOL, Y, 6);
+			newPLCTag('OCutter1B', BOOL, Y, 7);
+			newPLCTag('OCutter2A', BOOL, Y, 10);
+			newPLCTag('OCutter2B', BOOL, Y, 11);
+			newPLCTag('OCutter3A', BOOL, Y, 12);
+			newPLCTag('OCutter3B', BOOL, Y, 13);
+			newPLCTag('OCutter3Pos', BOOL, Y, 14);
+
+			newPLCTag('AutoNextLine', BOOL, M, 10);
+			newPLCTag('FileEnded', BOOL, M, 11);
+			newPLCTag('CommandLt', INT, D, 20);
+			newPLCTag('CommandNb', INT, D, 21);
+			newPLCTag('ArrayIndex', DINT, D, 22);
+			newPLCTag('ArrayIndexLimit', DINT, D, 24);
+			newPLCTag('ArrayIndexMax', DINT, D, 26);
+			newPLCTag('ArrayLength', DINT, D, 28);
+			newPLCTag('CommandLtArray', ARRAY(INT, 100), D, 100);
+			newPLCTag('CommandNbArray', ARRAY(INT, 100), D, 200);
+			newPLCTag('TargetArrayX', ARRAY(DINT, 100), D, 300);
+			newPLCTag('TargetArrayY', ARRAY(DINT, 100), D, 500);
+			newPLCTag('FeedSpeedArrayX', ARRAY(DINT, 100), D, 700);
+			newPLCTag('FeedSpeedArrayY', ARRAY(DINT, 100), D, 900);
+		}
+
+		function newPLCTag(name, type, deviceName, deviceIndex) {
+			deviceName = deviceName == undefined ? '' : deviceName;
+			deviceIndex = deviceIndex == undefined ? '' : deviceIndex;
+			if (PLCTags.hasOwnProperty(name)) { errorString += `PLCTags already has ${name}\n`; }
+			PLCTags[name] = { name: name, type: type, deviceName: deviceName, deviceIndex: deviceIndex }
+			PLCTagsString += `"VAR_GLOBAL"	"${name}"	"${type}"	""	"${deviceName}${deviceIndex}"	""	""	""	""	""	""\n`;
+		}
+
+		function ARRAY(type, length) {
+			return `ARRAY [0..${length - 1}] OF ${type}`;
+		}
+
+		function generateHMITags() {
+			newHMITag('-CurrentX', PLC1, D, 0);
+			newHMITag('-CurrentY', PLC1, D, 2);
+			newHMITag('-TargetX', PLC1, D, 4);
+			newHMITag('-TargetY', PLC1, D, 6);
+			newHMITag('-FeedSpeedX', PLC1, D, 8);
+			newHMITag('-FeedSpeedY', PLC1, D, 10);
+			newHMITag('-FeedSpeed', PLC1, D, 12);
+			newHMITag('-CommandLt', PLC1, D, 13);
+			newHMITag('-CommandNb', PLC1, D, 14);
+			newHMITag('-ArrayIndex', PLC1, D, 20);
+			newHMITag('-ArrayIndexLimit', PLC1, D, 22);
+			newHMITag('-ArrayIndexMax', PLC1, D, 24);
+			newHMITag('-ArrayLength', PLC1, D, 26);
+			newHMITag('-IsOn, PLC1', M, 0);
+			newHMITag('-RunButton', PLC1, M, 1);
+			newHMITag('-StopButton', PLC1, M, 2);
+			newHMITag('-ResetButton', PLC1, M, 3);
+			newHMITag('-SetButton', PLC1, M, 4);
+			newHMITag('-OriginButton', PLC1, M, 5);
+			newHMITag('-UpButton', PLC1, M, 6);
+			newHMITag('-DownButton', PLC1, M, 7);
+			newHMITag('-LeftButton', PLC1, M, 8);
+			newHMITag('-RightButton', PLC1, M, 9);
+			newHMITag('-AutoNextLine', PLC1, M, 10);
+			newHMITag('-FileEnded', PLC1, M, 11);
+			newHMITag('FileIndexChanged', Self, LB, 0);
+			newHMITag('PageIndexChanged', Self, LB, 1);
+			newHMITag('ArrayIndexChanged', Self, LB, 2);
+			newHMITag('ArrayIndexMaxChanged', Self, LB, 3);
+			newHMITag('FileIndex', Self, LW, 0);
+			newHMITag('PageIndex', Self, LW, 2);
+			newHMITag('PageIndexMax', Self, LW, 4);
+			newHMITag('ArrayIndex', Self, LW, 6);
+			newHMITag('ArrayIndexMax', Self, LW, 8);
+			newHMITag('ArrayLength', Self, LW, 10);
+			newHMITag('ArrayIndexLimit', Self, LW, 12);
+			newHMITag('ArrayStart', Self, LW, 14);
+			newHMITag('LineIndicatorState', Self, LW, 16);
+			newHMITag('LineIndicatorY', Self, LW, 17);
+		}
+
+		function newHMITag(name, plcName, deviceName, deviceIndex) {
+			if (HMITags.hasOwnProperty(name)) { errorString += `HMITags already has ${name}\n`; }
+			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
+			HMITagsString += `${name},${plcName},${deviceName},${deviceIndex}\n`;
+		}
+
+		generate();
+
+		function copy(text) {
+			const temp = document.createElement('textarea');
+			temp.value = text;
+			document.body.appendChild(temp);
+			temp.select();
+			document.execCommand('copy');
+			document.body.removeChild(temp);
+		}
+	</script>
+
+</body>
+
+</html>
