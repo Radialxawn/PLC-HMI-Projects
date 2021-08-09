@@ -2,11 +2,11 @@
 <html>
 
 <body>
-	<p id="error" style="white-space: pre;color: crimson;"></p>
+	<p id="error" style="white-space: pre;color: crimson;font-size: 13px;"></p>
 	<button onclick="copy(PLCTagsString)">Copy</button>
-	<p id="plc-tags" style="white-space: pre;"></p>
+	<p id="plc-tags" style="white-space: pre;font-size: 13px;"></p>
 	<button onclick="copy(HMITagsString)">Copy</button>
-	<p id="hmi-tags" style="white-space: pre;"></p>
+	<p id="hmi-tags" style="white-space: pre;font-size: 13px;"></p>
 
 	<script>
 		function setById(id, value) { document.getElementById(id).innerHTML = value; }
@@ -95,7 +95,6 @@
 				this.type = type;
 				this.length = length;
 			}
-
 			toString() { return `ARRAY [0..${this.length - 1}] OF ${this.type}`; }
 		}
 
