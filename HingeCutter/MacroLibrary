@@ -1,4 +1,4 @@
-22 serialization::archive 9 1048576 0  4 20038 3 3 Max 6 2 6 6 80 80 sub int Max(int a, int b)
+22 serialization::archive 9 1048576 0  5 20038 3 3 Max 6 2 6 6 80 80 sub int Max(int a, int b)
 	if (a > b) then
 		return a
 	end if
@@ -13,7 +13,7 @@ end sub
 	end if
 	return x
 end sub
- 0 0  6 6 Module 6 2 6 6 61 61 sub int Module(int a, int b)
+ 0 0  6 6 Module 6 2 6 6 63 63 sub int Module(int a, int b)
 	return a - ((a / b) * b)
 end sub
  0 0  3 3 Min 6 2 6 6 80 80 sub int Min(int a, int b)
@@ -21,5 +21,73 @@ end sub
 		return a
 	end if
 	return b
+end sub
+ 0 0  5 5 Shift 0 3 6 6 6 1557 1557 sub Shift(int emiIndex, int position, int length)
+	short shift[1000]
+	select case emiIndex
+		case 0 
+			GetData(shift[0], "Self", EM0, position, length)
+		break
+		case 1 
+			GetData(shift[0], "Self", EM1, position, length)
+		break
+		case 2 
+			GetData(shift[0], "Self", EM2, position, length)
+		break
+		case 3
+			GetData(shift[0], "Self", EM3, position, length)
+		break
+		case 4
+			GetData(shift[0], "Self", EM4, position, length)
+		break
+		case 5
+			GetData(shift[0], "Self", EM5, position, length)
+		break
+		case 6
+			GetData(shift[0], "Self", EM6, position, length)
+		break
+		case 7
+			GetData(shift[0], "Self", EM7, position, length)
+		break
+		case 8
+			GetData(shift[0], "Self", EM8, position, length)
+		break
+		case 9
+			GetData(shift[0], "Self", EM9, position, length)
+		break
+	end select
+	position = position + 10
+	select case emiIndex
+		case 0 
+			SetData(shift[0], "Self", EM0, position, length)
+		break
+		case 1 
+			SetData(shift[0], "Self", EM1, position, length)
+		break
+		case 2 
+			SetData(shift[0], "Self", EM2, position, length)
+		break
+		case 3
+			SetData(shift[0], "Self", EM3, position, length)
+		break
+		case 4
+			SetData(shift[0], "Self", EM4, position, length)
+		break
+		case 5
+			SetData(shift[0], "Self", EM5, position, length)
+		break
+		case 6
+			SetData(shift[0], "Self", EM6, position, length)
+		break
+		case 7
+			SetData(shift[0], "Self", EM7, position, length)
+		break
+		case 8
+			SetData(shift[0], "Self", EM8, position, length)
+		break
+		case 9
+			SetData(shift[0], "Self", EM9, position, length)
+		break
+	end select
 end sub
  0 0 
