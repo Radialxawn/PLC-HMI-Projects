@@ -22,72 +22,61 @@ end sub
 	end if
 	return b
 end sub
- 0 0  5 5 Shift 0 3 6 6 6 1557 1557 sub Shift(int emiIndex, int position, int length)
-	short shift[1000]
-	select case emiIndex
-		case 0 
-			GetData(shift[0], "Self", EM0, position, length)
-		break
-		case 1 
-			GetData(shift[0], "Self", EM1, position, length)
-		break
-		case 2 
-			GetData(shift[0], "Self", EM2, position, length)
-		break
-		case 3
-			GetData(shift[0], "Self", EM3, position, length)
-		break
-		case 4
-			GetData(shift[0], "Self", EM4, position, length)
-		break
-		case 5
-			GetData(shift[0], "Self", EM5, position, length)
-		break
-		case 6
-			GetData(shift[0], "Self", EM6, position, length)
-		break
-		case 7
-			GetData(shift[0], "Self", EM7, position, length)
-		break
-		case 8
-			GetData(shift[0], "Self", EM8, position, length)
-		break
-		case 9
-			GetData(shift[0], "Self", EM9, position, length)
-		break
-	end select
-	position = position + 10
-	select case emiIndex
-		case 0 
-			SetData(shift[0], "Self", EM0, position, length)
-		break
-		case 1 
-			SetData(shift[0], "Self", EM1, position, length)
-		break
-		case 2 
-			SetData(shift[0], "Self", EM2, position, length)
-		break
-		case 3
-			SetData(shift[0], "Self", EM3, position, length)
-		break
-		case 4
-			SetData(shift[0], "Self", EM4, position, length)
-		break
-		case 5
-			SetData(shift[0], "Self", EM5, position, length)
-		break
-		case 6
-			SetData(shift[0], "Self", EM6, position, length)
-		break
-		case 7
-			SetData(shift[0], "Self", EM7, position, length)
-		break
-		case 8
-			SetData(shift[0], "Self", EM8, position, length)
-		break
-		case 9
-			SetData(shift[0], "Self", EM9, position, length)
-		break
-	end select
+ 0 0  8 8 EMIShift 0 4 6 6 6 6 1357 1357 sub EMIShift(int index, int position, int length, int delta)
+	short cl
+	cl = 100
+	short shift[100]
+	int i, j, k, ei
+	ei = (length / cl) + 1
+	for i = 0 to ei step 1
+		if (delta > 0) then
+			j = position + (ei - i) * cl
+		else
+			j = position + i * cl
+		end if
+		k = j + delta
+		select case index
+			case 0 
+				GetData(shift[0], "Self", EM0, j, cl)
+				SetData(shift[0], "Self", EM0, k, cl)
+			break
+			case 1 
+				GetData(shift[0], "Self", EM1, j, cl)
+				SetData(shift[0], "Self", EM1, k, cl)
+			break
+			case 2 
+				GetData(shift[0], "Self", EM2, j, cl)
+				SetData(shift[0], "Self", EM2, k, cl)
+			break
+			case 3
+				GetData(shift[0], "Self", EM3, j, cl)
+				SetData(shift[0], "Self", EM3, k, cl)
+			break
+			case 4
+				GetData(shift[0], "Self", EM4, j, cl)
+				SetData(shift[0], "Self", EM4, k, cl)
+			break
+			case 5
+				GetData(shift[0], "Self", EM5, j, cl)
+				SetData(shift[0], "Self", EM5, k, cl)
+			break
+			case 6
+				GetData(shift[0], "Self", EM6, j, cl)
+				SetData(shift[0], "Self", EM6, k, cl)
+			break
+			case 7
+				GetData(shift[0], "Self", EM7, j, cl)
+				SetData(shift[0], "Self", EM7, k, cl)
+			break
+			case 8
+				GetData(shift[0], "Self", EM8, j, cl)
+				SetData(shift[0], "Self", EM8, k, cl)
+			break
+			case 9
+				GetData(shift[0], "Self", EM9, j, cl)
+				SetData(shift[0], "Self", EM9, k, cl)
+			break
+		end select
+	next i
 end sub
  0 0 
