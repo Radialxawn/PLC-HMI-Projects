@@ -26,7 +26,7 @@
 	}
 
 	table td {
-		border: 2px solid #30c;
+		border: 2px solid rgb(81, 38, 211);
 		border-radius: 3px;
 		padding: 2px;
 		text-align: center;
@@ -109,9 +109,10 @@
 					HMIRow.style.backgroundColor = '#92ed6b';
 					HMITag.drawn = true;
 				} else {
-					HMIRow.insertCell(0).innerHTML = 'ø';
-					HMIRow.insertCell(1).innerHTML = 'ø';
-					HMIRow.insertCell(2).innerHTML = 'ø';
+					for (var i = 0; i < 3; i++) {
+						HMIRow.insertCell(i).innerHTML = 'ø';
+						HMIRow.cells[i].style.visibility = 'hidden';
+					}
 				}
 			}
 
