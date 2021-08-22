@@ -1,24 +1,68 @@
 <!DOCTYPE html>
 <html>
+<style>
+	.button-flat {
+		align-items: center;
+		text-align: center;
+		text-decoration: none;
+		font-family: consolas;
+		border: 0;
+		font-size: 150%;
+		color: #FFF;
+		background: #0CADA7;
+		padding: 8px 8px;
+		display: inline-block;
+		white-space: nowrap;
+		border-radius: 5px;
+		margin: 10px 0;
+	}
+
+	.button-flat:hover {
+		background: #0A948F;
+	}
+
+	table {
+		border-spacing: 2px;
+	}
+
+	table td {
+		border: 2px solid #30c;
+		border-radius: 3px;
+		padding: 2px;
+		text-align: center;
+	}
+
+	.wrapper {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		column-gap: 8px;
+	}
+</style>
 
 <body>
 	<p id="error" style="white-space: pre;color: crimson;font-size: 13px;"></p>
-	<button onclick="copy(PLCTagsString)">Copy</button>
-	<table id="plc-tags" style="white-space: pre;font-size: 13px;">
-		<tr>
-		  <td>Name</td>
-		  <td>Type</td>
-		  <td>Device</td>
-		</tr>
-	 </table>
-	<button onclick="copy(HMITagsString)">Copy</button>
-	<table id="hmi-tags" style="white-space: pre;font-size: 13px;">
-		<tr>
-		  <td>Name</td>
-		  <td>PLC Name</td>
-		  <td>Device</td>
-		</tr>
-	 </table>
+	<div class="wrapper">
+		<div>
+			<button class="button-flat" style="width: 100%;" onclick="copy(PLCTagsString)">Copy PLC Tags</button>
+			<table id="plc-tags" style="font-size: 13px;font-family: consolas;width: 100%;">
+				<tr style="background-color: gray;">
+					<td style="width: 45%;">Name</td>
+					<td style="width: 45%;">Type</td>
+					<td style="width: 10%;">Device</td>
+				</tr>
+			</table>
+		</div>
+		<div>
+			<button class="button-flat" style="width: 100%;" onclick="copy(HMITagsString)">Copy HMI Tags</button>
+			<table id="hmi-tags" style="font-size: 13px;font-family: consolas;width: 100%;">
+				<tr style="background-color: gray;">
+					<td style="width: 45%;">Name</td>
+					<td style="width: 45%;">PLC</td>
+					<td style="width: 10%;">Device</td>
+				</tr>
+			</table>
+		</div>
+	</div>
 
 	<script>
 		function setById(id, value) { document.getElementById(id).innerHTML = value; }
@@ -40,6 +84,50 @@
 		function generate() {
 			generatePLCTags();
 			generateHMITags();
+			printDebug();
+		}
+
+		function printDebug() {
+			for (var key in PLCTags) {
+				let PLCTag = PLCTags[key];
+				if (PLCTag.name == undefined) {
+					continue;
+				}
+				let PLCRow = PLCTagsTable.insertRow(PLCTagsTable.rows.length);
+				PLCRow.insertCell(0).innerHTML = PLCTag.name;
+				PLCRow.insertCell(1).innerHTML = PLCTag.type;
+				PLCRow.insertCell(2).innerHTML = `${PLCTag.deviceName}${PLCTag.deviceIndex}`;
+
+				let HMIKey = `-${PLCTag.name}`;
+				let HMIRow = HMITagsTable.insertRow(HMITagsTable.rows.length);
+				if (HMITags.hasOwnProperty(HMIKey)) {
+					let HMITag = HMITags[HMIKey];
+					HMIRow.insertCell(0).innerHTML = HMITag.name;
+					HMIRow.insertCell(1).innerHTML = HMITag.plcName;
+					HMIRow.insertCell(2).innerHTML = `${HMITag.deviceName}${HMITag.deviceIndex}`;
+					PLCRow.style.backgroundColor = '#92ed6b';
+					HMIRow.style.backgroundColor = '#92ed6b';
+					HMITag.drawn = true;
+				} else {
+					HMIRow.insertCell(0).innerHTML = 'ø';
+					HMIRow.insertCell(1).innerHTML = 'ø';
+					HMIRow.insertCell(2).innerHTML = 'ø';
+				}
+			}
+
+			for (var key in HMITags) {
+				let HMITag = HMITags[key];
+				if (HMITag.name == undefined) {
+					continue;
+				}
+				if (HMITag.drawn != true) {
+					let HMIRow = HMITagsTable.insertRow(HMITagsTable.rows.length);
+					HMIRow.insertCell(0).innerHTML = HMITag.name;
+					HMIRow.insertCell(1).innerHTML = HMITag.plcName;
+					HMIRow.insertCell(2).innerHTML = `${HMITag.deviceName}${HMITag.deviceIndex}`;
+				}
+			}
+
 			setById('error', errorString);
 		}
 
@@ -127,7 +215,7 @@
 			devicesUsed.push(deviceIndex);
 		}
 
-		function newPLCTag(tagName, tagType, deviceName, deviceIndex, syncHMI) {
+		function newPLCTag(name, type, deviceName, deviceIndex, syncHMI) {
 			deviceName = deviceName == undefined ? '' : deviceName;
 			deviceIndex = deviceIndex == undefined ? '' : deviceIndex;
 			/*auto index*/
@@ -136,10 +224,10 @@
 			}
 			/*auto index*/
 			/*check*/
-			if (PLCTags.hasOwnProperty(tagName)) { errorString += `PLCTags already has ${tagName}\n`; }
-			let wordCount = tagType == DINT || tagType.type == DINT ? 2 : 1;
-			if (tagType instanceof ARRAY) {
-				for (i = 0; i < tagType.length * wordCount; i++) {
+			if (PLCTags.hasOwnProperty(name)) { errorString += `PLCTags already has ${name}\n`; }
+			let wordCount = type == DINT || type.type == DINT ? 2 : 1;
+			if (type instanceof ARRAY) {
+				for (i = 0; i < type.length * wordCount; i++) {
 					PLCTagsCheck(deviceName, deviceIndex + i);
 				}
 			} else {
@@ -148,17 +236,10 @@
 				}
 			}
 			/*check*/
-			PLCTags[tagName] = { name: tagName, type: tagType, deviceName: deviceName, deviceIndex: deviceIndex };
-			PLCTagsString += `"VAR_GLOBAL"	"${tagName}"	"${tagType}"	""	"${deviceName}${deviceIndex}"	""	""	""	""	""	""\n`;
-
-			let row = PLCTagsTable.insertRow(PLCTagsTable.rows.length);
-			row.insertCell(0).innerHTML = tagName;
-			row.insertCell(1).innerHTML = tagType;
-			row.insertCell(2).innerHTML = `${deviceName}${deviceIndex}`;
-
+			PLCTags[name] = { name: name, type: type, deviceName: deviceName, deviceIndex: deviceIndex };
+			PLCTagsString += `"VAR_GLOBAL"	"${name}"	"${type}"	""	"${deviceName}${deviceIndex}"	""	""	""	""	""	""\n`;
 			if (syncHMI == true) {
-				newHMITag(`-${tagName}`, PLC1, deviceName, deviceIndex);
-				row.style.backgroundColor = '#bafc77';
+				newHMITag(`-${name}`, PLC1, deviceName, deviceIndex);
 			}
 		}
 
@@ -202,17 +283,14 @@
 			newHMITag('LineIndicatorY', Self, LW, 17);
 		}
 
-		function newHMITag(tagName, plcName, deviceName, deviceIndex) {
+		function newHMITag(name, plcName, deviceName, deviceIndex) {
 			/**/
-			if (HMITags.hasOwnProperty(tagName)) { errorString += `HMITags already has ${tagName}\n`; }
+			if (HMITags.hasOwnProperty(name)) { errorString += `HMITags already has ${name}\n`; }
 			/**/
-			HMITags[tagName] = { name: tagName, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
-			HMITagsString += `${tagName},${plcName},${deviceName},${deviceIndex}\n`;
+			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
+			HMITagsString += `${name},${plcName},${deviceName},${deviceIndex}\n`;
 
-			let row = HMITagsTable.insertRow(HMITagsTable.rows.length);
-			row.insertCell(0).innerHTML = tagName;
-			row.insertCell(1).innerHTML = plcName;
-			row.insertCell(2).innerHTML = `${deviceName}${deviceIndex}`;
+
 		}
 
 		generate();
