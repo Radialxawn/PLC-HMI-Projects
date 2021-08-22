@@ -4,9 +4,21 @@
 <body>
 	<p id="error" style="white-space: pre;color: crimson;font-size: 13px;"></p>
 	<button onclick="copy(PLCTagsString)">Copy</button>
-	<p id="plc-tags" style="white-space: pre;font-size: 13px;"></p>
+	<table id="plc-tags" style="white-space: pre;font-size: 13px;">
+		<tr>
+		  <td>Name</td>
+		  <td>Type</td>
+		  <td>Device</td>
+		</tr>
+	 </table>
 	<button onclick="copy(HMITagsString)">Copy</button>
-	<p id="hmi-tags" style="white-space: pre;font-size: 13px;"></p>
+	<table id="hmi-tags" style="white-space: pre;font-size: 13px;">
+		<tr>
+		  <td>Name</td>
+		  <td>PLC Name</td>
+		  <td>Device</td>
+		</tr>
+	 </table>
 
 	<script>
 		function setById(id, value) { document.getElementById(id).innerHTML = value; }
@@ -18,16 +30,16 @@
 		const XAxis = 'XX', YAxis = 'YY';
 		const Auto = -1;
 		let PLCTags = { [AllDevicesUsed]: { M: [], D: [] } };
+		let PLCTagsTable = document.getElementById('plc-tags');
 		let PLCTagsString = '';
 		let HMITags = { [AllDevicesUsed]: { LB: [], LW: [] } };
+		let HMITagsTable = document.getElementById('hmi-tags');
 		let HMITagsString = '';
 		let errorString = '';
 
 		function generate() {
 			generatePLCTags();
-			setById('plc-tags', PLCTagsString);
 			generateHMITags();
-			setById('hmi-tags', HMITagsString);
 			setById('error', errorString);
 		}
 
@@ -115,7 +127,7 @@
 			devicesUsed.push(deviceIndex);
 		}
 
-		function newPLCTag(name, type, deviceName, deviceIndex, syncHMI) {
+		function newPLCTag(tagName, tagType, deviceName, deviceIndex, syncHMI) {
 			deviceName = deviceName == undefined ? '' : deviceName;
 			deviceIndex = deviceIndex == undefined ? '' : deviceIndex;
 			/*auto index*/
@@ -124,10 +136,10 @@
 			}
 			/*auto index*/
 			/*check*/
-			if (PLCTags.hasOwnProperty(name)) { errorString += `PLCTags already has ${name}\n`; }
-			let wordCount = type == DINT || type.type == DINT ? 2 : 1;
-			if (type instanceof ARRAY) {
-				for (i = 0; i < type.length * wordCount; i++) {
+			if (PLCTags.hasOwnProperty(tagName)) { errorString += `PLCTags already has ${tagName}\n`; }
+			let wordCount = tagType == DINT || tagType.type == DINT ? 2 : 1;
+			if (tagType instanceof ARRAY) {
+				for (i = 0; i < tagType.length * wordCount; i++) {
 					PLCTagsCheck(deviceName, deviceIndex + i);
 				}
 			} else {
@@ -136,10 +148,17 @@
 				}
 			}
 			/*check*/
-			PLCTags[name] = { name: name, type: type, deviceName: deviceName, deviceIndex: deviceIndex }
-			PLCTagsString += `"VAR_GLOBAL"	"${name}"	"${type}"	""	"${deviceName}${deviceIndex}"	""	""	""	""	""	""\n`;
+			PLCTags[tagName] = { name: tagName, type: tagType, deviceName: deviceName, deviceIndex: deviceIndex };
+			PLCTagsString += `"VAR_GLOBAL"	"${tagName}"	"${tagType}"	""	"${deviceName}${deviceIndex}"	""	""	""	""	""	""\n`;
+
+			let row = PLCTagsTable.insertRow(PLCTagsTable.rows.length);
+			row.insertCell(0).innerHTML = tagName;
+			row.insertCell(1).innerHTML = tagType;
+			row.insertCell(2).innerHTML = `${deviceName}${deviceIndex}`;
+
 			if (syncHMI == true) {
-				newHMITag(`-${name}`, PLC1, deviceName, deviceIndex);
+				newHMITag(`-${tagName}`, PLC1, deviceName, deviceIndex);
+				row.style.backgroundColor = '#bafc77';
 			}
 		}
 
@@ -183,12 +202,17 @@
 			newHMITag('LineIndicatorY', Self, LW, 17);
 		}
 
-		function newHMITag(name, plcName, deviceName, deviceIndex) {
+		function newHMITag(tagName, plcName, deviceName, deviceIndex) {
 			/**/
-			if (HMITags.hasOwnProperty(name)) { errorString += `HMITags already has ${name}\n`; }
+			if (HMITags.hasOwnProperty(tagName)) { errorString += `HMITags already has ${tagName}\n`; }
 			/**/
-			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
-			HMITagsString += `${name},${plcName},${deviceName},${deviceIndex}\n`;
+			HMITags[tagName] = { name: tagName, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
+			HMITagsString += `${tagName},${plcName},${deviceName},${deviceIndex}\n`;
+
+			let row = HMITagsTable.insertRow(HMITagsTable.rows.length);
+			row.insertCell(0).innerHTML = tagName;
+			row.insertCell(1).innerHTML = plcName;
+			row.insertCell(2).innerHTML = `${deviceName}${deviceIndex}`;
 		}
 
 		generate();
