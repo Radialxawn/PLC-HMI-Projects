@@ -76,9 +76,7 @@
 			newPLCTag('CommandLt', INT, D, Auto, true);
 			newPLCTag('CommandNb', INT, D, Auto, true);
 			newPLCTag('ArrayIndex', DINT, D, Auto, true);
-			newPLCTag('ArrayIndexLimit', DINT, D, Auto, true);
 			newPLCTag('ArrayIndexMax', DINT, D, Auto, true);
-			newPLCTag('ArrayLength', DINT, D, Auto, true);
 			newPLCTag('TargetArrayX', new ARRAY(DINT, 100), D, 100);
 			newPLCTag('FeedSpeedArrayX', new ARRAY(DINT, 100), D, 300);
 			newPLCTag('TargetArrayY', new ARRAY(DINT, 100), D, 500);
@@ -160,8 +158,8 @@
 			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
 			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
 			newPLCTag(lb('Manual'), BOOL);
-			newPLCTag(lb('ILimitN'), BOOL, X, xy(10, 30));
-			newPLCTag(lb('ILimitP'), BOOL, X, xy(11, 31));
+			newPLCTag(lb('ILimitN'), BOOL, X, xy(10, 30), true);
+			newPLCTag(lb('ILimitP'), BOOL, X, xy(11, 31), true);
 			newPLCTag(lb('OOnOff'), BOOL, Y, xy(24, 26));
 			newPLCTag(lb('OReset'), BOOL, Y, xy(25, 27));
 			newPLCTag(lb('OPulse'), BOOL, Y, xy(0, 1));
@@ -181,9 +179,6 @@
 			newHMITag('PageIndexMax', Self, LW, 4);
 			newHMITag('ArrayIndex', Self, LW, 6);
 			newHMITag('ArrayIndexMax', Self, LW, 8);
-			newHMITag('ArrayLength', Self, LW, 10);
-			newHMITag('ArrayIndexLimit', Self, LW, 12);
-			newHMITag('ArrayStart', Self, LW, 14);
 			newHMITag('LineIndicatorState', Self, LW, 16);
 			newHMITag('LineIndicatorY', Self, LW, 17);
 		}
