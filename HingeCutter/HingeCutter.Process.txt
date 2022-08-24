@@ -20,7 +20,7 @@ Auto run
 
 Auto program step
 	From origin
-	Move to x1 xs1
+	Move x8369 y0 lt0 nb0
 	Move to y1 ys1
 	Move to y2 ys2
 	Move to y1 ys2
