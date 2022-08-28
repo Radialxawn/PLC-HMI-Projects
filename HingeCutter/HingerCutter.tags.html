@@ -172,6 +172,7 @@
 			newPLCTag('OCutter3B', BOOL, Y, 13);
 			newPLCTag('OCutter3Pos', BOOL, Y, 14);
 
+			newPLCTag('RunStep', BOOL, M, Auto, true);
 			newPLCTag('AutoNextLine', BOOL, M, Auto, true);
 			newPLCTag('FileEnded', BOOL, M, Auto, true);
 			newPLCTag('CommandLt', INT, D, Auto, true);
@@ -251,7 +252,6 @@
 			newPLCTag(lb('DirInt'), DINT);
 			newPLCTag(lb('DirInstruction'), BOOL);
 			newPLCTag(lb('LimitR'), BOOL);
-			newPLCTag(lb('LimitRPos'), DINT, D, Auto, true);
 			newPLCTag(lb('CurPos'), DINT, D, Auto, true);
 			newPLCTag(lb('CurPosP'), DINT, D, xy(8140, 8142));
 			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
