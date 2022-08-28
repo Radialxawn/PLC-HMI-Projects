@@ -246,11 +246,12 @@
 
 		function generatePLCTagsAxis(name) {
 			let lb = function (n) { return `${name}${n}`; }
-			let xy = function (x, y) { return name == XAxis ? x : y; }
+			let xy = function (x, y) { return name == XAxis ? y : x; }
 			newPLCTag(lb('Dir'), BOOL);
 			newPLCTag(lb('DirInt'), DINT);
 			newPLCTag(lb('DirInstruction'), BOOL);
 			newPLCTag(lb('LimitR'), BOOL);
+			newPLCTag(lb('LimitRPos'), DINT, D, Auto, true);
 			newPLCTag(lb('CurPos'), DINT, D, Auto, true);
 			newPLCTag(lb('CurPosP'), DINT, D, xy(8140, 8142));
 			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
@@ -259,8 +260,8 @@
 			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
 			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
 			newPLCTag(lb('Manual'), BOOL);
-			newPLCTag(lb('ILimitN'), BOOL, X, xy(10, 30), true);
-			newPLCTag(lb('ILimitP'), BOOL, X, xy(11, 31), true);
+			newPLCTag(lb('ILimitN'), BOOL, X, xy(10, 31), true);
+			newPLCTag(lb('ILimitP'), BOOL, X, xy(11, 30), true);
 			newPLCTag(lb('OOnOff'), BOOL, Y, xy(24, 26));
 			newPLCTag(lb('OReset'), BOOL, Y, xy(25, 27));
 			newPLCTag(lb('OPulse'), BOOL, Y, xy(0, 1));
