@@ -249,7 +249,7 @@
 			let lb = function (n) { return `${name}${n}`; }
 			let xy = function (x, y) { return name == XAxis ? y : x; }
 			newPLCTag(lb('Dir'), BOOL);
-			newPLCTag(lb('DirInt'), DINT);
+			newPLCTag(lb('DirInt'), INT);
 			newPLCTag(lb('DirInstruction'), BOOL);
 			newPLCTag(lb('LimitR'), BOOL);
 			newPLCTag(lb('CurPos'), DINT, D, Auto, true);
