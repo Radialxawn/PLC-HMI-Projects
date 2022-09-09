@@ -73,7 +73,7 @@
 		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y';
 		const XAxis = 'XX', YAxis = 'YY';
 		const Auto = -1;
-		let PLCTags = { [AllDevicesUsed]: { M: [], D: [] } };
+		let PLCTags = { [AllDevicesUsed]: { M: [], D: [], X: [], Y: [] } };
 		let PLCTagsTable = document.getElementById('plc-tags');
 		let PLCTagsString = '';
 		let HMITags = { [AllDevicesUsed]: { LB: [], LW: [] } };
@@ -150,6 +150,7 @@
 			newPLCTag('ManualHandler', 'ManualHandler');
 			newPLCTag('AutoHandler', 'AutoHandler');
 			newPLCTag('CommandHandler', 'CommandHandler');
+			newPLCTag('CommandConditionHandler', 'CommandConditionHandler');
 			newPLCTag('PulseOutAndLimit', 'PulseOutAndLimit');
 			newPLCTag('OriginSetMove', 'OriginSetMove');
 
@@ -171,9 +172,14 @@
 			newPLCTag('OCutter3A', BOOL, Y, 12);
 			newPLCTag('OCutter3B', BOOL, Y, 13);
 			newPLCTag('OCutter3Pos', BOOL, Y, 14);
+			newPLCTag('ICutter3PosN', BOOL, X, 5);
+			newPLCTag('ICutter3PosP', BOOL, X, 6);
 
-			newPLCTag('RunStep', BOOL, M, Auto, true);
+			newPLCTag('StepRun', BOOL, M, Auto, true);
+			newPLCTag('StepDone', BOOL, M, Auto, true);
 			newPLCTag('AutoNextLine', BOOL, M, Auto, true);
+			newPLCTag('AutoNextLineCondition', BOOL, M, Auto);
+			newPLCTag('AutoNextLineSatisfy', BOOL, M, Auto);
 			newPLCTag('FileEnded', BOOL, M, Auto, true);
 			newPLCTag('CommandLt', INT, D, Auto, true);
 			newPLCTag('CommandNb', INT, D, Auto, true);
