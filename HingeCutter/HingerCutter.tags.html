@@ -156,13 +156,13 @@
 
 			newPLCTag('FoilBlocker', BOOL, M, Auto, true);
 			newPLCTag('FoilClamper', BOOL, M, Auto, true);
-			newPLCTag('Cutter1A', BOOL, M, Auto);
-			newPLCTag('Cutter1B', BOOL, M, Auto);
-			newPLCTag('Cutter2A', BOOL, M, Auto);
-			newPLCTag('Cutter2B', BOOL, M, Auto);
-			newPLCTag('Cutter3A', BOOL, M, Auto);
-			newPLCTag('Cutter3B', BOOL, M, Auto);
-			newPLCTag('Cutter3Pos', BOOL, M, Auto);
+			newPLCTag('Cutter1A', BOOL, M, Auto, true);
+			newPLCTag('Cutter1B', BOOL, M, Auto, true);
+			newPLCTag('Cutter2A', BOOL, M, Auto, true);
+			newPLCTag('Cutter2B', BOOL, M, Auto, true);
+			newPLCTag('Cutter3A', BOOL, M, Auto, true);
+			newPLCTag('Cutter3B', BOOL, M, Auto, true);
+			newPLCTag('Cutter3Pos', BOOL, M, Auto, true);
 			newPLCTag('OFoilBlocker', BOOL, Y, 4);
 			newPLCTag('OFoilClamper', BOOL, Y, 5);
 			newPLCTag('OCutter1A', BOOL, Y, 6);
@@ -277,7 +277,14 @@
 		}
 
 		function generateHMITags() {
-			newHMITag('DownloadingToPLC', Self, LB, 1);
+			newHMITag('DownloadingToPLC', Self, LB, 0);
+			newHMITag('OffsetChanged', Self, LB, 1);
+			newHMITag('CutterOffsetN', Self, LW, 0);
+			newHMITag('CutterOffsetP', Self, LW, 2);
+			newHMITag('RawMillerOffsetN', Self, LW, 4);
+			newHMITag('RawMillerOffsetP', Self, LW, 6);
+			newHMITag('FineMillerOffsetN', Self, LW, 8);
+			newHMITag('FineMillerOffsetP', Self, LW, 10);
 		}
 
 		function newHMITag(name, plcName, deviceName, deviceIndex) {
