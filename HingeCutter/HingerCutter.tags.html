@@ -277,18 +277,7 @@
 		}
 
 		function generateHMITags() {
-			newHMITag('FileIndexChanged', Self, LB, 0);
-			newHMITag('PageIndexChanged', Self, LB, 1);
-			newHMITag('ArrayIndexChanged', Self, LB, 2);
-			newHMITag('ArrayIndexMaxChanged', Self, LB, 3);
-			newHMITag('DownloadingToPLC', Self, LB, 4);
-			newHMITag('FileIndex', Self, LW, 0);
-			newHMITag('PageIndex', Self, LW, 2);
-			newHMITag('PageIndexMax', Self, LW, 4);
-			newHMITag('ArrayIndex', Self, LW, 6);
-			newHMITag('ArrayIndexMax', Self, LW, 8);
-			newHMITag('LineIndicatorState', Self, LW, 16);
-			newHMITag('LineIndicatorY', Self, LW, 17);
+			newHMITag('DownloadingToPLC', Self, LB, 1);
 		}
 
 		function newHMITag(name, plcName, deviceName, deviceIndex) {
