@@ -185,12 +185,12 @@
 			newPLCTag('CommandNb', INT, D, Auto, true);
 			newPLCTag('ArrayIndex', DINT, D, Auto, true);
 			newPLCTag('ArrayIndexMax', DINT, D, Auto, true);
-			newPLCTag('TargetArrayX', new ARRAY(DINT, 100), D, 100);
-			newPLCTag('FeedSpeedArrayX', new ARRAY(DINT, 100), D, 300);
+			newPLCTag('CommandLtArray', new ARRAY(INT, 100), D, 100);
+			newPLCTag('CommandNbArray', new ARRAY(INT, 100), D, 200);
+			newPLCTag('TargetArrayX', new ARRAY(DINT, 100), D, 300);
 			newPLCTag('TargetArrayY', new ARRAY(DINT, 100), D, 500);
-			newPLCTag('FeedSpeedArrayY', new ARRAY(DINT, 100), D, 700);
-			newPLCTag('CommandLtArray', new ARRAY(INT, 100), D, 900);
-			newPLCTag('CommandNbArray', new ARRAY(INT, 100), D, 1000);
+			newPLCTag('FeedSpeedArrayX', new ARRAY(DINT, 100), D, 700);
+			newPLCTag('FeedSpeedArrayY', new ARRAY(DINT, 100), D, 900);
 
 			generatePLCTagsAxis(XAxis);
 			generatePLCTagsAxis(YAxis);
