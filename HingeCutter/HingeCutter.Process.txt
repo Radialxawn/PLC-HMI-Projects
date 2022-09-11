@@ -1,3 +1,5 @@
+Area, X -400, Y 75
+
 Start and setup machine
 	Press on
 	Move machine near origin, inside bound
