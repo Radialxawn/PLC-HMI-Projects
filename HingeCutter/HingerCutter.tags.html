@@ -282,11 +282,17 @@
 			newHMITag('OffsetChanged', Self, LB, 2);
 			newHMITag('CutterOffsetN', Self, LW, 0);
 			newHMITag('CutterOffsetP', Self, LW, 2);
-			newHMITag('RawMillerOffsetN', Self, LW, 4);
-			newHMITag('RawMillerOffsetP', Self, LW, 6);
-			newHMITag('FineMillerOffsetN', Self, LW, 8);
-			newHMITag('FineMillerOffsetP', Self, LW, 10);
-			newHMITag('ArrayIndexMax', Self, LW, 12);
+			newHMITag('CutterOffsetD', Self, LW, 4);
+			newHMITag('CutterFeedSpeed', Self, LW, 6);
+			newHMITag('RawMillerOffsetN', Self, LW, 8);
+			newHMITag('RawMillerOffsetP', Self, LW, 10);
+			newHMITag('RawMillerOffsetD', Self, LW, 12);
+			newHMITag('RawMillerFeedSpeed', Self, LW, 14);
+			newHMITag('FineMillerOffsetN', Self, LW, 16);
+			newHMITag('FineMillerOffsetP', Self, LW, 18);
+			newHMITag('FineMillerOffsetD', Self, LW, 20);
+			newHMITag('FineMillerFeedSpeed', Self, LW, 22);
+			newHMITag('ArrayIndexMax', Self, LW, 24);
 		}
 
 		function newHMITag(name, plcName, deviceName, deviceIndex) {
