@@ -154,24 +154,17 @@
 			newPLCTag('PulseOutAndLimit', 'PulseOutAndLimit');
 			newPLCTag('OriginSetMove', 'OriginSetMove');
 
-			newPLCTag('FoilBlocker', BOOL, M, Auto, true);
-			newPLCTag('FoilClamper', BOOL, M, Auto, true);
-			newPLCTag('Cutter1A', BOOL, M, Auto, true);
-			newPLCTag('Cutter1B', BOOL, M, Auto, true);
-			newPLCTag('Cutter2A', BOOL, M, Auto, true);
-			newPLCTag('Cutter2B', BOOL, M, Auto, true);
-			newPLCTag('Cutter3A', BOOL, M, Auto, true);
-			newPLCTag('Cutter3B', BOOL, M, Auto, true);
-			newPLCTag('Cutter3Pos', BOOL, M, Auto, true);
-			newPLCTag('OFoilBlocker', BOOL, Y, 4);
-			newPLCTag('OFoilClamper', BOOL, Y, 5);
-			newPLCTag('OCutter1A', BOOL, Y, 6);
-			newPLCTag('OCutter1B', BOOL, Y, 7);
-			newPLCTag('OCutter2A', BOOL, Y, 10);
-			newPLCTag('OCutter2B', BOOL, Y, 11);
-			newPLCTag('OCutter3A', BOOL, Y, 12);
-			newPLCTag('OCutter3B', BOOL, Y, 13);
-			newPLCTag('OCutter3Pos', BOOL, Y, 14);
+			newPLCTag('IFoilBlocker', BOOL, X, 1);
+			newPLCTag('IFoilClamper', BOOL, X, 2);
+			newPLCTag('IAutoNextLine', BOOL, X, 3);
+			newPLCTag('IStepDone', BOOL, X, 4);
+
+			newPLCTag('OFoilBlocker', BOOL, Y, 4, true);
+			newPLCTag('OFoilClamper', BOOL, Y, 5, true);
+			newPLCTag('OCutter1', BOOL, Y, 6, true);
+			newPLCTag('OCutter2', BOOL, Y, 7, true);
+			newPLCTag('OCutter3', BOOL, Y, 10, true);
+			newPLCTag('OCutter3Pos', BOOL, Y, 14, true);
 			newPLCTag('ICutter3PosN', BOOL, X, 5);
 			newPLCTag('ICutter3PosP', BOOL, X, 6);
 
