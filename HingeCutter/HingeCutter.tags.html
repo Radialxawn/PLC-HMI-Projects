@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<style>
+	.button-flat {
+		align-items: center;
+		text-align: center;
+		text-decoration: none;
+		font-family: consolas;
+		border: 0;
+		font-size: 150%;
+		color: #FFF;
+		background: #0CADA7;
+		padding: 8px 8px;
+		display: inline-block;
+		white-space: nowrap;
+		border-radius: 5px;
+		margin: 10px 0;
+	}
+
+	.button-flat:hover {
+		background: #0A948F;
+	}
+
+	table {
+		border-spacing: 2px;
+	}
+
+	table td {
+		border: 2px solid rgb(81, 38, 211);
+		border-radius: 3px;
+		padding: 2px;
+		text-align: center;
+	}
+
+	.wrapper {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		column-gap: 8px;
+	}
+</style>
+
+<body>
+	<p id="error" style="white-space: pre;color: crimson;font-size: 13px;"></p>
+	<div class="wrapper">
+		<div>
+			<button class="button-flat" style="width: 100%;" onclick="copy(PLCTagsString)">Copy PLC Tags</button>
+			<table id="plc-tags" style="font-size: 13px;font-family: consolas;width: 100%;">
+				<tr style="background-color: gray;">
+					<td style="width: 45%;">Name</td>
+					<td style="width: 45%;">Type</td>
+					<td style="width: 10%;">Device</td>
+				</tr>
+			</table>
+		</div>
+		<div>
+			<button class="button-flat" style="width: 100%;" onclick="copy(HMITagsString)">Copy HMI Tags</button>
+			<table id="hmi-tags" style="font-size: 13px;font-family: consolas;width: 100%;">
+				<tr style="background-color: gray;">
+					<td style="width: 45%;">Name</td>
+					<td style="width: 45%;">PLC</td>
+					<td style="width: 10%;">Device</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<script>
+		function setById(id, value) { document.getElementById(id).innerHTML = value; }
+		function getById(id) { return document.getElementById(id); }
+
+		const AllDevicesUsed = '-AllDevicesUsed-';
+		const PLC1 = 'PLC1', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW';
+		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y';
+		const XAxis = 'XX', YAxis = 'YY';
+		const Auto = -1;
+		let PLCTags = { [AllDevicesUsed]: { M: [], D: [], X: [], Y: [] } };
+		let PLCTagsTable = document.getElementById('plc-tags');
+		let PLCTagsString = '';
+		let HMITags = { [AllDevicesUsed]: { LB: [], LW: [] } };
+		let HMITagsTable = document.getElementById('hmi-tags');
+		let HMITagsString = '';
+		let errorString = '';
+
+		function generate() {
+			generatePLCTags();
+			generateHMITags();
+			printDebug();
+		}
+
+		function printDebug() {
+			for (var key in PLCTags) {
+				let PLCTag = PLCTags[key];
+				if (PLCTag.name == undefined) {
+					continue;
+				}
+				let PLCRow = PLCTagsTable.insertRow(PLCTagsTable.rows.length);
+				PLCRow.insertCell(0).innerHTML = PLCTag.name;
+				PLCRow.insertCell(1).innerHTML = PLCTag.type;
+				PLCRow.insertCell(2).innerHTML = `${PLCTag.deviceName}${PLCTag.deviceIndex}`;
+
+				let HMIKey = `-${PLCTag.name}`;
+				let HMIRow = HMITagsTable.insertRow(HMITagsTable.rows.length);
+				if (HMITags.hasOwnProperty(HMIKey)) {
+					let HMITag = HMITags[HMIKey];
+					HMIRow.insertCell(0).innerHTML = HMITag.name;
+					HMIRow.insertCell(1).innerHTML = HMITag.plcName;
+					HMIRow.insertCell(2).innerHTML = `${HMITag.deviceName}${HMITag.deviceIndex}`;
+					PLCRow.style.backgroundColor = '#92ed6b';
+					HMIRow.style.backgroundColor = '#92ed6b';
+					HMITag.drawn = true;
+				} else {
+					for (var i = 0; i < 3; i++) {
+						HMIRow.insertCell(i).innerHTML = 'ø';
+						HMIRow.cells[i].style.visibility = 'hidden';
+					}
+				}
+			}
+
+			for (var key in HMITags) {
+				let HMITag = HMITags[key];
+				if (HMITag.name == undefined) {
+					continue;
+				}
+				if (HMITag.drawn != true) {
+					let HMIRow = HMITagsTable.insertRow(HMITagsTable.rows.length);
+					HMIRow.insertCell(0).innerHTML = HMITag.name;
+					HMIRow.insertCell(1).innerHTML = HMITag.plcName;
+					HMIRow.insertCell(2).innerHTML = `${HMITag.deviceName}${HMITag.deviceIndex}`;
+				}
+			}
+
+			setById('error', errorString);
+		}
+
+		function generatePLCTags() {
+			PLCTagsString += `"HingeCutter"\n`;
+			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
+			newPLCTag('IsOn', BOOL, M, Auto, true);
+			newPLCTag('RunButton', BOOL, M, Auto, true);
+			newPLCTag('RunButtonRisingLatch', BOOL);
+			newPLCTag('RunButtonFallingLatch', BOOL);
+			newPLCTag('StopButton', BOOL, M, Auto, true);
+			newPLCTag('ResetButton', BOOL, M, Auto, true);
+			newPLCTag('SetButton', BOOL, M, Auto, true);
+			newPLCTag('OriginButton', BOOL, M, Auto, true);
+			newPLCTag('FeedSpeed', DINT, D, Auto, true);
+
+			newPLCTag('OnOffResetStop', 'OnOffResetStop');
+			newPLCTag('PositionUpdater', 'PositionUpdater');
+			newPLCTag('ManualHandler', 'ManualHandler');
+			newPLCTag('AutoHandler', 'AutoHandler');
+			newPLCTag('CommandHandler', 'CommandHandler');
+			newPLCTag('CommandConditionHandler', 'CommandConditionHandler');
+			newPLCTag('PulseOutAndLimit', 'PulseOutAndLimit');
+			newPLCTag('OriginSetMove', 'OriginSetMove');
+
+			newPLCTag('IFoilBlocker', BOOL, X, 1);
+			newPLCTag('IFoilClamper', BOOL, X, 2);
+			newPLCTag('IAutoNextLine', BOOL, X, 3);
+			newPLCTag('IStepDone', BOOL, X, 4);
+
+			newPLCTag('OFoilBlocker', BOOL, Y, 4, true);
+			newPLCTag('OFoilClamper', BOOL, Y, 5, true);
+			newPLCTag('OCutter1', BOOL, Y, 6, true);
+			newPLCTag('OCutter2', BOOL, Y, 7, true);
+			newPLCTag('OCutter3', BOOL, Y, 10, true);
+			newPLCTag('OCutter3Pos', BOOL, Y, 14, true);
+			newPLCTag('ICutter3PosN', BOOL, X, 5);
+			newPLCTag('ICutter3PosP', BOOL, X, 6);
+
+			newPLCTag('StepRun', BOOL, M, Auto, true);
+			newPLCTag('StepDone', BOOL, M, Auto, true);
+			newPLCTag('AutoNextLine', BOOL, M, Auto, true);
+			newPLCTag('AutoNextLineCondition', BOOL, M, Auto);
+			newPLCTag('AutoNextLineSatisfy', BOOL, M, Auto);
+			newPLCTag('FileEnded', BOOL, M, Auto, true);
+			newPLCTag('CommandLt', INT, D, Auto, true);
+			newPLCTag('CommandNb', INT, D, Auto, true);
+			newPLCTag('ArrayIndex', DINT, D, Auto, true);
+			newPLCTag('ArrayIndexMax', DINT, D, Auto, true);
+			newPLCTag('CommandLtArray', new ARRAY(INT, 100), D, 100);
+			newPLCTag('CommandNbArray', new ARRAY(INT, 100), D, 200);
+			newPLCTag('TargetArrayX', new ARRAY(DINT, 100), D, 300);
+			newPLCTag('TargetArrayY', new ARRAY(DINT, 100), D, 500);
+			newPLCTag('FeedSpeedArrayX', new ARRAY(DINT, 100), D, 700);
+			newPLCTag('FeedSpeedArrayY', new ARRAY(DINT, 100), D, 900);
+
+			generatePLCTagsAxis(XAxis);
+			generatePLCTagsAxis(YAxis);
+		}
+
+		class ARRAY {
+			constructor(type, length) {
+				this.type = type;
+				this.length = length;
+			}
+			toString() { return `ARRAY [0..${this.length - 1}] OF ${this.type}`; }
+		}
+
+		function PLCTagsAutoIndex(deviceName) {
+			let devicesUsed = PLCTags[AllDevicesUsed][deviceName];
+			for (i = 0; i < 100; i++) {
+				if (devicesUsed.includes(i)) { continue; }
+				return i;
+			}
+			return 0;
+		}
+
+		function PLCTagsCheck(deviceName, deviceIndex) {
+			let allDevicesUsed = PLCTags[AllDevicesUsed];
+			if (allDevicesUsed.hasOwnProperty(deviceName) == false) { return; }
+			let devicesUsed = allDevicesUsed[deviceName];
+			if (devicesUsed.includes(deviceIndex)) {
+				errorString += `PLCTags overlap device ${deviceName}${deviceIndex}\n`;
+			}
+			devicesUsed.push(deviceIndex);
+		}
+
+		function newPLCTag(name, type, deviceName, deviceIndex, syncHMI) {
+			deviceName = deviceName == undefined ? '' : deviceName;
+			deviceIndex = deviceIndex == undefined ? '' : deviceIndex;
+			/*auto index*/
+			if (deviceIndex == Auto) {
+				deviceIndex = PLCTagsAutoIndex(deviceName);
+			}
+			/*auto index*/
+			/*check*/
+			if (PLCTags.hasOwnProperty(name)) { errorString += `PLCTags already has ${name}\n`; }
+			let wordCount = type == DINT || type.type == DINT ? 2 : 1;
+			if (type instanceof ARRAY) {
+				for (i = 0; i < type.length * wordCount; i++) {
+					PLCTagsCheck(deviceName, deviceIndex + i);
+				}
+			} else {
+				for (i = 0; i < wordCount; i++) {
+					PLCTagsCheck(deviceName, deviceIndex + i);
+				}
+			}
+			/*check*/
+			PLCTags[name] = { name: name, type: type, deviceName: deviceName, deviceIndex: deviceIndex };
+			PLCTagsString += `"VAR_GLOBAL"	"${name}"	"${type}"	""	"${deviceName}${deviceIndex}"	""	""	""	""	""	""\n`;
+			if (syncHMI == true) {
+				newHMITag(`-${name}`, PLC1, deviceName, deviceIndex);
+			}
+		}
+
+		function generatePLCTagsAxis(name) {
+			let lb = function (n) { return `${name}${n}`; }
+			let xy = function (x, y) { return name == XAxis ? y : x; }
+			newPLCTag(lb('Dir'), BOOL);
+			newPLCTag(lb('DirInt'), INT);
+			newPLCTag(lb('DirInstruction'), BOOL);
+			newPLCTag(lb('LimitR'), BOOL);
+			newPLCTag(lb('CurPos'), DINT, D, Auto, true);
+			newPLCTag(lb('CurPosP'), DINT, D, xy(8140, 8142));
+			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
+			newPLCTag(lb('CurFS'), DINT, D, Auto, true);
+			newPLCTag(lb('TarR'), BOOL);
+			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
+			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
+			newPLCTag(lb('Manual'), BOOL);
+			newPLCTag(lb('ILimitN'), BOOL, X, xy(10, 31), true);
+			newPLCTag(lb('ILimitP'), BOOL, X, xy(11, 30), true);
+			newPLCTag(lb('OOnOff'), BOOL, Y, xy(24, 26));
+			newPLCTag(lb('OReset'), BOOL, Y, xy(25, 27));
+			newPLCTag(lb('OPulse'), BOOL, Y, xy(0, 1));
+			newPLCTag(lb('ODirection'), BOOL, Y, xy(2, 3));
+			newPLCTag(lb('RunLatch'), BOOL);
+			newPLCTag(lb('RunLatchFalling'), BOOL);
+		}
+
+		function generateHMITags() {
+			newHMITag('Initializing', Self, LB, 0);
+			newHMITag('DownloadingToPLC', Self, LB, 1);
+			newHMITag('ChangingStepIndex', Self, LB, 2);
+			newHMITag('OffsetChanged', Self, LB, 2);
+			newHMITag('CutterOffsetN', Self, LW, 0);
+			newHMITag('CutterOffsetP', Self, LW, 2);
+			newHMITag('CutterOffsetD', Self, LW, 4);
+			newHMITag('CutterFeedSpeed', Self, LW, 6);
+			newHMITag('RawMillerOffsetN', Self, LW, 8);
+			newHMITag('RawMillerOffsetP', Self, LW, 10);
+			newHMITag('RawMillerOffsetD', Self, LW, 12);
+			newHMITag('RawMillerFeedSpeed', Self, LW, 14);
+			newHMITag('FineMillerOffsetN', Self, LW, 16);
+			newHMITag('FineMillerOffsetP', Self, LW, 18);
+			newHMITag('FineMillerOffsetD', Self, LW, 20);
+			newHMITag('FineMillerFeedSpeed', Self, LW, 22);
+			newHMITag('ArrayIndexMax', Self, LW, 24);
+		}
+
+		function newHMITag(name, plcName, deviceName, deviceIndex) {
+			/**/
+			if (HMITags.hasOwnProperty(name)) { errorString += `HMITags already has ${name}\n`; }
+			/**/
+			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
+			HMITagsString += `${name},${plcName},${deviceName},${deviceIndex}\n`;
+		}
+
+		generate();
+
+		function copy(text) {
+			const temp = document.createElement('textarea');
+			temp.value = text;
+			document.body.appendChild(temp);
+			temp.select();
+			document.execCommand('copy');
+			document.body.removeChild(temp);
+		}
+	</script>
+
+</body>
+
+</html>
