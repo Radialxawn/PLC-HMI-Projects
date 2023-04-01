@@ -71,7 +71,7 @@
 		const AllDevicesUsed = '-AllDevicesUsed-';
 		const PLC1 = 'PLC1', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW';
 		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y';
-		const XAxis = 'XX', YAxis = 'YY';
+		const XAxis = 'XX', YAxis = 'YY', ZAxis = 'ZZ';
 		const Auto = -1;
 		let PLCTags = { [AllDevicesUsed]: { M: [], D: [], X: [], Y: [] } };
 		let PLCTagsTable = document.getElementById('plc-tags');
@@ -154,19 +154,8 @@
 			newPLCTag('PulseOutAndLimit', 'PulseOutAndLimit');
 			newPLCTag('OriginSetMove', 'OriginSetMove');
 
-			newPLCTag('IFoilBlocker', BOOL, X, 1);
-			newPLCTag('IFoilClamper', BOOL, X, 2);
 			newPLCTag('IAutoNextLine', BOOL, X, 3);
 			newPLCTag('IStepDone', BOOL, X, 4);
-
-			newPLCTag('OFoilBlocker', BOOL, Y, 4, true);
-			newPLCTag('OFoilClamper', BOOL, Y, 5, true);
-			newPLCTag('OCutter1', BOOL, Y, 6, true);
-			newPLCTag('OCutter2', BOOL, Y, 7, true);
-			newPLCTag('OCutter3', BOOL, Y, 10, true);
-			newPLCTag('OCutter3Pos', BOOL, Y, 14, true);
-			newPLCTag('ICutter3PosN', BOOL, X, 5);
-			newPLCTag('ICutter3PosP', BOOL, X, 6);
 
 			newPLCTag('StepRun', BOOL, M, Auto, true);
 			newPLCTag('StepDone', BOOL, M, Auto, true);
@@ -182,11 +171,14 @@
 			newPLCTag('CommandNbArray', new ARRAY(INT, 100), D, 200);
 			newPLCTag('TargetArrayX', new ARRAY(DINT, 100), D, 300);
 			newPLCTag('TargetArrayY', new ARRAY(DINT, 100), D, 500);
-			newPLCTag('FeedSpeedArrayX', new ARRAY(DINT, 100), D, 700);
-			newPLCTag('FeedSpeedArrayY', new ARRAY(DINT, 100), D, 900);
+			newPLCTag('TargetArrayZ', new ARRAY(DINT, 100), D, 700);
+			newPLCTag('FeedSpeedArrayX', new ARRAY(DINT, 100), D, 900);
+			newPLCTag('FeedSpeedArrayY', new ARRAY(DINT, 100), D, 1100);
+			newPLCTag('FeedSpeedArrayZ', new ARRAY(DINT, 100), D, 1300);
 
 			generatePLCTagsAxis(XAxis);
 			generatePLCTagsAxis(YAxis);
+			generatePLCTagsAxis(ZAxis);
 		}
 
 		class ARRAY {
@@ -246,25 +238,25 @@
 
 		function generatePLCTagsAxis(name) {
 			let lb = function (n) { return `${name}${n}`; }
-			let xy = function (x, y) { return name == XAxis ? y : x; }
+			let xyz = function (x, y, z) { return name == XAxis ? x : name == YAxis ? y : z; }
 			newPLCTag(lb('Dir'), BOOL);
 			newPLCTag(lb('DirInt'), INT);
 			newPLCTag(lb('DirInstruction'), BOOL);
 			newPLCTag(lb('LimitR'), BOOL);
 			newPLCTag(lb('CurPos'), DINT, D, Auto, true);
-			newPLCTag(lb('CurPosP'), DINT, D, xy(8140, 8142));
+			newPLCTag(lb('CurPosP'), DINT, D, xyz(8140, 8142, 8144));
 			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
 			newPLCTag(lb('CurFS'), DINT, D, Auto, true);
 			newPLCTag(lb('TarR'), BOOL);
 			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
 			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
 			newPLCTag(lb('Manual'), BOOL);
-			newPLCTag(lb('ILimitN'), BOOL, X, xy(10, 31), true);
-			newPLCTag(lb('ILimitP'), BOOL, X, xy(11, 30), true);
-			newPLCTag(lb('OOnOff'), BOOL, Y, xy(24, 26));
-			newPLCTag(lb('OReset'), BOOL, Y, xy(25, 27));
-			newPLCTag(lb('OPulse'), BOOL, Y, xy(0, 1));
-			newPLCTag(lb('ODirection'), BOOL, Y, xy(2, 3));
+			newPLCTag(lb('ILimitN'), BOOL, X, xyz(10, 12, 14), true);
+			newPLCTag(lb('ILimitP'), BOOL, X, xyz(11, 13, 15), true);
+			newPLCTag(lb('OOnOff'), BOOL, Y, xyz(24, 26, 28));
+			newPLCTag(lb('OReset'), BOOL, Y, xyz(25, 27, 29));
+			newPLCTag(lb('OPulse'), BOOL, Y, xyz(0, 1, 2));
+			newPLCTag(lb('ODirection'), BOOL, Y, xyz(4, 5, 6));
 			newPLCTag(lb('RunLatch'), BOOL);
 			newPLCTag(lb('RunLatchFalling'), BOOL);
 		}
@@ -294,7 +286,7 @@
 			if (HMITags.hasOwnProperty(name)) { errorString += `HMITags already has ${name}\n`; }
 			/**/
 			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
-			HMITagsString += `${name},${plcName},${deviceName},${deviceIndex}\n`;
+			HMITagsString += `${name},${plcName},${deviceName},${deviceIndex},,Undesignated\n`;
 		}
 
 		generate();

@@ -1,3 +1,6 @@
 Mitsubishi FX3U-64MT/ES-A
-Any PC + EB8000
-Mitsubishi MR-J4-10A Driver + Motor 100W
+HMI Weintek MT8071iP
+Mitsubishi MR-J3-20A
+
+Mitsubishi MR-J3-20A:
+	CN1: đỏ 20, đỏ trắng 21, đen 46, đen trắng 47, xanh dương 42, nâu 43, xám trắng 44, xám 10, cam 11, xanh lá 15, vàng 19, nâu trắng 11, cam trắng 36
