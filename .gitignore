@@ -1,3 +1,4 @@
 **/*.bak[0-9]*
 **/*.xob*
 **/[Bb]ackup*
+__pycache__/
