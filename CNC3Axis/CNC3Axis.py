@@ -43,7 +43,7 @@ axis_x = Axis()
 axis_y = Axis()
 axis_z = Axis()
 R, LS = 3, 0.01 # Bit radius, length step
-FSM, FS = 100, 20 # Feed speed max, feed speed
+FSM, FS = 100, 10 # Feed speed max, feed speed
 
 def _to_machine_location(x, y, z):
    return (axis_x.get_machine_location(x), axis_y.get_machine_location(y), axis_z.get_machine_location(z))
@@ -58,16 +58,17 @@ def _get_range(a, b, step):
    count, count_max = 0, 1024
    while True:
       result.append(i)
-      i = increase and i + step or i - step
       if increase:
+         i += step
          if i >= b:
             break
       else:
+         i -= step
          if i <= b:
             break
       count += 1
       if (count == count_max):
-         print('_get_range overflow')
+         print('_get_range overflow', 'a = %s, b = %s, step = %s, increase = %s' % (a, b, step, increase))
          return []
    result.append(b)
    return result
@@ -117,26 +118,161 @@ def _run_code_C1(xStep, zStep):
    #
    interpolation.local_end()
 
+def _run_code_D1(yStep, zStep):
+   interpolation.local_start()
+   kx, ky = -1, -23
+   for iz in _get_range(0.5, 22, zStep):
+      interpolation.line((kx, ky, 0), FSM)
+      left = True
+      for iy in _get_range(ky, ky + 30.75, yStep):
+         interpolation.line((left and -kx or kx, iy, iz), FS)
+         left = not left
+      interpolation.line((left and -kx or kx, iy, iz), FS)
+   interpolation.line((kx, ky, 22), FS)
+   interpolation.line((kx, ky + 30.75, 22), FS)
+   interpolation.line((-kx, ky + 30.75, 22), FS)
+   interpolation.line((-kx, ky, 22), FS)
+   interpolation.line((0, 0, 0), FSM)
+   interpolation.local_end()
+
+def _run_code_AB2(yStep, zStep):
+   interpolation.local_start()
+   #Top
+   kx, ky = -35, -17.5
+   for iz in _get_range(0.5, 4.5, zStep):
+      interpolation.line((kx, ky, 0), FSM)
+      left = True
+      factor = math.cos(math.asin(1 - (iz / 17)))
+      for iy in _get_range(-17 * factor - R, 17 * factor - R, yStep):
+         ix = left and -kx or kx
+         interpolation.line((-ix, iy, iz), FS)
+         interpolation.line((ix, iy, iz), FS)
+         left = not left
+      interpolation.line((left and -kx or kx, iy, iz), FS)
+   interpolation.line((0, 0, 0), FSM)
+   #Carve
+   kxs = [-35.0396, -20.6396, 11.5718, 16.768]
+   kys = [-17, -8, -8, -17]
+   def _carve(sign):
+      interpolation.line((kxs[0], sign * kys[0], 4), FSM)
+      for iz in _get_range(4.6, 5.5, zStep):
+         factor = math.cos(math.asin(1 - (iz / 17)))
+         for iy in _get_range(17 * factor - 5.5, 0, 1):
+            interpolation.line((kxs[0], sign * kys[0], iz), FSM)
+            interpolation.line((kxs[1], sign * (kys[1] - iy), iz), FS)
+            interpolation.line((kxs[2], sign * (kys[2] - iy), iz), FS)
+            interpolation.line((kxs[3], sign * kys[3], iz), FS)
+      interpolation.line((kxs[3], sign * kys[3], 0), FS)
+   _carve(1)
+   interpolation.line((0, 0, 0), FSM)
+   _carve(-1)
+   interpolation.line((0, 0, 0), FSM)
+   #SideA
+   kxs = [-33.2574, -30.2575, 17.9714, 26.2135]
+   kys = [-20, -17, -17, -20]
+   interpolation.line((kxs[0], kys[0], 0), FSM)
+   for iz in _get_range(8.1, 27, zStep):
+      factor = math.cos(math.asin(1 - (iz / 17)))
+      for iy in _get_range(17 * factor - 14, 0, 1):
+         interpolation.line((kxs[0], kys[0], iz), FSM)
+         interpolation.line((kxs[1], kys[1] - iy, iz), FS)
+         interpolation.line((kxs[2], kys[2] - iy, iz), FS)
+         interpolation.line((kxs[3], kys[3], iz), FS)
+   interpolation.line((kxs[3], kys[3], 0), FS)
+   interpolation.line((0, 0, 0), FSM)
+   #SideB
+   kx, oy = -34, 20
+   interpolation.line((kx, oy, 0), FSM)
+   for iz in _get_range(8.1, 27, zStep):
+      interpolation.line((kx, oy, iz), FSM)
+      factor = math.cos(math.asin(1 - (iz / 17)))
+      left = True
+      for iy in _get_range(17 * factor - 14, 0, 1):
+         ix = left and -kx or kx
+         ky = oy - 3 + iy
+         interpolation.line((-ix, ky, iz), FS)
+         interpolation.line((ix, ky, iz), FS)
+         left = not left
+   interpolation.line((kx, oy, 0), FSM)
+   interpolation.line((0, 0, 0), FSM)
+   #
+   interpolation.local_end()
+
+def _run_code_AB1(yStep, zStep):
+   interpolation.local_start()
+   #Top
+   kx, ky = -35, -17.5
+   for iz in _get_range(0.5, 4.5, zStep):
+      interpolation.line((kx, ky, 0), FSM)
+      left = True
+      factor = math.cos(math.asin(1 - (iz / 17)))
+      for iy in _get_range(-17 * factor - R, 17 * factor - R, yStep):
+         ix = left and -kx or kx
+         interpolation.line((-ix, iy, iz), FS)
+         interpolation.line((ix, iy, iz), FS)
+         left = not left
+      interpolation.line((left and -kx or kx, iy, iz), FS)
+   interpolation.line((0, 0, 0), FSM)
+   #Carve
+   kxs = [-35.0396, -20.6396, 11.5718, 16.768]
+   kys = [-17, -8, -8, -17]
+   def _carve(sign):
+      interpolation.line((kxs[0], sign * kys[0], 4), FSM)
+      for iz in _get_range(4.6, 5.5, zStep):
+         factor = math.cos(math.asin(1 - (iz / 17)))
+         for iy in _get_range(17 * factor - 5.5, 0, 1):
+            interpolation.line((kxs[0], sign * kys[0], iz), FSM)
+            interpolation.line((kxs[1], sign * (kys[1] - iy), iz), FS)
+            interpolation.line((kxs[2], sign * (kys[2] - iy), iz), FS)
+            interpolation.line((kxs[3], sign * kys[3], iz), FS)
+      interpolation.line((kxs[3], sign * kys[3], 0), FS)
+   _carve(1)
+   interpolation.line((0, 0, 0), FSM)
+   _carve(-1)
+   interpolation.line((0, 0, 0), FSM)
+   #
+   interpolation.local_end()
+
+def _run_code_A1(zStep):
+   interpolation.local_start()
+   kx, ky = -0.1, -10
+   for iz in _get_range(1, 22, zStep):
+      interpolation.line((kx, 0, iz), FS)
+      interpolation.line((kx, -ky, iz), FS)
+      interpolation.line((-kx, -ky, iz), FS)
+      interpolation.line((-kx, ky, iz), FS)
+      interpolation.line((kx, ky, iz), FS)
+      interpolation.line((kx, 0, iz), FS)
+   interpolation.line((0, 0, iz), FS)
+   interpolation.line((0, 0, 0), FSM)
+   interpolation.local_end()
+
+def _run_code_B1(yStep, zStep):
+   interpolation.local_start()
+   interpolation.local_end()
+
 def run_code():
    interpolation.set_data(mathutils.Vector((axis_x.max, axis_y.max, axis_z.max)))
    interpolation.refresh()
    #C1
    interpolation.line(_to_machine_location(-41, 20, 0), FSM)
-   _run_code_C1(1, 1)
-   #C1-End
-   '''
+   #_run_code_C1(1, 1)
    #D1
-   interpolation.line(_to_machine_position(-15, 21, 0), FSM)
+   interpolation.line(_to_machine_location(-15, 21, 0), FSM)
+   #_run_code_D1(1, 1)
    #AB2
-   interpolation.line(_to_machine_position(-20.5, -25, 0), FSM)
+   interpolation.line(_to_machine_location(-20.5, -25, 0), FSM)
+   #_run_code_AB2(1, 1)
    #B1
-   interpolation.line(_to_machine_position(20, 20, 0), FSM)
+   interpolation.line(_to_machine_location(20, 20, 0), FSM)
+   #_run_code_B1(1, 1)
    #AB1
-   interpolation.line(_to_machine_position(50.5, -25, 0), FSM)
+   interpolation.line(_to_machine_location(50.5, -25, 0), FSM)
+   #_run_code_AB1(1, 1)
    #A1
-   interpolation.line(_to_machine_position(63, 20, 0), FSM)
-   #End
-   '''
+   interpolation.line(_to_machine_location(63, 19, 0), FSM)
+   #_run_code_A1(1)
+   #
    x, y, z = interpolation.get_location()
    interpolation.line((x, y, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
