@@ -73,7 +73,7 @@ def _get_range(a, b, step):
    result.append(b)
    return result
 
-def _run_code_C1(location, xStep, zStep):
+def _run_code_mill_C1(location, xStep, zStep):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
@@ -122,7 +122,7 @@ def _run_code_C1(location, xStep, zStep):
    #
    interpolation.local_end()
 
-def _run_code_D1(location, yStep, zStep):
+def _run_code_mill_D1(location, yStep, zStep):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
@@ -174,7 +174,7 @@ def _run_code_AB_top_carve(h, yStep, zStep):
    _carve(-1)
    interpolation.line((0, 0, 0), FSM)
 
-def _run_code_AB2(location, yStep, zStep):
+def _run_code_mill_AB2(location, yStep, zStep):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
@@ -210,14 +210,14 @@ def _run_code_AB2(location, yStep, zStep):
    #
    interpolation.local_end()
 
-def _run_code_AB1(location, yStep, zStep):
+def _run_code_mill_AB1(location, yStep, zStep):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
    _run_code_AB_top_carve(h, yStep, zStep)
    interpolation.local_end()
 
-def _run_code_A1(location, zStep):
+def _run_code_mill_A1(location, zStep):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
@@ -233,11 +233,11 @@ def _run_code_A1(location, zStep):
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
 
-def _run_code_B1(location, yStep, zStep):
+def _run_code_mill_B1(location, yStep, zStep):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   #Out
+   #Out face
    ox, oy = -16.5 - R, -16.5 - R
    dx, dy = -12.5 - R, -14 - R
    for iz in _get_range(h, h + 5, zStep):
@@ -256,19 +256,86 @@ def _run_code_B1(location, yStep, zStep):
          interpolation.line((id, dy, iz), FS)
       interpolation.line((ox, oy, iz), FS)
    interpolation.line((ox, oy, 0), FS)
+   #Out edge
+   kxs = [-16, -6, 6, 16, 16, 6, -6, -16, -16]
+   kys = [-8, -18, -18, -8, 8, 18, 18, 8, -8]
+   iz_last = h
+   for iz in _get_range(h, h + 5, zStep):
+      for id in _get_range(2, 0, yStep * 0.7071067):
+         for i, (x, y) in enumerate(zip(kxs, kys)):
+            dx = x < 0 and -id or id
+            dy = y < 0 and -id or id
+            if i == 0:
+               interpolation.line((x + dx, y + dy, iz_last), FS)
+            interpolation.line((x + dx, y + dy, iz), FS)
+      iz_last = iz
+   interpolation.line((ox, oy, 0), FS)
    interpolation.line((0, 0, 0), FSM)
    #4Hole
+   interpolation.line((-17.5, -17.5, 0), FSM)
+   for iz in _get_range(h, h + 5, zStep):
+      interpolation.line((-17.5, -17.5, 0), FS)
+      for id in _get_range(2, 0, yStep * 0.7071067):
+         dx, dy = -id, -id
+         interpolation.line((-15.5 + dx, -6.5 + dy, iz), FS)
+         interpolation.arc((-11.5 + dx, -6.5 + dy, iz), (-11.5 + dx, -10.5 + dy, iz), False, LS, FS)
+         interpolation.line((-9 + dx, -10.5 + dy, iz), FS)
+         interpolation.line((-9 + dx, -13 + dy, iz), FS)
+         interpolation.arc((-5 + dx, -13 + dy, iz), (-5 + dx, -17 + dy, iz), False, LS, FS)
+         interpolation.line((-4 + dx, -17 + dy, iz), FS)
+         dx, dy = id, -id
+         interpolation.line((5 + dx, -17 + dy, iz), FS)
+         interpolation.arc((5 + dx, -13 + dy, iz), (9 + dx, -13 + dy, iz), False, LS, FS)
+         interpolation.line((9 + dx, -10.5 + dy, iz), FS)
+         interpolation.line((11.5 + dx, -10.5 + dy, iz), FS)
+         interpolation.arc((11.5 + dx, -6.5 + dy, iz), (15.5 + dx, -6.5 + dy, iz), False, LS, FS)
+         dx, dy = id, id
+         interpolation.line((15.5 + dx, 6.5 + dy, iz), FS)
+         interpolation.arc((11.5 + dx, 6.5 + dy, iz), (11.5 + dx, 10.5 + dy, iz), False, LS, FS)
+         interpolation.line((9 + dx, 10.5 + dy, iz), FS)
+         interpolation.line((9 + dx, 12.5 + dy, iz), FS)
+         interpolation.arc((5 + dx, 13 + dy, iz), (5 + dx, 17 + dy, iz), False, LS, FS)
+         dx, dy = -id, id
+         interpolation.line((-5 + dx, 17 + dy, iz), FS)
+         interpolation.arc((-5 + dx, 13 + dy, iz), (-9 + dx, 13 + dy, iz), False, LS, FS)
+         interpolation.line((-9 + dx, 10.5 + dy, iz), FS)
+         interpolation.line((-11.5 + dx, 10.5 + dy, iz), FS)
+         interpolation.arc((-11.5 + dx, 6.5 + dy, iz), (-15.5 + dx, 6.5 + dy, iz), False, LS, FS)
+         interpolation.line((-15.5 + dx, -5.5 + dy, iz), FS)
+         interpolation.line((-15.5 + dx, -7.5 + dy, iz), FS)
+   interpolation.line((-15.5 + dx, -7.5 + dy, 0), FS)
+   interpolation.line((0, 0, 0), FS)
    interpolation.local_end()
+
+def _run_code_drill_A1(location):
+   h = location[2]
+   interpolation.line((location[0], location[1], 0), FSM)
+
+def _run_code_drill_A2(location):
+   h = location[2]
+   interpolation.line((location[0], location[1], 0), FSM)
+
+def _run_code_drill_B1(location):
+   h = location[2]
+   interpolation.line((location[0], location[1], 0), FSM)
+
+def _run_code_drill_AB1(location):
+   h = location[2]
+   interpolation.line((location[0], location[1], 0), FSM)
 
 def run_code():
    interpolation.set_data(mathutils.Vector((axis_x.max, axis_y.max, axis_z.max)))
    interpolation.refresh()
-   #_run_code_C1(_to_machine_location(-41, 20, 1), 1, 1)
-   #_run_code_D1(_to_machine_location(-15, 21, 1), 1, 1)
-   #_run_code_AB2(_to_machine_location(-20.5, -25, 0.5), 1, 1)
-   _run_code_B1(_to_machine_location(20, 20, 1), 1, 1)
-   #_run_code_AB1(_to_machine_location(50.5, -25, 0.5), 1, 1)
-   #_run_code_A1(_to_machine_location(63, 19, 1), 1)
+   #_run_code_mill_C1(_to_machine_location(-41, 20, 1), 1, 1)
+   #_run_code_mill_D1(_to_machine_location(-15, 21, 1), 1, 1)
+   #_run_code_mill_AB2(_to_machine_location(-20.5, -25, 0.5), 1, 1)
+   #_run_code_mill_B1(_to_machine_location(20, 20, 1), 1, 1)
+   #_run_code_mill_AB1(_to_machine_location(50.5, -25, 0.5), 1, 1)
+   #_run_code_mill_A1(_to_machine_location(63, 19, 1), 1)
+   _run_code_drill_A1(_to_machine_location(-4, 19, 0))
+   _run_code_drill_A2(_to_machine_location(-47, 19, 0))
+   _run_code_drill_B1(_to_machine_location(-90, 20, 0))
+   _run_code_drill_AB1(_to_machine_location(-59.5, -25, 0))
    x, y, z = interpolation.get_location()
    interpolation.line((x, y, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
