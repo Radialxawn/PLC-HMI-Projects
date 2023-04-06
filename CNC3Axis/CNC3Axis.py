@@ -84,7 +84,7 @@ def _run_code_mill_C1(location, xStep, zStep):
       z = iz
       interpolation.line((x, 0, z), FSM)
       for ix in _get_range(x, 1 - R + 1, xStep):
-         interpolation.arc((0, 0, z), (ix, 0, z), True, LS, FS)
+         interpolation.arc((0, 0, z), (ix, 0, z), False, LS, FS)
       z = 0
       interpolation.line((x, 0, z), FSM)
    #Mid
@@ -94,8 +94,8 @@ def _run_code_mill_C1(location, xStep, zStep):
       interpolation.line((x, 0, z), FSM)
       k = -3.4 - R
       for ix in _get_range(x, k, xStep):
-         interpolation.arc((0, 0, z), (ix, 0, z), True, LS, FS)
-      interpolation.arc((0, 0, z), (k, 0, z), True, LS, FS)
+         interpolation.arc((0, 0, z), (ix, 0, z), False, LS, FS)
+      interpolation.arc((0, 0, z), (k, 0, z), False, LS, FS)
       z = 0
       interpolation.line((x, 0, z), FSM)
    #Bottom
@@ -105,8 +105,8 @@ def _run_code_mill_C1(location, xStep, zStep):
       interpolation.line((x, 0, z), FSM)
       kx = -5 - R
       for ix in _get_range(x, kx, xStep):
-         interpolation.arc((0, 0, z), (ix, 0, z), True, LS, FS)
-      interpolation.arc((0, 0, z), (kx, 0, z), True, LS, FS)
+         interpolation.arc((0, 0, z), (ix, 0, z), False, LS, FS)
+      interpolation.arc((0, 0, z), (kx, 0, z), False, LS, FS)
       z = 0
       interpolation.line((x, 0, z), FSM)
    #Curve
@@ -310,18 +310,54 @@ def _run_code_mill_B1(location, yStep, zStep):
 def _run_code_drill_A1(location):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
+   interpolation.local_start()
+   kxs = [-9, 9, 9, -9]
+   kys = [-10.5, -10.5, 10.5, 10.5]
+   for x, y in zip(kxs, kys):
+      interpolation.line((x, y, 0), FSM)
+      interpolation.line((x, y, h + 2), FS)
+      interpolation.line((x, y, 0), FS)
+   interpolation.line((0, 0, 0), FSM)
+   interpolation.local_end()
 
 def _run_code_drill_A2(location):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
+   interpolation.local_start()
+   kxs = [0, -4]
+   kys = [-12, 5]
+   for x, y in zip(kxs, kys):
+      interpolation.line((x, y, 0), FSM)
+      interpolation.line((x, y, h + 4), FS)
+      interpolation.line((x, y, 0), FS)
+   interpolation.line((0, 0, 0), FSM)
+   interpolation.local_end()
 
 def _run_code_drill_B1(location):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
+   interpolation.local_start()
+   kxs = [-9, 9, 9, -9]
+   kys = [-10.5, -10.5, 10.5, 10.5]
+   for x, y in zip(kxs, kys):
+      interpolation.line((x, y, 0), FSM)
+      interpolation.line((x, y, h + 5 + 2), FS)
+      interpolation.line((x, y, 0), FS)
+   interpolation.line((0, 0, 0), FSM)
+   interpolation.local_end()
 
 def _run_code_drill_AB1(location):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
+   interpolation.local_start()
+   kxs = [22.5]
+   kys = [0]
+   for x, y in zip(kxs, kys):
+      interpolation.line((x, y, 0), FSM)
+      interpolation.line((x, y, h + 4.5 + 4), FS)
+      interpolation.line((x, y, 0), FS)
+   interpolation.line((0, 0, 0), FSM)
+   interpolation.local_end()
 
 def run_code():
    interpolation.set_data(mathutils.Vector((axis_x.max, axis_y.max, axis_z.max)))
@@ -332,10 +368,10 @@ def run_code():
    #_run_code_mill_B1(_to_machine_location(20, 20, 1), 1, 1)
    #_run_code_mill_AB1(_to_machine_location(50.5, -25, 0.5), 1, 1)
    #_run_code_mill_A1(_to_machine_location(63, 19, 1), 1)
-   _run_code_drill_A1(_to_machine_location(-4, 19, 0))
-   _run_code_drill_A2(_to_machine_location(-47, 19, 0))
-   _run_code_drill_B1(_to_machine_location(-90, 20, 0))
-   _run_code_drill_AB1(_to_machine_location(-59.5, -25, 0))
+   _run_code_drill_A1(_to_machine_location(-47, 19, 1))
+   _run_code_drill_A2(_to_machine_location(-4, 19, 1))
+   _run_code_drill_B1(_to_machine_location(-90, 20, 1))
+   _run_code_drill_AB1(_to_machine_location(-59.5, -25, 0.5))
    x, y, z = interpolation.get_location()
    interpolation.line((x, y, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
