@@ -173,6 +173,17 @@ def _run_code_AB_top_carve(h, yStep, zStep):
    interpolation.line((0, 0, 0), FSM)
    _carve(-1)
    interpolation.line((0, 0, 0), FSM)
+   #Fillet
+   for sign in [1, -1]:
+      for i, ix in enumerate(_get_range(-0.5, 2, yStep)):
+         if i == 0:
+            interpolation.line((-25.5 + ix, sign * (8.5 + R), 0), FSM)
+         interpolation.line((-25.5 + ix, sign * (8.5 + R), 5.5), FS)
+         interpolation.line((-25.5 + ix, sign * (7.5 + R), 5.5), FS)
+         interpolation.arc((-25.5 + ix + sign * 1, sign * (7.5 + R), 5.5), (-25.5 + ix + sign * 1, sign* (7.5 + R) - 1, 5.5), sign < 0, LS, FS, 'yz')
+         interpolation.line((-25.5 + ix, sign * (5.5 + R), 4), FS)
+         interpolation.line((-25.5 + ix, sign * (8.5 + R), 4), FS)
+      interpolation.line((0, 0, 0), FSM)
 
 def _run_code_mill_AB2(location, yStep, zStep):
    h = location[2]
@@ -222,14 +233,14 @@ def _run_code_mill_A1(location, zStep):
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
    kx, ky = -0.1, -10
-   for iz in _get_range(h, h + 21, zStep):
-      interpolation.line((kx, 0, iz), FS)
-      interpolation.line((kx, -ky, iz), FS)
-      interpolation.line((-kx, -ky, iz), FS)
-      interpolation.line((-kx, ky, iz), FS)
-      interpolation.line((kx, ky, iz), FS)
-      interpolation.line((kx, 0, iz), FS)
-   interpolation.line((0, 0, iz), FS)
+   for sign in [1, -1]:
+      for i, iz in enumerate(_get_range(h, h + 21, zStep)):
+         if i == 0:
+            interpolation.line((kx, 0, iz), FS)
+         interpolation.line((kx, sign * (ky + 4), iz), FS)
+         interpolation.line((kx, sign * ky, iz), FS)
+         interpolation.line((-kx, sign * ky, iz), FS)
+         interpolation.line((-kx, sign * (ky + 4), iz), FS)
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
 
@@ -368,14 +379,30 @@ def run_code():
    #_run_code_mill_B1(_to_machine_location(20, 20, 1), 1, 1)
    #_run_code_mill_AB1(_to_machine_location(50.5, -25, 0.5), 1, 1)
    #_run_code_mill_A1(_to_machine_location(63, 19, 1), 1)
-   _run_code_drill_A1(_to_machine_location(-47, 19, 1))
-   _run_code_drill_A2(_to_machine_location(-4, 19, 1))
-   _run_code_drill_B1(_to_machine_location(-90, 20, 1))
-   _run_code_drill_AB1(_to_machine_location(-59.5, -25, 0.5))
+   #_run_code_drill_A1(_to_machine_location(-47, 19, 1))
+   #_run_code_drill_A2(_to_machine_location(-4, 19, 1))
+   #_run_code_drill_B1(_to_machine_location(-90, 20, 1))
+   #_run_code_drill_AB1(_to_machine_location(-59.5, -25, 0.5))
    x, y, z = interpolation.get_location()
    interpolation.line((x, y, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
    interpolation.check()
+
+def _int_to_word(value):
+  value += value < 0 and 65536 or 0
+  a = value % 256
+  b = (value - a) / 256
+  return chr(int(a)) + chr(int(b))
+
+def int_to_dword(value):
+  value += value < 0 and 4294967296 or 0
+  a = (value - (value % 16777216)) / 16777216
+  value -= a * 16777216
+  b = (value - (value % 65536)) / 65536
+  value -= b * 65536
+  c = (value - (value % 256)) / 256
+  value -= c * 256
+  return chr(int(value)) + chr(int(c)) + chr(int(b)) + chr(int(a))
 
 def export_data():
    f = open('C:\EBpro\emfile\em0.emi', "w")
