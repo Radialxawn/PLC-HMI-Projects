@@ -119,7 +119,22 @@ def _run_code_mill_C1(location, xStep, zStep):
       clockwise = not clockwise
    interpolation.line((-ix, ky, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
-   #
+   #Weld cut
+   r0, r = 9, 6.5
+   kas = [25, -50, -130, 180 - 25]
+   for i, ka in enumerate(kas):
+      x0, y0 = -math.cos(math.radians(ka)) * r0, -math.sin(math.radians(ka)) * r0
+      x, y = -math.cos(math.radians(ka)) * r, -math.sin(math.radians(ka)) * r
+      iz = h + 3.5 + 0.2
+      if i == 0:
+         interpolation.line((x0, y0, 0), FS)
+      else:
+         interpolation.arc((0, 0, iz), (x0, y0, iz), True, 1, FS)
+      interpolation.line((x0, y0, iz), FS)
+      interpolation.line((x, y, iz), FS)
+      interpolation.line((x0, y0, iz), FS)
+   interpolation.line((x0, y0, 0), FS)
+   interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
 
 def _run_code_mill_D1(location, yStep, zStep):
