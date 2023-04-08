@@ -126,19 +126,27 @@ def _run_code_mill_D1(location, yStep, zStep):
    h = location[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   kx, ky = -1, -23
-   kh = h + 21
-   for iz in _get_range(h, kh, zStep):
-      interpolation.line((kx, ky, 0), FSM)
-      left = True
-      for iy in _get_range(ky, ky + 30.75, yStep):
-         interpolation.line((left and -kx or kx, iy, iz), FS)
-         left = not left
-      interpolation.line((left and -kx or kx, iy, iz), FS)
-   interpolation.line((kx, ky, kh), FS)
-   interpolation.line((kx, ky + 30.75, kh), FS)
-   interpolation.line((-kx, ky + 30.75, kh), FS)
-   interpolation.line((-kx, ky, kh), FS)
+   kxs = [-1, -1, 1, 1]
+   kys = [-23, 7.75, 7.75, -23]
+   first = False
+   for iz in _get_range(h, h + 21, zStep):
+     for x, y in zip(kxs, kys):
+         if not first:
+            interpolation.line((x, y, 0), FS)
+            first = True
+         interpolation.line((x, y, iz), FS)
+   interpolation.line((0, 0, 0), FSM)
+   kxs = [-13.5, -12.75, -12.75, -13.5] + [-13.5, -12.5, -12.5, -13.5]
+   kys = [-1, -0.5, -3.5, -3] + [-1, -0.5, -3.5, -3]
+   for sign in [1, -1]:
+      first = False
+      for iz in _get_range(h + 7, h + 14, zStep):
+         for x, y in zip(kxs, kys):
+            if not first:
+               interpolation.line((sign * x, y, 0), FS)
+               first = True
+            interpolation.line((sign * x, y, iz), FS)
+      interpolation.line((sign * x, y, 0), FS)
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
 
@@ -374,7 +382,7 @@ def run_code():
    interpolation.set_data(mathutils.Vector((axis_x.max, axis_y.max, axis_z.max)))
    interpolation.refresh()
    #_run_code_mill_C1(_to_machine_location(-41, 20, 1), 1, 1)
-   #_run_code_mill_D1(_to_machine_location(-15, 21, 1), 1, 1)
+   _run_code_mill_D1(_to_machine_location(-15, 21, 1), 1, 1)
    #_run_code_mill_AB2(_to_machine_location(-20.5, -25, 0.5), 1, 1)
    #_run_code_mill_B1(_to_machine_location(20, 20, 1), 1, 1)
    #_run_code_mill_AB1(_to_machine_location(50.5, -25, 0.5), 1, 1)
@@ -392,7 +400,7 @@ def _int_to_word(value):
   value += value < 0 and 65536 or 0
   a = value % 256
   b = (value - a) / 256
-  return chr(int(a)) + chr(int(b))
+  return [int(a), int(b)]
 
 def int_to_dword(value):
   value += value < 0 and 4294967296 or 0
@@ -402,18 +410,24 @@ def int_to_dword(value):
   value -= b * 65536
   c = (value - (value % 256)) / 256
   value -= c * 256
-  return chr(int(value)) + chr(int(c)) + chr(int(b)) + chr(int(a))
+  return [int(value), int(c), int(b), int(a)]
 
 def export_data():
-   f = open('C:\EBpro\emfile\em0.emi', "w")
    locations, speeds = interpolation.get_data()
-   lines = []
    def fx(value):
       return int(round(value * 1000))
+   byte_arr = []
    for l, s in zip(locations, speeds):
-      lines.append('%s,%s,%s:%s,%s,%s\n' % (fx(l.x), fx(l.y), fx(l.z), fx(s.x), fx(s.y), fx(s.z)))
-   f.writelines(lines)
-   f.close()
+      byte_arr += int_to_dword(fx(l.x))
+      byte_arr += int_to_dword(fx(l.y))
+      byte_arr += int_to_dword(fx(l.z))
+      byte_arr += int_to_dword(fx(s.x))
+      byte_arr += int_to_dword(fx(s.y))
+      byte_arr += int_to_dword(fx(s.z))
+   some_bytes = bytearray(byte_arr)
+   immutable_bytes = bytes(some_bytes)
+   with open('C:\EBpro\emfile\em0.emi', 'wb') as binary_file:
+      binary_file.write(immutable_bytes)
 
 def animate(target, timeFactor):
    locations, frames = interpolation.animate(target, timeFactor)
