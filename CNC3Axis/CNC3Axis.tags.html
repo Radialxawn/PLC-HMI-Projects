@@ -264,21 +264,24 @@
 		function generateHMITags() {
 			newHMITag('Initializing', Self, LB, 0);
 			newHMITag('DownloadingToPLC', Self, LB, 1);
-			newHMITag('ChangingStepIndex', Self, LB, 2);
-			newHMITag('OffsetChanged', Self, LB, 2);
-			newHMITag('CutterOffsetN', Self, LW, 0);
-			newHMITag('CutterOffsetP', Self, LW, 2);
-			newHMITag('CutterOffsetD', Self, LW, 4);
-			newHMITag('CutterFeedSpeed', Self, LW, 6);
-			newHMITag('RawMillerOffsetN', Self, LW, 8);
-			newHMITag('RawMillerOffsetP', Self, LW, 10);
-			newHMITag('RawMillerOffsetD', Self, LW, 12);
-			newHMITag('RawMillerFeedSpeed', Self, LW, 14);
-			newHMITag('FineMillerOffsetN', Self, LW, 16);
-			newHMITag('FineMillerOffsetP', Self, LW, 18);
-			newHMITag('FineMillerOffsetD', Self, LW, 20);
-			newHMITag('FineMillerFeedSpeed', Self, LW, 22);
-			newHMITag('ArrayIndexMax', Self, LW, 24);
+			arr = ['A1', 'B1', 'C1', 'D1', 'AB1', 'AB2', 'A2']
+			for (var i = 0; i < arr.length; i++) {
+				newHMITag(`Foil${arr[i]}`, Self, LB, i + 2);
+			}
+			newHMITag(`FileSelected`, Self, LB, 9);
+			newHMITag('FileIndex', Self, LW, 0);
+			newHMITag('ArrayIndexMin', Self, LW, 2);
+			newHMITag('ArrayIndexMax', Self, LW, 4);
+		}
+
+		function HMITagsCheck(deviceName, deviceIndex) {
+			let allDevicesUsed = HMITags[AllDevicesUsed];
+			if (allDevicesUsed.hasOwnProperty(deviceName) == false) { return; }
+			let devicesUsed = allDevicesUsed[deviceName];
+			if (devicesUsed.includes(deviceIndex)) {
+				errorString += `HMITags overlap device ${deviceName}${deviceIndex}\n`;
+			}
+			devicesUsed.push(deviceIndex);
 		}
 
 		function newHMITag(name, plcName, deviceName, deviceIndex) {
@@ -287,6 +290,7 @@
 			/**/
 			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
 			HMITagsString += `${name},${plcName},${deviceName},${deviceIndex},,Undesignated\n`;
+			HMITagsCheck(deviceName, deviceIndex)
 		}
 
 		generate();
