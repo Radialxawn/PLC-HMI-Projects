@@ -154,27 +154,16 @@
 			newPLCTag('PulseOutAndLimit', 'PulseOutAndLimit');
 			newPLCTag('OriginSetMove', 'OriginSetMove');
 
-			newPLCTag('IAutoNextLine', BOOL, X, 3);
-			newPLCTag('IStepDone', BOOL, X, 4);
-
-			newPLCTag('StepRun', BOOL, M, Auto, true);
-			newPLCTag('StepDone', BOOL, M, Auto, true);
-			newPLCTag('AutoNextLine', BOOL, M, Auto, true);
-			newPLCTag('AutoNextLineCondition', BOOL, M, Auto);
-			newPLCTag('AutoNextLineSatisfy', BOOL, M, Auto);
-			newPLCTag('FileEnded', BOOL, M, Auto, true);
-			newPLCTag('CommandLt', INT, D, Auto, true);
-			newPLCTag('CommandNb', INT, D, Auto, true);
+			newPLCTag('StepRunning', BOOL, M, Auto, true);
+			newPLCTag('FileRunning', BOOL, M, Auto, true);
 			newPLCTag('ArrayIndex', DINT, D, Auto, true);
 			newPLCTag('ArrayIndexMax', DINT, D, Auto, true);
-			newPLCTag('CommandLtArray', new ARRAY(INT, 100), D, 100);
-			newPLCTag('CommandNbArray', new ARRAY(INT, 100), D, 200);
-			newPLCTag('TargetArrayX', new ARRAY(DINT, 100), D, 300);
-			newPLCTag('TargetArrayY', new ARRAY(DINT, 100), D, 500);
-			newPLCTag('TargetArrayZ', new ARRAY(DINT, 100), D, 700);
-			newPLCTag('FeedSpeedArrayX', new ARRAY(DINT, 100), D, 900);
-			newPLCTag('FeedSpeedArrayY', new ARRAY(DINT, 100), D, 1100);
-			newPLCTag('FeedSpeedArrayZ', new ARRAY(DINT, 100), D, 1300);
+			newPLCTag('TargetArrayX', new ARRAY(DINT, 100), D, 100);
+			newPLCTag('TargetArrayY', new ARRAY(DINT, 100), D, 300);
+			newPLCTag('TargetArrayZ', new ARRAY(DINT, 100), D, 500);
+			newPLCTag('FeedSpeedArrayX', new ARRAY(DINT, 100), D, 700);
+			newPLCTag('FeedSpeedArrayY', new ARRAY(DINT, 100), D, 900);
+			newPLCTag('FeedSpeedArrayZ', new ARRAY(DINT, 100), D, 1100);
 
 			generatePLCTagsAxis(XAxis);
 			generatePLCTagsAxis(YAxis);
@@ -250,9 +239,8 @@
 			newPLCTag(lb('TarR'), BOOL);
 			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
 			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
-			newPLCTag(lb('Manual'), BOOL);
 			newPLCTag(lb('ILimitN'), BOOL, X, xyz(10, 12, 14), true);
-			newPLCTag(lb('ILimitP'), BOOL, X, xyz(11, 13, 15), true);
+			//newPLCTag(lb('ILimitP'), BOOL, X, xyz(11, 13, 15), true);
 			newPLCTag(lb('OOnOff'), BOOL, Y, xyz(24, 26, 28));
 			newPLCTag(lb('OReset'), BOOL, Y, xyz(25, 27, 29));
 			newPLCTag(lb('OPulse'), BOOL, Y, xyz(0, 1, 2));
@@ -270,8 +258,8 @@
 			}
 			newHMITag(`FileSelected`, Self, LB, 9);
 			newHMITag('FileIndex', Self, LW, 0);
-			newHMITag('ArrayIndexMin', Self, LW, 2);
-			newHMITag('ArrayIndexMax', Self, LW, 4);
+			newHMITag('ArrayIndexMax', Self, LW, 2);
+			newHMITag('ArrayIndex', Self, LW, 4);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {

@@ -313,16 +313,16 @@ def _run_code_cut_A2(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   radius = 3
-   kx, ky = 5, 35
-   iz = h + 10
-   for i, ix in enumerate(_get_range(-1 - radius, 4 - radius, yStep)):
-      if i == 0:
-         interpolation.line((kx, 0, 0), FS)
-      interpolation.line((kx, 0, iz), FS)
-      interpolation.line((-ix, 0, iz), FS)
-      interpolation.line((-ix, ky, iz), FS)
-      interpolation.line((kx, ky, iz), FS)
+   radius = 12.5
+   kx, ky = 2 + radius, 35
+   for iz in _get_range(h + 8.75, h + 9.25, zStep):
+      for i, ix in enumerate(_get_range(-1 - radius, 4 - radius, yStep)):
+         if i == 0:
+            interpolation.line((kx, 0, 0), FS)
+         interpolation.line((kx, 0, iz), FS)
+         interpolation.line((-ix, 0, iz), FS)
+         interpolation.line((-ix, ky, iz), FS)
+         interpolation.line((kx, ky, iz), FS)
    interpolation.line((kx, ky, 0), FS)
    interpolation.local_end()
 
@@ -392,13 +392,13 @@ def _export_data(file_name):
 def animate(target, timeFactor):
    print('-Animate')
    interpolation.refresh()
-   _run_code_mill_A1((183, 69, 1),           (1, 1, 1))
+   #_run_code_mill_A1((183, 69, 1),           (1, 1, 1))
    #_run_code_mill_B1((140, 70, 1),           (1, 1, 1))
    #_run_code_mill_C1((79, 70, 1),            (1, 1, 1))
-   _run_code_mill_D1((105, 71, 1),           (1, 1, 1))
+   #_run_code_mill_D1((105, 71, 1),           (1, 1, 1))
    #_run_code_mill_AB1((170.5, 25, 0.5),      (1, 1, 1))
    #_run_code_mill_AB2((99.5, 25, 0.5),       (1, 1, 1))
-   #_run_code_cut_A2((16, 42, 2.5),           (1, 1, 1))
+   _run_code_cut_A2((16, 42, 2.5),           (1, 1, 1))
    interpolation.line((0, 0, 0), FSM)
    interpolation.check()
    locations, frames = interpolation.animate(target, timeFactor)
