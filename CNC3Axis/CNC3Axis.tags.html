@@ -158,6 +158,7 @@
 			newPLCTag('FileRunning', BOOL, M, Auto, true);
 			newPLCTag('ArrayIndex', DINT, D, Auto, true);
 			newPLCTag('ArrayIndexMax', DINT, D, Auto, true);
+			newPLCTag('ArrayIndexEnd', DINT, D, Auto, true);
 			newPLCTag('TargetArrayX', new ARRAY(DINT, 100), D, 100);
 			newPLCTag('TargetArrayY', new ARRAY(DINT, 100), D, 300);
 			newPLCTag('TargetArrayZ', new ARRAY(DINT, 100), D, 500);
@@ -236,6 +237,7 @@
 			newPLCTag(lb('CurPosP'), DINT, D, xyz(8140, 8142, 8144));
 			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
 			newPLCTag(lb('CurFS'), DINT, D, Auto, true);
+			newPLCTag(lb('Backlash'), DINT, D, Auto, true);
 			newPLCTag(lb('TarR'), BOOL);
 			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
 			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
@@ -251,15 +253,15 @@
 
 		function generateHMITags() {
 			newHMITag('Initializing', Self, LB, 0);
-			newHMITag('DownloadingToPLC', Self, LB, 1);
+			newHMITag('Test', Self, LB, 1);
+			newHMITag('DownloadingToPLC', Self, LB, 2);
 			arr = ['A1', 'B1', 'C1', 'D1', 'AB1', 'AB2', 'A2']
 			for (var i = 0; i < arr.length; i++) {
-				newHMITag(`Foil${arr[i]}`, Self, LB, i + 2);
+				newHMITag(`Foil${arr[i]}`, Self, LB, i + 3);
 			}
-			newHMITag(`FileSelected`, Self, LB, 9);
+			newHMITag(`FileSelected`, Self, LB, 10);
 			newHMITag('FileIndex', Self, LW, 0);
-			newHMITag('ArrayIndexMax', Self, LW, 2);
-			newHMITag('ArrayIndex', Self, LW, 4);
+			newHMITag('FileDataCount', Self, LW, 2);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
