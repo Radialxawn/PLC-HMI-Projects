@@ -40,6 +40,16 @@ def _get_range(a, b, step):
    result.append(b)
    return result
 
+def _run_code_test(location, xyzStep):
+   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+   interpolation.line((location[0], location[1], 0), FSM)
+   interpolation.local_start()
+   interpolation.line((-5 - R, 0, 0), FSM)
+   interpolation.arc((0, 0, 0), (-5 - R, 0, 0), True, 0.1, FS)
+   interpolation.arc((0, 0, 0), (-5 - R, 0, 0), False, 0.1, FS)
+   interpolation.line((0, 0, 0), FSM)
+   interpolation.local_end()
+
 def _run_code_mill_A1(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
@@ -352,6 +362,7 @@ def int_to_dword(value):
 
 def export_data():
    fs = [
+      _run_code_test,         (183, 69, 1),        (1, 1, 1),
       _run_code_mill_A1,      (183, 69, 1),        (1, 1, 1),
       _run_code_mill_B1,      (140, 70, 1),        (1, 1, 1),
       _run_code_mill_C1,      (79, 70, 1),         (1, 1, 1),
@@ -375,7 +386,8 @@ def _export_data(file_name):
    def fx(value):
       return int(round(value * 1000))
    byte_arr = []
-   byte_arr += int_to_dword(len(locations))
+   for i in range(6):
+      byte_arr += int_to_dword(len(locations))
    for l, s in zip(locations, speeds):
       byte_arr += int_to_dword(fx(l.x))
       byte_arr += int_to_dword(fx(l.y))
@@ -385,13 +397,13 @@ def _export_data(file_name):
       byte_arr += int_to_dword(fx(s.z))
    some_bytes = bytearray(byte_arr)
    immutable_bytes = bytes(some_bytes)
-   print(file_name)
    with open(('C:\EBpro\emfile\%s.emi' % file_name), 'wb') as binary_file:
       binary_file.write(immutable_bytes)
 
 def animate(target, timeFactor):
    print('-Animate')
    interpolation.refresh()
+   _run_code_test((183, 69, 1),               (1, 1, 1))
    #_run_code_mill_A1((183, 69, 1),           (1, 1, 1))
    #_run_code_mill_B1((140, 70, 1),           (1, 1, 1))
    #_run_code_mill_C1((79, 70, 1),            (1, 1, 1))
