@@ -43,7 +43,7 @@
 	<p id="error" style="white-space: pre;color: crimson;font-size: 13px;"></p>
 	<div class="wrapper">
 		<div>
-			<button class="button-flat" style="width: 100%;" onclick="copy(PLCTagsString)">Copy PLC Tags</button>
+			<button class="button-flat" style="width: 100%;" onclick="copy(PLCTagsString)">Copy PLC Tags (Pass to GXWorks2 generated file)</button>
 			<table id="plc-tags" style="font-size: 13px;font-family: consolas;width: 100%;">
 				<tr style="background-color: gray;">
 					<td style="width: 45%;">Name</td>
@@ -133,33 +133,29 @@
 		}
 
 		function generatePLCTags() {
-			PLCTagsString += `"HingeCutter"\n`;
+			PLCTagsString += `"CNC3Axis"\n`;
 			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
 			newPLCTag('IsOn', BOOL, M, Auto, true);
 			newPLCTag('RunButton', BOOL, M, Auto, true);
-			newPLCTag('RunButtonRisingLatch', BOOL);
-			newPLCTag('RunButtonFallingLatch', BOOL);
 			newPLCTag('StopButton', BOOL, M, Auto, true);
 			newPLCTag('ResetButton', BOOL, M, Auto, true);
 			newPLCTag('SetButton', BOOL, M, Auto, true);
 			newPLCTag('OriginButton', BOOL, M, Auto, true);
 			newPLCTag('FeedSpeed', DINT, D, Auto, true);
+			newPLCTag('State', INT, D, Auto, true);
 
 			newPLCTag('OnOffResetStop', 'OnOffResetStop');
 			newPLCTag('PositionUpdater', 'PositionUpdater');
 			newPLCTag('ManualHandler', 'ManualHandler');
 			newPLCTag('AutoHandler', 'AutoHandler');
-			newPLCTag('CommandHandler', 'CommandHandler');
-			newPLCTag('CommandConditionHandler', 'CommandConditionHandler');
 			newPLCTag('PulseOutAndLimit', 'PulseOutAndLimit');
 			newPLCTag('OriginSetMove', 'OriginSetMove');
 
-			newPLCTag('StepRunning', BOOL, M, Auto, true);
 			newPLCTag('FileRunning', BOOL, M, Auto, true);
 			newPLCTag('ArrayIndex', DINT, D, Auto, true);
 			newPLCTag('ArrayIndexMax', DINT, D, Auto, true);
 			newPLCTag('ArrayIndexEnd', DINT, D, Auto, true);
-			newPLCTag('Array', new ARRAY(DINT, 600), D, 100);
+			newPLCTag('ArrayData', new ARRAY(DINT, 600), D, 100);
 
 			generatePLCTagsAxis(XAxis);
 			generatePLCTagsAxis(YAxis);
@@ -224,23 +220,22 @@
 		function generatePLCTagsAxis(name) {
 			let lb = function (n) { return `${name}${n}`; }
 			let xyz = function (x, y, z) { return name == XAxis ? x : name == YAxis ? y : z; }
-			newPLCTag(lb('Dir'), BOOL);
-			newPLCTag(lb('DirInt'), INT);
 			newPLCTag(lb('DirInstruction'), BOOL);
 			newPLCTag(lb('LimitR'), BOOL);
 			newPLCTag(lb('CurPos'), DINT, D, Auto, true);
-			newPLCTag(lb('CurPosP'), DINT, D, xyz(8140, 8142, 8144));
+			newPLCTag(lb('CurPosP'), DINT, D, xyz(8340, 8350, 8360));
 			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
 			newPLCTag(lb('CurFS'), DINT, D, Auto, true);
 			newPLCTag(lb('Backlash'), DINT, D, Auto, true);
+			newPLCTag(lb('BacklashModifier'), DINT, D, Auto);
 			newPLCTag(lb('ToOrigin'), DINT, D, Auto, true);
 			newPLCTag(lb('TarR'), BOOL);
 			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
 			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
 			newPLCTag(lb('ILimitN'), BOOL, X, xyz(10, 12, 14), true);
-			//newPLCTag(lb('ILimitP'), BOOL, X, xyz(11, 13, 15), true);
-			newPLCTag(lb('OOnOff'), BOOL, Y, xyz(24, 26, 28));
-			newPLCTag(lb('OReset'), BOOL, Y, xyz(25, 27, 29));
+			newPLCTag(lb('ILimitP'), BOOL, X, xyz(11, 13, 15), true);
+			newPLCTag(lb('OOnOff'), BOOL, Y, xyz(20, 22, 24));
+			newPLCTag(lb('OReset'), BOOL, Y, xyz(21, 23, 25));
 			newPLCTag(lb('OPulse'), BOOL, Y, xyz(0, 1, 2));
 			newPLCTag(lb('ODirection'), BOOL, Y, xyz(4, 5, 6));
 			newPLCTag(lb('RunLatch'), BOOL);
