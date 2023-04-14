@@ -142,7 +142,9 @@
 			newPLCTag('SetButton', BOOL, M, Auto, true);
 			newPLCTag('OriginButton', BOOL, M, Auto, true);
 			newPLCTag('FeedSpeed', DINT, D, Auto, true);
-			newPLCTag('State', INT, D, Auto, true);
+			newPLCTag('StateRun', INT, D, Auto, true);
+			newPLCTag('StateSetOrigin', INT, D, Auto, true);
+			newPLCTag('StateFile', INT, D, Auto, true);
 
 			newPLCTag('OnOffResetStop', 'OnOffResetStop');
 			newPLCTag('PositionUpdater', 'PositionUpdater');
@@ -151,11 +153,13 @@
 			newPLCTag('PulseOutAndLimit', 'PulseOutAndLimit');
 			newPLCTag('OriginSetMove', 'OriginSetMove');
 
-			newPLCTag('FileRunning', BOOL, M, Auto, true);
+			newPLCTag('ArrayRun', BOOL, M, Auto, true);
 			newPLCTag('ArrayIndex', DINT, D, Auto, true);
 			newPLCTag('ArrayIndexMax', DINT, D, Auto, true);
 			newPLCTag('ArrayIndexEnd', DINT, D, Auto, true);
+			newPLCTag('ArrayIndexModulo', DINT, D, Auto, true);
 			newPLCTag('ArrayData', new ARRAY(DINT, 600), D, 100);
+			newPLCTag('ArrayStep', BOOL, M, Auto, true);
 
 			generatePLCTagsAxis(XAxis);
 			generatePLCTagsAxis(YAxis);
@@ -221,7 +225,8 @@
 			let lb = function (n) { return `${name}${n}`; }
 			let xyz = function (x, y, z) { return name == XAxis ? x : name == YAxis ? y : z; }
 			newPLCTag(lb('DirInstruction'), BOOL);
-			newPLCTag(lb('LimitR'), BOOL);
+			newPLCTag(lb('LimitN'), BOOL, M, xyz(8344, 8354, 8364));
+			newPLCTag(lb('LimitP'), BOOL, M, xyz(8343, 8353, 8363));
 			newPLCTag(lb('CurPos'), DINT, D, Auto, true);
 			newPLCTag(lb('CurPosP'), DINT, D, xyz(8340, 8350, 8360));
 			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
