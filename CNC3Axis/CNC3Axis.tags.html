@@ -145,9 +145,9 @@
 			newPLCTag('StateRun', INT, D, Auto, true);
 			newPLCTag('StateSetOrigin', INT, D, Auto, true);
 			newPLCTag('StateFile', INT, D, Auto, true);
+			newPLCTag('StateBacklash', INT, D, Auto, true);
 
 			newPLCTag('OnOffResetStop', 'OnOffResetStop');
-			newPLCTag('PositionUpdater', 'PositionUpdater');
 			newPLCTag('ManualHandler', 'ManualHandler');
 			newPLCTag('AutoHandler', 'AutoHandler');
 			newPLCTag('PulseOutAndLimit', 'PulseOutAndLimit');
@@ -160,6 +160,7 @@
 			newPLCTag('ArrayIndexModulo', DINT, D, Auto, true);
 			newPLCTag('ArrayData', new ARRAY(DINT, 600), D, 100);
 			newPLCTag('ArrayStep', BOOL, M, Auto, true);
+			newPLCTag('ArrayStepManual', BOOL, M, Auto, true);
 
 			generatePLCTagsAxis(XAxis);
 			generatePLCTagsAxis(YAxis);
@@ -224,15 +225,12 @@
 		function generatePLCTagsAxis(name) {
 			let lb = function (n) { return `${name}${n}`; }
 			let xyz = function (x, y, z) { return name == XAxis ? x : name == YAxis ? y : z; }
-			newPLCTag(lb('DirInstruction'), BOOL);
 			newPLCTag(lb('LimitN'), BOOL, M, xyz(8344, 8354, 8364));
 			newPLCTag(lb('LimitP'), BOOL, M, xyz(8343, 8353, 8363));
-			newPLCTag(lb('CurPos'), DINT, D, Auto, true);
-			newPLCTag(lb('CurPosP'), DINT, D, xyz(8340, 8350, 8360));
+			newPLCTag(lb('CurPos'), DINT, D, xyz(8340, 8350, 8360));
+			newPLCTag(lb('CurPosView'), DINT, D, Auto, true);
 			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
 			newPLCTag(lb('CurFS'), DINT, D, Auto, true);
-			newPLCTag(lb('Backlash'), DINT, D, Auto, true);
-			newPLCTag(lb('BacklashModifier'), DINT, D, Auto);
 			newPLCTag(lb('ToOrigin'), DINT, D, Auto, true);
 			newPLCTag(lb('TarR'), BOOL);
 			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
@@ -245,6 +243,9 @@
 			newPLCTag(lb('ODirection'), BOOL, Y, xyz(4, 5, 6));
 			newPLCTag(lb('RunLatch'), BOOL);
 			newPLCTag(lb('RunLatchFalling'), BOOL);
+			newPLCTag(lb('BacklashConstant'), DINT, D, Auto, true);
+			newPLCTag(lb('Backlash'), BOOL, M, Auto, true);
+			newPLCTag(lb('BacklashDirection'), BOOL, M, Auto, true);
 		}
 
 		function generateHMITags() {
