@@ -245,7 +245,7 @@
 			newPLCTag(lb('RunLatchFalling'), BOOL);
 			newPLCTag(lb('BacklashConstant'), DINT, D, Auto, true);
 			newPLCTag(lb('Backlash'), BOOL, M, Auto, true);
-			newPLCTag(lb('BacklashDirection'), BOOL, M, Auto, true);
+			newPLCTag(lb('BacklashDirection'), INT, D, Auto, true);
 		}
 
 		function generateHMITags() {
