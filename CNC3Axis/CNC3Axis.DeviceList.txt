@@ -3,4 +3,14 @@ HMI Weintek MT8071iP
 Mitsubishi MR-J3-20A
 
 Mitsubishi MR-J3-20A:
-	CN1: đỏ 20, đỏ trắng 21, đen 46, đen trắng 47, xanh dương 42, nâu 43, xám trắng 44, xám 10, cam 11, xanh lá 15, vàng 19, nâu trắng 11, cam trắng 36
+	CN1: 	đỏ 20, đỏ trắng 21
+		đen 46, đen trắng 47
+		xanh dương 10, xanh dương trắng 11
+		cam 35, cam trắng 36
+		xám 43, xám trắng 44
+		xanh lá 15, xanh lá trắng 19
+		vàng 42, vàng trắng
+		nâu, nâu trắng
+	V+: 11, 36
+	V-: 42, 43, 44
+		
