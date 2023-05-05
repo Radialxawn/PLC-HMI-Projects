@@ -141,7 +141,8 @@
 			newPLCTag('ResetButton', BOOL, M, Auto, true);
 			newPLCTag('SetButton', BOOL, M, Auto, true);
 			newPLCTag('OriginButton', BOOL, M, Auto, true);
-			newPLCTag('FeedSpeed', DINT, D, Auto, true);
+			newPLCTag('ManualSpeed', DINT, D, Auto, true);
+			newPLCTag('ManualStepLength', DINT, D, Auto, true);
 			newPLCTag('StateRun', INT, D, Auto, true);
 			newPLCTag('StateSetOrigin', INT, D, Auto, true);
 			newPLCTag('StateFile', INT, D, Auto, true);
@@ -254,7 +255,7 @@
 			newHMITag('Initializing', Self, LB, 0);
 			newHMITag('Test', Self, LB, 1);
 			newHMITag('DownloadingToPLC', Self, LB, 2);
-			arr = ['Test', 'A1', 'B1', 'C1', 'D1', 'AB1', 'AB2', 'A2']
+			arr = ['Test', 'A1', 'B1', 'D1', 'AB1', 'AB2', 'A2']
 			for (var i = 0; i < arr.length; i++) {
 				newHMITag(`Foil${arr[i]}`, Self, LB, i + 3);
 			}
