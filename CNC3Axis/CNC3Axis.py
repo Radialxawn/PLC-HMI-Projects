@@ -80,7 +80,8 @@ def _run_code_mill_B1(location, xyzStep):
    #Out face
    ox, oy = -16.5 - R, -16.5 - R
    dx, dy = -12.5 - R, -14 - R
-   for iz in _get_range(h, h + 5, zStep):
+   interpolation.line((ox, oy, 0), FS)
+   for iz in _get_range(h, h + 11.3, zStep):
       interpolation.line((ox, oy, iz), FS)
       for id in _get_range(oy, dy, yStep):
          interpolation.line((id, id, iz), FS)
@@ -414,7 +415,7 @@ def animate(target, timeFactor):
    interpolation.refresh()
    #_run_code_test((183, 59, 1),              (1, 1, 1))
    #_run_code_mill_A1((183, 69, 1),           (1, 1, 1))
-   #_run_code_mill_B1((140, 70, 1),           (1, 1, 1))
+   _run_code_mill_B1((137, 68, 1),           (1, 1, 1))
    #_run_code_mill_D1((105, 71, 1),           (1, 1, 1))
    #_run_code_mill_AB1((170.5, 25, 0.5),      (1, 1, 1))
    #_run_code_mill_AB2((99.5, 25, 0.5),       (1, 1, 1))
