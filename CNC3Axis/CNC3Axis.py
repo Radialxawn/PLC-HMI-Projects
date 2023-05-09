@@ -51,9 +51,9 @@ def _run_code_test(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   interpolation.line((-5 - R, 0, 0), FSM)
-   interpolation.arc((0, 0, 0), (-5 - R, 0, 0), True, LS, FS)
-   interpolation.arc((0, 0, 0), (-5 - R, 0, 0), False, LS, FS)
+   interpolation.line((-39 - R, 0, 0), FSM)
+   interpolation.arc((0, 0, 0), (-39 - R, 0, 0), True, LS, FS)
+   interpolation.arc((0, 0, 0), (-39 - R, 0, 0), False, LS, FS)
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
 
@@ -367,13 +367,13 @@ def _int_to_dword(value):
 
 def export_data():
    fs = [
-      _run_code_test,         (183, 59, 1),        (1, 1, 1),
-      _run_code_mill_A1,      (183, 69, 1),        (1, 1, 1),
-      _run_code_mill_B1,      (140, 70, 1),        (1, 1, 1),
-      _run_code_mill_D1,      (105, 71, 1),        (1, 1, 1),
-      _run_code_mill_AB1,     (170.5, 25, 0.5),    (1, 1, 1),
-      _run_code_mill_AB2,     (99.5, 25, 0.5),     (1, 1, 1),
-      _run_code_cut_A2,       (22, 76, 1.5),       (1, 1, 1),
+      _run_code_test,         (117, 43, 1),        (1, 1, 1),
+      _run_code_mill_A1,      (117, 43, 1),        (1, 1, 1),
+      _run_code_mill_B1,      (117, 43, 1),        (1, 1, 1),
+      _run_code_mill_D1,      (117, 43, 1),        (1, 1, 1),
+      _run_code_mill_AB1,     (117, 43, 0.5),    (1, 1, 1),
+      _run_code_mill_AB2,     (117, 43, 0.5),     (1, 1, 1),
+      _run_code_cut_A2,       (117, 43, 1.5),       (1, 1, 1),
    ]
    print('-Export data')
    for i in range(0, len(fs), 3):
@@ -413,13 +413,13 @@ def _export_data(file_name):
 def animate(target, timeFactor):
    print('-Animate')
    interpolation.refresh()
-   #_run_code_test((183, 59, 1),              (1, 1, 1))
+   _run_code_test((117, 43, 1),              (1, 1, 1))
    #_run_code_mill_A1((183, 69, 1),           (1, 1, 1))
    _run_code_mill_B1((137, 68, 1),           (1, 1, 1))
    #_run_code_mill_D1((105, 71, 1),           (1, 1, 1))
    #_run_code_mill_AB1((170.5, 25, 0.5),      (1, 1, 1))
    #_run_code_mill_AB2((99.5, 25, 0.5),       (1, 1, 1))
-   _run_code_cut_A2((22, 76, 1.5),           (1, 1, 1))
+   #_run_code_cut_A2((22, 76, 1.5),           (1, 1, 1))
    interpolation.line((0, 0, 0), FSM)
    interpolation.check()
    locations, frames = interpolation.animate(target, timeFactor)
