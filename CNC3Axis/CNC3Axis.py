@@ -12,7 +12,7 @@ if not dir in sys.path:
 import interpolation
 importlib.reload(interpolation)
 
-R, LS = 3, 0.1 # Bit radius, length step
+R, LS = 3, 0.05 # Bit radius, length step
 FSM, FS = 50, 10 # Feed speed max, feed speed
 
 def _get_range(a, b, step):
