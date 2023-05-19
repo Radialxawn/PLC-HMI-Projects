@@ -61,7 +61,7 @@ def _run_code_mill_A1(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   kx, ky = -0.1, -10
+   kx, ky = -0.1, -11
    for sign in [1, -1]:
       for i, iz in enumerate(_get_range(h, h + 21, zStep)):
          if i == 0:
@@ -77,31 +77,29 @@ def _run_code_mill_B1(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   '''
    #Out face
    kxs = [-15.5, -15.5, 15.5, 15.5, -15.5, -15.5]
-   kys = [  -17,    17,   17,  -17,   -17,   -17]
+   kys = [  -18,    18,   18,  -18,   -18,   -18]
    interpolation.line((kxs[0], kys[0], 0), FS)
    for iz in _get_range(h, h + 11.3, zStep):
       for x, y in zip(kxs, kys):
          interpolation.line((x, y, iz), FS)
    interpolation.line((kxs[-1], kys[-1], 0), FS)
    #Corner
-   kxs = [-15.5, -15.5, -15.5, -7, 7, 15.5, 15.5,  7,   -7, -15.5, -15.5]
-   kys = [  -17,  -8.5,   8.5, 17, 17, 8.5, -8.5, -17, -17,  -8.5,   -17]
+   kxs = [-15.5, -15.5, -15.5, -7.5, 7.5, 15.5, 15.5, 7.5, -7.5, -15.5, -15.5]
+   kys = [  -18,  -8.5,   8.5,   18,  18,  8.5, -8.5, -18,  -18,  -8.5,   -18]
    interpolation.line((kxs[0], kys[0], 0), FS)
    for iz in _get_range(h, h + 5, zStep):
       for x, y in zip(kxs, kys):
          interpolation.line((x, y, iz), FS)
    interpolation.line((kxs[-1], kys[-1], 0), FS)
-   '''
    #4Hole
    dx, dy = -12.5 - R, -14 - R
-   interpolation.line((-5, -18, 0), FS)
+   interpolation.line((-5, -20, 0), FS)
    for iz in _get_range(h, h + 5, zStep):
-      interpolation.line((-5, -18, iz), FS)
+      interpolation.line((-5, -20, iz), FS)
       #
-      interpolation.line((-5, -17, iz), FS)
+      interpolation.line((-5, -18, iz), FS)
       interpolation.arc((-5, -13, iz), (-9, -13, iz), True, LS, FS)
       interpolation.line((-9, -10.5, iz), FS)
       interpolation.line((-11.5, -10.5, iz), FS)
@@ -111,9 +109,9 @@ def _run_code_mill_B1(location, xyzStep):
       interpolation.arc((-11.5, 6.5, iz), (-11.5, 10.5, iz), True, LS, FS)
       interpolation.line((-9, 10.5, iz), FS)
       interpolation.line((-9, 13, iz), FS)
-      interpolation.arc((-5, 13, iz), (-5, 17, iz), True, LS, FS)
+      interpolation.arc((-5, 13, iz), (-5, 18, iz), True, LS, FS)
       #
-      interpolation.line((5, 17, iz), FS)
+      interpolation.line((5, 18, iz), FS)
       interpolation.arc((5, 13, iz), (9, 13, iz), True, LS, FS)
       interpolation.line((9, 10.5, iz), FS)
       interpolation.line((11.5, 10.5, iz), FS)
@@ -123,10 +121,10 @@ def _run_code_mill_B1(location, xyzStep):
       interpolation.arc((11.5, -6.5, iz), (11.5, -10.5, iz), True, LS, FS)
       interpolation.line((9, -10.5, iz), FS)
       interpolation.line((9, -13, iz), FS)
-      interpolation.arc((5, -13, iz), (5, -17, iz), True, LS, FS)
+      interpolation.arc((5, -13, iz), (5, -18, iz), True, LS, FS)
       #
-      interpolation.line((-5, -17, iz), FS)
       interpolation.line((-5, -18, iz), FS)
+      interpolation.line((-5, -20, iz), FS)
    interpolation.line((-15.5 + dx, -7.5 + dy, 0), FS)
    interpolation.line((0, 0, 0), FS)
    interpolation.local_end()
@@ -217,20 +215,20 @@ def _run_code_mill_AB2(location, xyzStep):
    _run_code_AB_top_carve(h, xyzStep)
    #SideA
    kxs = [26.2135, 17.9714, -30.2575, -33.2574]
-   kys = [-20, -17, -17, -20]
+   kys = [-21, -18, -18, -21]
    kfs = [FSM, FS, FS, FS]
    interpolation.line((kxs[0], kys[0], 0), FSM)
-   for iz in _get_range(8.1, 27, zStep):
+   for iz in _get_range(10.1, 25, zStep):
       for x, y, f in zip(kxs, kys, kfs):
          interpolation.line((x, y, iz), f)
    interpolation.line((kxs[3], kys[3], 0), FS)
    interpolation.line((0, 0, 0), FSM)
    #SideB
    kxs = [-34, -34, 34, 34]
-   kys = [20, 17, 17, 20]
+   kys = [21, 18, 18, 21]
    kfs = [FSM, FS, FS, FS]
    interpolation.line((kxs[0], kys[0], 0), FSM)
-   for iz in _get_range(8.1, 27, zStep):
+   for iz in _get_range(10.1, 25, zStep):
       for x, y, f in zip(kxs, kys, kfs):
          interpolation.line((x, y, iz), f)
    interpolation.line((kxs[3], kys[3], 0), FS)
@@ -279,11 +277,11 @@ def _int_to_dword(value):
 def export_data():
    fs = [
       _run_code_test,         (117, 43, 1),        (1, 1, 1),
-      _run_code_mill_A1,      (117, 43, 1),        (1, 1, 0.2),
-      _run_code_mill_B1,      (117, 43, 1),        (1, 3, 0.2),
-      _run_code_mill_D1,      (117, 43, 1),        (1, 1, 0.2),
-      _run_code_mill_AB1,     (117, 43, 0.5),      (0.2, 3, 0.2),
-      _run_code_mill_AB2,     (117, 43, 0.5),      (0.2, 3, 0.2),
+      _run_code_mill_A1,      (117, 43, 1),        (1, 1, 0.4),
+      _run_code_mill_B1,      (117, 43, 1),        (1, 3, 0.4),
+      _run_code_mill_D1,      (117, 43, 1),        (1, 1, 0.4),
+      _run_code_mill_AB1,     (117, 43, 0.5),      (0.2, 3, 0.4),
+      _run_code_mill_AB2,     (117, 43, 0.5),      (0.2, 3, 0.4),
       _run_code_cut_A2,       (117, 43, 1.5),      (1, 1, 1),
    ]
    print('-Export data')
@@ -328,11 +326,11 @@ def animate(target, timeFactor):
    print('-Animate')
    interpolation.refresh()
    #_run_code_test((117, 43, 1),              (1, 1, 1))
-   #_run_code_mill_A1((183, 69, 1),           (1, 1, 1))
-   _run_code_mill_B1((137, 68, 1),           (1, 3, 1))
+   #_run_code_mill_A1((180, 67, 1),           (1, 1, 1))
+   #_run_code_mill_B1((137, 68, 1),           (1, 3, 1))
    #_run_code_mill_D1((105, 71, 1),           (1, 1, 1))
    #_run_code_mill_AB1((167.5, 23, 0.5),      (0.2, 3, 1))
-   #_run_code_mill_AB2((96.5, 23, 0.5),       (0.2, 3, 1))
+   _run_code_mill_AB2((96.5, 23, 0.5),       (0.2, 3, 1))
    #_run_code_cut_A2((22, 76, 1.5),           (1, 1, 1))
    interpolation.line((0, 0, 0), FSM)
    interpolation.check()
