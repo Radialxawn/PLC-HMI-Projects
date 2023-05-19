@@ -45,7 +45,6 @@ def _run_code_test(location, xyzStep):
    for i in range(48):
       interpolation.line((234, 86, 0), FSM)
       interpolation.line((0, 0, 0), FSM)
-'''
       
 def _run_code_test(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
@@ -54,6 +53,21 @@ def _run_code_test(location, xyzStep):
    interpolation.line((-39 - R, 0, 0), FSM)
    interpolation.arc((0, 0, 0), (-39 - R, 0, 0), True, LS, FS)
    interpolation.arc((0, 0, 0), (-39 - R, 0, 0), False, LS, FS)
+   interpolation.line((0, 0, 0), FSM)
+   interpolation.local_end()
+'''
+
+def _run_code_test(location, xyzStep):
+   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+   interpolation.line((location[0], location[1], 0), FSM)
+   interpolation.local_start()
+   kxs = [ 0, -13.5, -13.5, -2,  -2,   2,    2, 13.5, 13.5,  0]
+   kys = [32,    32,    23, 23, 5.5, 5.5,   23,   23,   32, 32]
+   interpolation.line((kxs[0], kys[0], 0), FS)
+   for iz in _get_range(h, h + 17, zStep):
+      for x, y in zip(kxs, kys):
+         interpolation.line((x, y, iz), FS)
+   interpolation.line((x, y, 0), FS)
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
 
@@ -133,8 +147,8 @@ def _run_code_mill_D1(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   kxs = [-1, -1, 1, 1]
-   kys = [-23, 7.75, 7.75, -23]
+   kxs = [   -1,   -1,    1,     1]
+   kys = [-22.5, 7.75, 7.75, -22.5]
    first = False
    for iz in _get_range(h, h + 21, zStep):
      for x, y in zip(kxs, kys):
@@ -143,17 +157,23 @@ def _run_code_mill_D1(location, xyzStep):
             first = True
          interpolation.line((x, y, iz), FS)
    interpolation.line((0, 0, 0), FSM)
-   kxs = [-13.5, -12.75, -12.75, -13.5] + [-13.5, -12.5, -12.5, -13.5]
-   kys = [-1, -0.5, -3.5, -3] + [-1, -0.5, -3.5, -3]
-   for sign in [1, -1]:
-      first = False
-      for iz in _get_range(h + 7, h + 14, zStep):
-         for x, y in zip(kxs, kys):
-            if not first:
-               interpolation.line((sign * x, y, 0), FS)
-               first = True
-            interpolation.line((sign * x, y, iz), FS)
-      interpolation.line((sign * x, y, 0), FS)
+   #
+   kxs = [ -13, -12.5, -12.5,  -13] 
+   kys = [-3.5,  -3.5,  -0.5, -3.5]
+   interpolation.line((kxs[0], kys[0], 0), FS)
+   for iz in _get_range(h + 7, h + 14, zStep):
+      for x, y in zip(kxs, kys):
+         interpolation.line((x, y, iz), FS)
+   interpolation.line((x, y, 0), FS)
+   #
+   kxs = [  13,  12.5,  12.5,   13]
+   kys = [-0.5,  -0.5,  -3.5, -0.5]
+   interpolation.line((kxs[0], kys[0], 0), FS)
+   for iz in _get_range(h + 7, h + 14, zStep):
+      for x, y in zip(kxs, kys):
+         interpolation.line((x, y, iz), FS)
+   interpolation.line((x, y, 0), FS)
+   #
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
 
@@ -276,7 +296,7 @@ def _int_to_dword(value):
 
 def export_data():
    fs = [
-      _run_code_test,         (117, 43, 1),        (1, 1, 1),
+      _run_code_test,         (117, 43, 1),        (1, 1, 0.4),
       _run_code_mill_A1,      (117, 43, 1),        (1, 1, 0.4),
       _run_code_mill_B1,      (117, 43, 1),        (1, 3, 0.4),
       _run_code_mill_D1,      (117, 43, 1),        (1, 1, 0.4),
@@ -325,12 +345,12 @@ def _export_data(file_name):
 def animate(target, timeFactor):
    print('-Animate')
    interpolation.refresh()
-   #_run_code_test((117, 43, 1),              (1, 1, 1))
+   _run_code_test((37, 10, 1),              (1, 1, 1))
    #_run_code_mill_A1((180, 67, 1),           (1, 1, 1))
    #_run_code_mill_B1((137, 68, 1),           (1, 3, 1))
-   #_run_code_mill_D1((105, 71, 1),           (1, 1, 1))
+   #_run_code_mill_D1((102, 69, 1),           (1, 1, 1))
    #_run_code_mill_AB1((167.5, 23, 0.5),      (0.2, 3, 1))
-   _run_code_mill_AB2((96.5, 23, 0.5),       (0.2, 3, 1))
+   #_run_code_mill_AB2((96.5, 23, 0.5),       (0.2, 3, 1))
    #_run_code_cut_A2((22, 76, 1.5),           (1, 1, 1))
    interpolation.line((0, 0, 0), FSM)
    interpolation.check()
