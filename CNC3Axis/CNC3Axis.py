@@ -40,13 +40,12 @@ def _get_range(a, b, step):
    result.append(b)
    return result
 
-'''
-def _run_code_test(location, xyzStep):
+def _run_code_test_limit(location, xyzStep):
    for i in range(48):
       interpolation.line((234, 86, 0), FSM)
       interpolation.line((0, 0, 0), FSM)
       
-def _run_code_test(location, xyzStep):
+def _run_code_test_circle(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
@@ -55,9 +54,8 @@ def _run_code_test(location, xyzStep):
    interpolation.arc((0, 0, 0), (-39 - R, 0, 0), False, LS, FS)
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
-'''
 
-def _run_code_test(location, xyzStep):
+def _run_code_test_fixture_D1(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
@@ -70,6 +68,11 @@ def _run_code_test(location, xyzStep):
    interpolation.line((x, y, 0), FS)
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
+
+def _run_code_test(location, xyzStep):
+   #_run_code_test_limit(location, xyzStep)
+   #_run_code_test_circle(location, xyzStep)
+   _run_code_test_fixture_D1(location, xyzStep)
 
 def _run_code_mill_A1(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]

@@ -1,0 +1,9 @@
+Q35B			| 1.7
+Q64PN			| 3.7
+Q03UDVCPU		| 9.2
+QX40			| 1.3
+QY40P			| 1.6
+QD77GF16		| 29		| (CC-Link IE Field)
+MR-J4-40GF (x6)		| X		| (CC-Link IE Field)
+MR-J4-200GF (x2)	| Y		| (CC-Link IE Field)
+			| 46.5 + X + Y
