@@ -13,7 +13,7 @@ import interpolation
 importlib.reload(interpolation)
 
 R, LS = 3, 0.05 # Bit radius, length step
-FSM, FS = 50, 20 # Feed speed max, feed speed
+FSM, FS = 20, 4 # Feed speed max, feed speed
 
 def _get_range(a, b, step):
    if a == b:
@@ -59,8 +59,8 @@ def _run_code_test_fixture_D1(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   kxs = [ 0, -13.5, -13.5, -2,  -2,   2,    2, 13.5, 13.5,  0]
-   kys = [32,    32,    23, 23, 5.5, 5.5,   23,   23,   32, 32]
+   kxs = [ 0, -13.5, -13.5, -2,  -2,   2,  0]
+   kys = [32,    32,    23, 23, 5.5, 5.5, 32]
    interpolation.line((kxs[0], kys[0], 0), FS)
    for iz in _get_range(h, h + 17, zStep):
       for x, y in zip(kxs, kys):
@@ -150,34 +150,16 @@ def _run_code_mill_D1(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   kxs = [   -1,   -1,    1,     1]
-   kys = [-22.5, 7.75, 7.75, -22.5]
+   kxs = [-1.5,  -1.5,   1.5,  1.5]
+   kys = [-3.5, 26, 26, -3.5]
    first = False
-   for iz in _get_range(h, h + 21, zStep):
+   for iz in _get_range(h, h + 22, zStep):
      for x, y in zip(kxs, kys):
          if not first:
             interpolation.line((x, y, 0), FS)
             first = True
          interpolation.line((x, y, iz), FS)
-   interpolation.line((0, 0, 0), FSM)
-   #
-   kxs = [ -13, -12.5, -12.5,  -13] 
-   kys = [-3.5,  -3.5,  -0.5, -3.5]
-   interpolation.line((kxs[0], kys[0], 0), FS)
-   for iz in _get_range(h + 7, h + 14, zStep):
-      for x, y in zip(kxs, kys):
-         interpolation.line((x, y, iz), FS)
-   interpolation.line((x, y, 0), FS)
-   #
-   kxs = [  13,  12.5,  12.5,   13]
-   kys = [-0.5,  -0.5,  -3.5, -0.5]
-   interpolation.line((kxs[0], kys[0], 0), FS)
-   for iz in _get_range(h + 7, h + 14, zStep):
-      for x, y in zip(kxs, kys):
-         interpolation.line((x, y, iz), FS)
-   interpolation.line((x, y, 0), FS)
-   #
-   interpolation.line((0, 0, 0), FSM)
+   interpolation.line((0, 0, 0), FS)
    interpolation.local_end()
 
 def _run_code_AB_top_carve(h, xyzStep):
@@ -300,9 +282,9 @@ def _int_to_dword(value):
 def export_data():
    fs = [
       _run_code_test,         (117, 43, 1),        (1, 1, 0.4),
-      _run_code_mill_A1,      (117, 43, 1),        (1, 1, 0.4),
-      _run_code_mill_B1,      (117, 43, 1),        (1, 3, 0.4),
-      _run_code_mill_D1,      (117, 43, 1),        (1, 1, 0.4),
+      _run_code_mill_A1,      (6.1, 16.4, 1),        (1, 1, 0.4),
+      _run_code_mill_B1,      (214.05, 20.675, 1),        (1, 3, 0.4),
+      _run_code_mill_D1,      (228.55, 56.3, 1),        (1, 1, 0.4),
       _run_code_mill_AB1,     (117, 43, 0.5),      (0.2, 3, 0.4),
       _run_code_mill_AB2,     (117, 43, 0.5),      (0.2, 3, 0.4),
       _run_code_cut_A2,       (117, 43, 1.5),      (1, 1, 1),
@@ -313,7 +295,6 @@ def export_data():
       interpolation.refresh()
       function, center, xyzStep = fs[i], fs[i + 1], fs[i + 2]
       function(center, xyzStep)
-      interpolation.line((0, 0, 0), FSM)
       function_name = function.__name__[10:]
       print(function_name)
       _export_data(function_name)
@@ -333,7 +314,9 @@ def _export_data(file_name):
    byte_arr += _int_to_word(4)
    byte_arr += _int_to_word(5)
    byte_arr += _int_to_word(6)
-   for l, s in zip(locations, speeds):
+   for i, (l, s) in enumerate(zip(locations, speeds)):
+      if i < 1:
+         continue
       byte_arr += _int_to_dword(fx(l.x))
       byte_arr += _int_to_dword(fx(l.y))
       byte_arr += _int_to_word(fx(l.z))
@@ -348,14 +331,13 @@ def _export_data(file_name):
 def animate(target, timeFactor):
    print('-Animate')
    interpolation.refresh()
-   _run_code_test((37, 10, 1),              (1, 1, 1))
-   #_run_code_mill_A1((180, 67, 1),           (1, 1, 1))
+   #_run_code_test((37, 10, 1),              (1, 1, 1))
+   _run_code_mill_A1((180 + 1, 67 - 1, 1),           (1, 1, 1))
    #_run_code_mill_B1((137, 68, 1),           (1, 3, 1))
-   #_run_code_mill_D1((102, 69, 1),           (1, 1, 1))
+   #_run_code_mill_D1((102, 50, 1),           (1, 1, 1))
    #_run_code_mill_AB1((167.5, 23, 0.5),      (0.2, 3, 1))
    #_run_code_mill_AB2((96.5, 23, 0.5),       (0.2, 3, 1))
    #_run_code_cut_A2((22, 76, 1.5),           (1, 1, 1))
-   interpolation.line((0, 0, 0), FSM)
    interpolation.check()
    locations, frames = interpolation.animate(target, timeFactor)
    for fcurve in target.animation_data.action.fcurves:
