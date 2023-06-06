@@ -141,8 +141,8 @@ def _run_code_mill_D1(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   kxs = [-1.5,  -1.5,   1.5,  1.5]
-   kys = [-3.5, 26, 26, -3.5]
+   kxs = [ 1.5, 1.5, -1.5, -1.5]
+   kys = [-3.5,  26,   26, -3.5]
    first = False
    for iz in _get_range(h, h + 22, zStep):
      for x, y in zip(kxs, kys):
@@ -324,8 +324,8 @@ def animate(target, timeFactor):
    interpolation.refresh()
    #_run_code_test((37, 10, 1),              (1, 1, 1))
    #_run_code_mill_A1((180, 67, 1),           (1, 1, 1))
-   _run_code_mill_B1((137, 64, 1),           (1, 3, 1))
-   #_run_code_mill_D1((102, 50, 1),           (1, 1, 1))
+   #_run_code_mill_B1((137, 64, 1),           (1, 3, 1))
+   _run_code_mill_D1((102, 50, 1),           (1, 1, 1))
    #_run_code_mill_AB1((167.5, 23, 0.5),      (0.2, 3, 1))
    #_run_code_mill_AB2((96.5, 23, 0.5),       (0.2, 3, 1))
    #_run_code_cut_A2((22, 76, 1.5),           (1, 1, 1))
