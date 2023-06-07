@@ -105,35 +105,45 @@ def _run_code_mill_B1(location, xyzStep):
       interpolation.line((-9, -10.5, iz), FS)
       interpolation.line((-11.5, -10.5, iz), FS)
       interpolation.arc((-11.5, -6.5, iz), (-15.5, -6.5, iz), True, LS, FS)
-      interpolation.line((-15.5 - o, -6.5, iz), FS) # offset
+      #interpolation.line((-15.5 - o, -6.5, iz), FS) # offset
       #
-      interpolation.line((-15.5 - o, 6.5, iz), FS) # offset
+      #interpolation.line((-15.5 - o, 6.5, iz), FS) # offset
       interpolation.line((-15.5, 6.5, iz), FS)
       interpolation.arc((-11.5, 6.5, iz), (-11.5, 10.5, iz), True, LS, FS)
       interpolation.line((-9, 10.5, iz), FS)
       interpolation.line((-9, 13, iz), FS)
       interpolation.arc((-5, 13, iz), (-5, 18, iz), True, LS, FS)
       #
-      interpolation.line((-5, 18 + o, iz), FS) # offset
-      interpolation.line((5, 18 + o, iz), FS) # offset
+      #interpolation.line((-5, 18 + o, iz), FS) # offset
+      #interpolation.line((5, 18 + o, iz), FS) # offset
       interpolation.line((5, 18, iz), FS)
       interpolation.arc((5, 13, iz), (9, 13, iz), True, LS, FS)
       interpolation.line((9, 10.5, iz), FS)
       interpolation.line((11.5, 10.5, iz), FS)
       interpolation.arc((11.5, 6.5, iz), (15.5, 6.5, iz), True, LS, FS)
-      interpolation.line((15.5 + o, 6.5, iz), FS) # offset
+      #interpolation.line((15.5 + o, 6.5, iz), FS) # offset
       #
-      interpolation.line((15.5 + o, -6.5, iz), FS) # offset
+      #interpolation.line((15.5 + o, -6.5, iz), FS) # offset
       interpolation.line((15.5, -6.5, iz), FS)
       interpolation.arc((11.5, -6.5, iz), (11.5, -10.5, iz), True, LS, FS)
       interpolation.line((9, -10.5, iz), FS)
       interpolation.line((9, -13, iz), FS)
       interpolation.arc((5, -13, iz), (5, -18, iz), True, LS, FS)
-      interpolation.line((5, -18 - o, iz), FS) # offset
+      #interpolation.line((5, -18 - o, iz), FS) # offset
       #
-      interpolation.line((-5, -18 - o, iz), FS) # offset
+      #interpolation.line((-5, -18 - o, iz), FS) # offset
+      interpolation.line((-5, -18, iz), FS)
       interpolation.line((-5, -20, iz), FS)
-   interpolation.line((-5, -20, 0), FS)
+   #Out face
+   kxs = [-10, -15.5, -15.5, -10, 10, 15.5, 15.5,  10, -10]
+   kys = [-18,   -13,    13,  18, 18,   13,  -13, -18, -18]
+   kfs = [FSM,   FSM,    FS, FSM, FS,  FSM,   FS, FSM,  FS]
+   interpolation.line((kxs[0], kys[0], iz), FS)
+   for iz in _get_range(h + 5.1, h + 11.5, zStep):
+     for x, y, f in zip(kxs, kys, kfs):
+         interpolation.line((x, y, iz), f)
+   interpolation.line((x, y, 0), FS)
+   #
    interpolation.line((0, 0, 0), FS)
    interpolation.local_end()
 
@@ -324,8 +334,8 @@ def animate(target, timeFactor):
    interpolation.refresh()
    #_run_code_test((37, 10, 1),              (1, 1, 1))
    #_run_code_mill_A1((180, 67, 1),           (1, 1, 1))
-   #_run_code_mill_B1((137, 64, 1),           (1, 3, 1))
-   _run_code_mill_D1((102, 50, 1),           (1, 1, 1))
+   _run_code_mill_B1((137, 64, 1),           (1, 3, 1))
+   #_run_code_mill_D1((102, 50, 1),           (1, 1, 1))
    #_run_code_mill_AB1((167.5, 23, 0.5),      (0.2, 3, 1))
    #_run_code_mill_AB2((96.5, 23, 0.5),       (0.2, 3, 1))
    #_run_code_cut_A2((22, 76, 1.5),           (1, 1, 1))
