@@ -12,7 +12,7 @@ if not dir in sys.path:
 import interpolation
 importlib.reload(interpolation)
 
-R, LS = 3, 0.07 # Bit radius, length step
+R, LS = 3, 0.05 # Bit radius, length step
 FSM, FS = 20, 4 # Feed speed max, feed speed
 
 def _get_range(a, b, step):
@@ -284,7 +284,7 @@ def export_data():
    fs = [
       _run_code_test,         (117, 43, 1),        (1, 1, 0.4),
       _run_code_mill_A1,      (6.1, 16.4, 1),        (1, 1, 0.4),
-      _run_code_mill_B1,      (214.05, 20.675, 1),        (1, 3, 0.4),
+      _run_code_mill_B1,      (214.13, 20.785, 1),        (1, 3, 0.4),
       _run_code_mill_D1,      (228.55, 56.3, 1),        (1, 1, 0.4),
       _run_code_mill_AB1,     (117, 43, 0.5),      (0.2, 3, 0.4),
       _run_code_mill_AB2,     (117, 43, 0.5),      (0.2, 3, 0.4),
