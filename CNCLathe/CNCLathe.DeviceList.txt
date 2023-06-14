@@ -4,7 +4,7 @@ Q03UDVCPU					| 9.2
 QX40						| 1.3
 QY40P						| 1.6
 QD77GF16					| 29		| (CC-Link IE Field)
-MR-J4-70GF(HG-KR73,HG-KR73B) (x2,x1)		| 20 * 3	| (CC-Link IE Field)
+MR-J4-60GF-RJ(HG-SR51,HG-SR51B) (x2,x1)		| 20 * 3	| (CC-Link IE Field)
 MR-J4-200GF(HG-JR203,HG-SR201) (x2,x2)		| 40 * 4	| (CC-Link IE Field)
 						| 46.5 + (20 * 3) + (40 * 4)
 						= 266.5
