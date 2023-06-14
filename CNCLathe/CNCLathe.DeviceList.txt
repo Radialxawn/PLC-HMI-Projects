@@ -1,11 +1,10 @@
-Q35B					| 1.7
-Q64PN					| 3.7
-Q03UDVCPU				| 9.2
-QX40					| 1.3
-QY40P					| 1.6
-QD77GF16				| 29		| (CC-Link IE Field)
-MR-J4-40GF(HG-KR43B) (x3)		| 17 * 3	| (CC-Link IE Field)
-MR-J4-70GF(HG-KR73) (x4)		| 20 * 3	| (CC-Link IE Field)
-MR-J4-200GF(HG-JR203B,HG-SR201B) (x3)	| 40 * 3	| (CC-Link IE Field)
-					| 46.5 + (17 * 3) + (20 * 4) + (40 * 3)
-					= 297.5
+Q35B						| 1.7
+Q64PN						| 3.7
+Q03UDVCPU					| 9.2
+QX40						| 1.3
+QY40P						| 1.6
+QD77GF16					| 29		| (CC-Link IE Field)
+MR-J4-70GF(HG-KR73B) (x3)			| 20 * 3	| (CC-Link IE Field)
+MR-J4-200GF(HG-JR203B,HG-SR201B,HG-SR201) (x4)	| 40 * 4	| (CC-Link IE Field)
+						| 46.5 + (20 * 3) + (40 * 4)
+						= 266.5

@@ -146,6 +146,9 @@ def _run_code_mill_B1(location, xyzStep):
    #
    interpolation.line((0, 0, 0), FS)
    interpolation.local_end()
+   x, y, z = interpolation.get_location()
+   interpolation.line((x, 0, 0), FSM)
+   interpolation.line((0, 0, 0), FSM)
 
 def _run_code_mill_D1(location, xyzStep):
    h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
@@ -284,7 +287,7 @@ def export_data():
    fs = [
       _run_code_test,         (117, 43, 1),        (1, 1, 0.4),
       _run_code_mill_A1,      (6.1, 16.4, 1),        (1, 1, 0.4),
-      _run_code_mill_B1,      (214.13, 20.785, 1),        (1, 3, 0.4),
+      _run_code_mill_B1,      (214.03, 20.59, 1),        (1, 3, 0.4),
       _run_code_mill_D1,      (228.55, 56.3, 1),        (1, 1, 0.4),
       _run_code_mill_AB1,     (117, 43, 0.5),      (0.2, 3, 0.4),
       _run_code_mill_AB2,     (117, 43, 0.5),      (0.2, 3, 0.4),
