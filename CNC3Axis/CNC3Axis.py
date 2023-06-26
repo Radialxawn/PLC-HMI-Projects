@@ -124,7 +124,7 @@ def _run_code_mill_B1(location, xyzStep):
    kfs = [FSM,   FSM,    FS, FSM, FS,  FSM,   FS, FSM,  FS]
    final = False
    interpolation.line((kxs[0], kys[0], iz), FS)
-   for iz in _get_range(h + 5.1, h + 11.5, zStep):
+   for iz in _get_range(h + 5.1, h + 12, zStep):
      if (iz >= h + 10.5) and not final:
          kxs.reverse()
          kys.reverse()
