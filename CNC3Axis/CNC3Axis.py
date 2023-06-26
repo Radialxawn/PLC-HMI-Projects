@@ -13,7 +13,7 @@ import interpolation
 importlib.reload(interpolation)
 
 R, LS = 3, 0.05 # Bit radius, length step
-FSM, FS = 20, 4 # Feed speed max, feed speed
+FSM, FS = 20, 5 # Feed speed max, feed speed
 
 def _get_range(a, b, step):
    if a == b:
@@ -85,7 +85,7 @@ def _run_code_mill_B1(location, xyzStep):
    interpolation.line((location[0], 0, 0), FSM)
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   ox = -0.07
+   ox = -0.06
    oy = 0.04
    #4Hole
    interpolation.line((-5 - ox, -20 - oy, 0), FS)
@@ -145,8 +145,10 @@ def _run_code_mill_D1(location, xyzStep):
    interpolation.line((location[0], 0, 0), FSM)
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   kxs = [ 1.5, 1.5, -1.5, -1.5]
-   kys = [-3.5,  26,   26, -3.5]
+   width = 9.5
+   kx = (width - R * 2) / 2
+   kxs = [kx,   kx, -kx,  -kx]
+   kys = [-3.5, 26,  26, -3.5]
    first = False
    for iz in _get_range(h, h + 22, zStep):
      for x, y in zip(kxs, kys):
@@ -292,39 +294,49 @@ def _int_to_dword(value):
 
 def export_data():
    fs = [
-      _run_code_test,         (117, 43, 1),        (1, 1, 0.4),
-      _run_code_mill_A1,      (5.8, 16.9, 1),        (1, 1, 0.4),
-      _run_code_mill_B1,      (213.89, 21.12, 1),        (1, 3, 0.4),
-      _run_code_mill_D1,      (228.55, 56.3, 1),        (1, 1, 0.4),
-      _run_code_mill_AB1,     (117, 43, 1),      (5, 1, 0.4),
-      _run_code_mill_AB2,     (117, 43, 1),      (5, 1, 0.4),
-      _run_code_cut_A2,       (117, 43, 1),      (1, 1, 1),
+      _run_code_test,         (117, 43, 1),       (1, 1, 0.4), (0, 0),
+      _run_code_mill_A1,      (5.8, 16.9, 1),     (1, 1, 0.4), (0, 14),
+      _run_code_mill_B1,      (213.89, 21.12, 1), (1, 3, 0.4), (0, 0),
+      _run_code_mill_D1,      (228.3, 56.9, 1),   (1, 1, 0.4), (0, 0),
+      _run_code_mill_AB1,     (117, 43, 1),       (5, 1, 0.4), (0, 0),
+      _run_code_mill_AB2,     (117, 43, 1),       (5, 1, 0.4), (0, 0),
+      _run_code_cut_A2,       (117, 43, 1),       (1, 1, 1),   (0, 0),
    ]
    print('-Export data')
    timeMinutesTotal = 0
-   for i in range(0, len(fs), 3):
+   for i in range(0, len(fs), 4):
       interpolation.refresh()
-      function, center, xyzStep = fs[i], fs[i + 1], fs[i + 2]
+      function, center, xyzStep, setZOffset = fs[i], fs[i + 1], fs[i + 2], fs[i + 3]
       function(center, xyzStep)
       function_name = function.__name__[10:]
       print(function_name)
-      _export_data(function_name)
+      _export_data(function_name, center, setZOffset)
       timeMinutes = interpolation.check()
       if not 'test' in function_name:
          timeMinutesTotal += timeMinutes
    print('-Export data done: Total time: %s minutes' % ('{:.2f}'.format(timeMinutesTotal)))
 
-def _export_data(file_name):
+def _export_data(file_name, center, setZOffset):
    locations, speeds = interpolation.get_data()
    def fx(value):
       return int(round(value * 1000))
+   
+   centerX = fx(center[0])
+   centerY = fx(center[1])
+   centerIndex = 1
+   for i, (l, s) in enumerate(zip(locations, speeds)):
+      if i < 1:
+         continue
+      if fx(l.x) == centerX and fx(l.y) == centerY:
+         centerIndex = i
+         break
    byte_arr = []
    byte_arr += _int_to_dword(len(locations))
    byte_arr += _int_to_dword(len(locations))
-   byte_arr += _int_to_word(3)
-   byte_arr += _int_to_word(4)
-   byte_arr += _int_to_word(5)
-   byte_arr += _int_to_word(6)
+   byte_arr += _int_to_word(centerIndex)
+   byte_arr += _int_to_word(fx(setZOffset[0]))
+   byte_arr += _int_to_word(fx(setZOffset[1]))
+   byte_arr += _int_to_word(0)
    for i, (l, s) in enumerate(zip(locations, speeds)):
       if i < 1:
          continue
@@ -347,8 +359,8 @@ def animate(target, timeFactor):
    interpolation.refresh()
    #_run_code_test((37, 10, 1),              (1, 1, 0.4))
    #_run_code_mill_A1((6, 16, 1),           (1, 1, 0.4))
-   _run_code_mill_B1((214, 20, 1),           (1, 3, 0.4))
-   #_run_code_mill_D1((228, 56, 1),           (1, 1, 0.4))
+   #_run_code_mill_B1((214, 20, 1),           (1, 3, 0.4))
+   _run_code_mill_D1((228, 56, 1),           (1, 1, 0.4))
    #_run_code_mill_AB1((154, 12, 1),      (5, 1, 0.4))
    #_run_code_mill_AB2((100, 12, 1),       (5, 1, 0.4))
    #_run_code_cut_A2((22, 76, 1),           (1, 1, 1))
