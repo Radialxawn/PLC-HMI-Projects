@@ -162,22 +162,22 @@ def _run_code_mill_D1(location, xyzStep):
    interpolation.line((location[0], 0, 0), FSM)
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   width = 9.5
-   kx = (width - R * 2) / 2
+   #
+   kx = (9.5 - R * 2) / 2
    kxs = [kx,   kx, -kx,  -kx]
    kys = [-3.5, 26,  26, -3.5]
-   #
+   #   
    interpolation.line((kxs[0], kys[0], 0), FS)
    for iz in _get_range(h + 0.1, h + 20, zStep):
       for x, y in zip(kxs, kys):
          interpolation.line((x, y, iz), FS)
    interpolation.line((0, 0, 0), FS)
    #
-   kys = [-3.5, 24,  24, -3.5]
-   interpolation.line((kxs[0], kys[0], 0), FS)
-   for iz in _get_range(h + 5, h + 21, zStep * 10):
-      for x, y in zip(kxs, kys):
-         interpolation.line((x, y, iz), FS)
+   for _ in range(2):
+      interpolation.line((kxs[0], kys[0], 0), FS)
+      for iz in _get_range(h + 5, h + 21, zStep * 10):
+         for x, y in zip(kxs, kys):
+            interpolation.line((x, y, iz), FS)
    interpolation.line((0, 0, 0), FS)
    #
    interpolation.local_end()
@@ -388,9 +388,9 @@ def animate(target, timeFactor):
    #_run_code_test((37, 10, 1),              (1, 1, 0.4))
    #_run_code_mill_A1((6, 16, 1),           (1, 1, 0.4))
    #_run_code_mill_B1((214, 20, 1),           (1, 3, 0.4))
-   #_run_code_mill_D1((228, 56, 1),           (1, 1, 0.4))
+   _run_code_mill_D1((228, 56, 1),           (1, 1, 0.4))
    #_run_code_mill_AB1((154, 12, 1),      (5, 1, 0.4))
-   _run_code_mill_AB2((100, 12, 1),       (5, 1, 0.4))
+   #_run_code_mill_AB2((100, 12, 1),       (5, 1, 0.4))
    #_run_code_cut_A2((22, 76, 1),           (1, 1, 1))
    interpolation.check()
    locations, frames = interpolation.animate(target, timeFactor)
