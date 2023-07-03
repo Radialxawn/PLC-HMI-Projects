@@ -12,8 +12,9 @@ if not dir in sys.path:
 import interpolation
 importlib.reload(interpolation)
 
-R, LS = 3, 0.05 # Bit radius, length step
-FSM, FS = 20, 3 # Feed speed max, feed speed
+LS = 0.05 # length step
+R6, R16 = 6/2, 16/2 # bit radius
+FSM, FS6, FS16, FS25 = 20, 3, 6, 3 # feed speed: max, d6mm end mill, d16mm end mill, d25mm-2mm cutter
 
 def _get_range(a, b, step):
    if a == b:
@@ -40,27 +41,26 @@ def _get_range(a, b, step):
    result.append(b)
    return result
 
-def _run_code_test_limit(location, xyzStep):
+def _run_code_test_limit(location):
    for i in range(48):
       interpolation.line((234, 86, 0), FSM)
       interpolation.line((0, 0, 0), FSM)
       
-def _run_code_test_circle(location, xyzStep):
-   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_test_circle(location):
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   interpolation.line((-39 - R, 0, 0), FSM)
-   interpolation.arc((0, 0, 0), (-39 - R, 0, 0), True, LS, FS)
-   interpolation.arc((0, 0, 0), (-39 - R, 0, 0), False, LS, FS)
+   interpolation.line((-39 - R6, 0, 0), FSM)
+   interpolation.arc((0, 0, 0), (-39 - R6, 0, 0), True, LS, FS6)
+   interpolation.arc((0, 0, 0), (-39 - R6, 0, 0), False, LS, FS6)
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
 
-def _run_code_test(location, xyzStep):
-   _run_code_test_limit(location, xyzStep)
-   #_run_code_test_circle(location, xyzStep)
+def _run_code_test(location):
+   _run_code_test_limit(location)
+   #_run_code_test_circle(location)
 
-def _run_code_mill_A1(location, xyzStep):
-   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_mill_A1(location):
+   h, zStep = location[2], 0.4
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
    kx, ky = -0.3, -11
@@ -70,53 +70,50 @@ def _run_code_mill_A1(location, xyzStep):
       for i, iz in enumerate(_get_range(h, h + depth, zStep)):
          if i == 0:
             interpolation.line((kx, 0, iz), FSM)
-         interpolation.line((kx, sign * (ky + 4), iz), FS)
-         interpolation.line((kx, sign * ky, iz), FS)
-         interpolation.line((-kx, sign * ky, iz), FS)
-         interpolation.line((-kx, sign * (ky + 4), iz), FS)
+         interpolation.line((kx, sign * (ky + 4), iz), FS6)
+         interpolation.line((kx, sign * ky, iz), FS6)
+         interpolation.line((-kx, sign * ky, iz), FS6)
+         interpolation.line((-kx, sign * (ky + 4), iz), FS6)
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
    x, y, z = interpolation.get_location()
    interpolation.line((x, 0, 0), FSM)
    interpolation.line((100, 0, 0), FSM)
 
-def _run_code_mill_B1R(location, xyzStep):
-   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_mill_B1R(location): # out of working range
+   h, zStep = location[2], 0.4
    interpolation.line((location[0], 0, 0), FSM)
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   kxs = [-10, -15.5, -15.5, -10, 10, 15.5, 15.5,  10, -10]
-   kys = [-18,   -13,    13,  18, 18,   13,  -13, -18, -18]
-   kfs = [FSM,   FSM,    FS, FSM, FS,  FSM,   FS, FSM,  FS]
+   kxs = [-15, -20.5, -20.5, -15,   15, 20.5, 20.5,  15,  -15]
+   kys = [-23,   -18,    18,  23,   23,   18,  -18, -23,  -23]
+   kfs = [FSM,   FSM,  FS16, FSM, FS16,  FSM, FS16, FSM, FS16]
+   '''#
+   interpolation.line((kxs[0], kys[0], 0), FSM)
    final = False
    for iz in _get_range(h, h + 11.9, zStep):
       if (iz >= h + 10.5) and not final:
          kxs.reverse()
          kys.reverse()
-         kfs = [FS, FS,    FSM, FS, FSM,  FS,   FSM, FS,  FSM]
+         kfs = [FS16, FS16,    FSM, FS16, FSM,  FS16,   FSM, FS16,  FSM]
          final = True
       for x, y, f in zip(kxs, kys, kfs):
          interpolation.line((x, y, iz), f)
-   kxs.reverse()
-   kys.reverse()
-   kfs = [FSM,   FSM,    FS, FSM, FS,  FSM,   FS, FSM,  FS]
-   for x, y, f in zip(kxs, kys, kfs):
-      interpolation.line((x, y, iz), f)
-   #
+   '''#
    interpolation.local_end()
    x, y, z = interpolation.get_location()
    interpolation.line((x, 0, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
 
-def _run_code_mill_B1(location, xyzStep):
-   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_mill_B1(location):
+   h, zStep = location[2], 0.4
    interpolation.line((location[0], 0, 0), FSM)
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
    ox = 0.05
    oy = 0.05
    #4Hole
-   interpolation.line((-5 - ox, -20 - oy, 0), FS)
+   interpolation.line((-5 - ox, -20 - oy, 0), FS6)
    kzs = _get_range(h, h + 5, zStep)
    kzs.append(h + 4.95)
    lastIndex = len(kzs) - 1
@@ -126,47 +123,47 @@ def _run_code_mill_B1(location, xyzStep):
          ox = 0
          oy = 0
       '''
-      interpolation.line((-5 - ox, -20 - oy, iz), FS)
+      interpolation.line((-5 - ox, -20 - oy, iz), FS6)
       #
-      interpolation.line((-5 - ox, -18 - oy, iz), FS)
-      interpolation.arc((-5 - ox, -13 - oy, iz), (-9 - ox, -13 - oy, iz), True, LS, FS)
-      interpolation.line((-9 - ox, -10.5 - oy, iz), FS)
-      interpolation.line((-11.5 - ox, -10.5 - oy, iz), FS)
-      interpolation.arc((-11.5 - ox, -6.5 - oy, iz), (-15.5 - ox, -6.5 - oy, iz), True, LS, FS)
+      interpolation.line((-5 - ox, -18 - oy, iz), FS6)
+      interpolation.arc((-5 - ox, -13 - oy, iz), (-9 - ox, -13 - oy, iz), True, LS, FS6)
+      interpolation.line((-9 - ox, -10.5 - oy, iz), FS6)
+      interpolation.line((-11.5 - ox, -10.5 - oy, iz), FS6)
+      interpolation.arc((-11.5 - ox, -6.5 - oy, iz), (-15.5 - ox, -6.5 - oy, iz), True, LS, FS6)
       #
-      interpolation.line((-15.5 - ox, 6.5 + oy, iz), FS)
-      interpolation.arc((-11.5 - ox, 6.5 + oy, iz), (-11.5 - ox, 10.5 + oy, iz), True, LS, FS)
-      interpolation.line((-9 - ox, 10.5 + oy, iz), FS)
-      interpolation.line((-9 - ox, 13 + oy, iz), FS)
-      interpolation.arc((-5 - ox, 13 + oy, iz), (-5 - ox, 18 + oy, iz), True, LS, FS)
+      interpolation.line((-15.5 - ox, 6.5 + oy, iz), FS6)
+      interpolation.arc((-11.5 - ox, 6.5 + oy, iz), (-11.5 - ox, 10.5 + oy, iz), True, LS, FS6)
+      interpolation.line((-9 - ox, 10.5 + oy, iz), FS6)
+      interpolation.line((-9 - ox, 13 + oy, iz), FS6)
+      interpolation.arc((-5 - ox, 13 + oy, iz), (-5 - ox, 18 + oy, iz), True, LS, FS6)
       #
-      interpolation.line((5 + ox, 18 + oy, iz), FS)
-      interpolation.arc((5 + ox, 13 + oy, iz), (9 + ox, 13 + oy, iz), True, LS, FS)
-      interpolation.line((9 + ox, 10.5 + oy, iz), FS)
-      interpolation.line((11.5 + ox, 10.5 + oy, iz), FS)
-      interpolation.arc((11.5 + ox, 6.5 + oy, iz), (15.5 + ox, 6.5 + oy, iz), True, LS, FS)
+      interpolation.line((5 + ox, 18 + oy, iz), FS6)
+      interpolation.arc((5 + ox, 13 + oy, iz), (9 + ox, 13 + oy, iz), True, LS, FS6)
+      interpolation.line((9 + ox, 10.5 + oy, iz), FS6)
+      interpolation.line((11.5 + ox, 10.5 + oy, iz), FS6)
+      interpolation.arc((11.5 + ox, 6.5 + oy, iz), (15.5 + ox, 6.5 + oy, iz), True, LS, FS6)
       #
-      interpolation.line((15.5 + ox, -6.5 - oy, iz), FS)
-      interpolation.arc((11.5 + ox, -6.5 - oy, iz), (11.5 + ox, -10.5 - oy, iz), True, LS, FS)
-      interpolation.line((9 + ox, -10.5 - oy, iz), FS)
-      interpolation.line((9 + ox, -13 - oy, iz), FS)
-      interpolation.arc((5 + ox, -13 - oy, iz), (5 + ox, -18 - oy, iz), True, LS, FS)
+      interpolation.line((15.5 + ox, -6.5 - oy, iz), FS6)
+      interpolation.arc((11.5 + ox, -6.5 - oy, iz), (11.5 + ox, -10.5 - oy, iz), True, LS, FS6)
+      interpolation.line((9 + ox, -10.5 - oy, iz), FS6)
+      interpolation.line((9 + ox, -13 - oy, iz), FS6)
+      interpolation.arc((5 + ox, -13 - oy, iz), (5 + ox, -18 - oy, iz), True, LS, FS6)
       #
-      interpolation.line((-5 - ox, -18 - oy, iz), FS)
-      interpolation.line((-5 - ox, -20 - oy, iz), FS)
+      interpolation.line((-5 - ox, -18 - oy, iz), FS6)
+      interpolation.line((-5 - ox, -20 - oy, iz), FS6)
    #Out face
    ox = 0.05
    oy = 0.05
    kxs = [-10, -15.5, -15.5, -10, 10, 15.5, 15.5,  10, -10]
    kys = [-18,   -13,    13,  18, 18,   13,  -13, -18, -18]
-   kfs = [FSM,   FSM,    FS, FSM, FS,  FSM,   FS, FSM,  FS]
+   kfs = [FSM,   FSM,    FS6, FSM, FS6,  FSM,   FS6, FSM,  FS6]
    final = False
-   interpolation.line((kxs[0], kys[0], iz), FS)
+   interpolation.line((kxs[0], kys[0], iz), FS6)
    for iz in _get_range(h + 5.1, h + 11.9, zStep):
       if (iz >= h + 10.5) and not final:
          kxs.reverse()
          kys.reverse()
-         kfs = [FS, FS,    FSM, FS, FSM,  FS,   FSM, FS,  FSM]
+         kfs = [FS6, FS6,    FSM, FS6, FSM,  FS6,   FSM, FS6,  FSM]
          final = True
       for x, y, f in zip(kxs, kys, kfs):
          dx = x < 0 and -ox or ox
@@ -174,7 +171,7 @@ def _run_code_mill_B1(location, xyzStep):
          interpolation.line((x + dx, y + dy, iz), f)
    kxs.reverse()
    kys.reverse()
-   kfs = [FSM,   FSM,    FS, FSM, FS,  FSM,   FS, FSM,  FS]
+   kfs = [FSM,   FSM,    FS6, FSM, FS6,  FSM,   FS6, FSM,  FS6]
    for x, y, f in zip(kxs, kys, kfs):
       dx = x < 0 and -ox or ox
       dy = y < 0 and -oy or oy
@@ -185,36 +182,71 @@ def _run_code_mill_B1(location, xyzStep):
    interpolation.line((x, 0, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
 
-def _run_code_mill_D1(location, xyzStep):
-   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_mill_D1(location):
+   h, zStep = location[2], 0.4
    interpolation.line((location[0], 0, 0), FSM)
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
    #
-   kx = (9.5 - R * 2) / 2
+   kx = (9.5 - R6 * 2) / 2
    kxs = [kx,   kx, -kx,  -kx]
    kys = [-3.5, 26,  26, -3.5]
    #   
-   interpolation.line((kxs[0], kys[0], 0), FS)
+   interpolation.line((kxs[0], kys[0], 0), FS6)
    for iz in _get_range(h + 0.1, h + 20, zStep):
       for x, y in zip(kxs, kys):
-         interpolation.line((x, y, iz), FS)
-   interpolation.line((0, 0, 0), FS)
+         interpolation.line((x, y, iz), FS6)
+   interpolation.line((0, 0, 0), FS6)
    #
    for _ in range(2):
-      interpolation.line((kxs[0], kys[0], 0), FS)
+      interpolation.line((kxs[0], kys[0], 0), FS6)
       for iz in _get_range(h + 5, h + 21, zStep * 10):
          for x, y in zip(kxs, kys):
-            interpolation.line((x, y, iz), FS)
-   interpolation.line((0, 0, 0), FS)
+            interpolation.line((x, y, iz), FS6)
+   interpolation.line((0, 0, 0), FS6)
    #
    interpolation.local_end()
    x, y, z = interpolation.get_location()
    interpolation.line((x, 0, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
 
-def _run_code_AB_topR(h, xyzStep, flipY):
-   xStep, yStep, zStep = xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_AB_topR(h, flipY):
+   xStep, zStep = 5, 0.4
+   foilRadius = 16.5
+   sy = 9 * (flipY and -1 or 1)
+   ey = 63 * (flipY and -1 or 1)
+   my = sy + ey / 2
+   kzs = _get_range(h + 0.3, h + 4, zStep)
+   lastIndex = len(kzs) - 1
+   xSign, ySign = 1, 1
+   for i, iz in enumerate(kzs):
+      iw = math.sin(math.acos((foilRadius - (iz - h)) / foilRadius)) * foilRadius * 2 + 1
+      count = math.ceil(iw / xStep)
+      if i == lastIndex:
+         sy = 1
+      x = xSign * (-iw / 2 - R16 - 1)
+      y = ySign == 1 and sy or ey
+      interpolation.line((x, y, iz - 2 * zStep), FS16)
+      interpolation.line((x, y, iz), FS16)
+      x = xSign * (-iw / 2 - R16 - xStep)
+      j = 0
+      for _ in range(count * 2):
+         x += xSign * xStep
+         y = ySign == 1 and sy or ey
+         interpolation.line((x, y, iz), FS16)
+         j += 1
+         ySign *= -1
+         if j > count:
+            break
+         else:
+            interpolation.line((x + xSign * xStep, y, iz), FS16)
+      xSign *= -1
+      ySign *= -1
+   interpolation.line((x, y, 0), FSM)
+   interpolation.line((0, 0, 0), FSM)
+
+def _run_code_AB_top(h, flipY):
+   xStep, zStep = 4, 0.4
    foilRadius = 16.5
    up = True
    sy = 7 * (flipY and -1 or 1)
@@ -228,7 +260,7 @@ def _run_code_AB_topR(h, xyzStep, flipY):
          firstZ = True
       id = foilRadius - (iz - h)
       iw = math.sin(math.acos(id / foilRadius)) * foilRadius
-      iw = max(0, iw - R * 0.6)
+      iw = max(0, iw - R6 * 0.6)
       kxs = []
       kys = []
       for ix in _get_range(-iw, iw, xStep):
@@ -241,115 +273,81 @@ def _run_code_AB_topR(h, xyzStep, flipY):
          if firstZ:
             interpolation.line((ix, iy, 0), FSM)
             firstZ = False
-         interpolation.line((ix, iy, iz), FS)
+         interpolation.line((ix, iy, iz), FS6)
    interpolation.line((ix, iy, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
 
-def _run_code_AB_top(h, xyzStep, flipY):
-   xStep, yStep, zStep = xyzStep[0], xyzStep[1], xyzStep[2]
-   foilRadius = 16.5
-   up = True
-   sy = 7 * (flipY and -1 or 1)
-   ey = 65 * (flipY and -1 or 1)
-   firstZ = True
-   kzs = _get_range(h + 0.3, h + 4, zStep)
-   lastIndex = len(kzs) - 1
-   for i, iz in enumerate(kzs):
-      if i == lastIndex:
-         sy = 1
-         firstZ = True
-      id = foilRadius - (iz - h)
-      iw = math.sin(math.acos(id / foilRadius)) * foilRadius
-      iw = max(0, iw - R * 0.6)
-      kxs = []
-      kys = []
-      for ix in _get_range(-iw, iw, xStep):
-         kxs.append(ix)
-         kys.append(up and sy or ey)
-         kxs.append(ix)
-         kys.append(up and ey or sy)
-         up = not up
-      for ix, iy in zip(kxs, kys):
-         if firstZ:
-            interpolation.line((ix, iy, 0), FSM)
-            firstZ = False
-         interpolation.line((ix, iy, iz), FS)
-   interpolation.line((ix, iy, 0), FSM)
+def _run_code_AB_carveR(h, flipY):
+   kxs = [-22, -14, -14,  -22]
+   kys = [  3,  15,  37, 41.5]
+   def _carve(signX, signY):
+      interpolation.line((signX * kxs[0], signY * kys[0], 0), FSM)
+      for iz in _get_range(h + 4.3, h + 4.8, 0.3):
+         for ix, iy in zip(kxs, kys):
+            fx = signX * ix
+            fy = signY * iy
+            interpolation.line((fx, fy, iz), FS6)
+         kxs.reverse()
+         kys.reverse()
+      interpolation.line((fx, fy, 0), FSM)
+   _carve(1, flipY and -1 or 1)
+   _carve(-1, flipY and -1 or 1)
    interpolation.line((0, 0, 0), FSM)
 
-def _run_code_AB_carveR(h, xyzStep, flipY):
-   xStep, yStep, zStep = xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_AB_carve(h, flipY):
    kxs = [-17, -10, -10,     -17,      -8,      -8, -11.9981, -17]
    kys = [  4,  10,  40, 46.6807, 41.5718, 9.89692,        2,   4]
-   def _carve(sign):
-      interpolation.line((sign * kxs[0], kys[0], 0), FSM)
-      for iz in _get_range(h + 4.3, h + 5, 0.3):
+   def _carve(signX, signY):
+      interpolation.line((signX * kxs[0], signY * kys[0], 0), FSM)
+      for iz in _get_range(h + 0.3, h + 1, 0.3):
          for ix, iy in zip(kxs, kys):
-            fx = sign * ix
-            fy = flipY and -iy or iy
-            interpolation.line((fx, fy, iz), FS)
+            fx = signX * ix
+            fy = signY * iy
+            interpolation.line((fx, fy, iz), FS6)
       interpolation.line((fx, fy, 0), FSM)
-   _carve(1)
-   interpolation.line((0, 0, 0), FSM)
-   _carve(-1)
+   _carve(1, flipY and -1 or 1)
+   _carve(-1, flipY and -1 or 1)
    interpolation.line((0, 0, 0), FSM)
 
-def _run_code_AB_carve(h, xyzStep, flipY):
-   xStep, yStep, zStep = xyzStep[0], xyzStep[1], xyzStep[2]
-   kxs = [-17, -10, -10,     -17,      -8,      -8, -11.9981, -17]
-   kys = [  4,  10,  40, 46.6807, 41.5718, 9.89692,        2,   4]
-   def _carve(sign):
-      interpolation.line((sign * kxs[0], kys[0], 0), FSM)
-      for iz in _get_range(h + 4.3, h + 5, 0.3):
-         for ix, iy in zip(kxs, kys):
-            fx = sign * ix
-            fy = flipY and -iy or iy
-            interpolation.line((fx, fy, iz), FS)
-      interpolation.line((fx, fy, 0), FSM)
-   _carve(1)
-   interpolation.line((0, 0, 0), FSM)
-   _carve(-1)
-   interpolation.line((0, 0, 0), FSM)
-
-def _run_code_mill_AB1R(location, xyzStep):
-   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_mill_AB1R(location):
+   h = location[2]
    interpolation.line((location[0], 0, 0), FSM)
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   _run_code_AB_topR(h, xyzStep, False)
-   _run_code_AB_carveR(h, xyzStep, False)
-   #
+   _run_code_AB_topR(h, False)
+   _run_code_AB_carveR(h, False)
    #
    interpolation.local_end()
    x, y, z = interpolation.get_location()
    interpolation.line((x, 0, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
 
-def _run_code_mill_AB1(location, xyzStep):
-   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_mill_AB1(location):
+   h, zStep = location[2], 0.4
    interpolation.line((location[0], 0, 0), FSM)
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   _run_code_AB_top(h, xyzStep, False)
-   _run_code_AB_carve(h, xyzStep, False)
+   _run_code_AB_carve(h, False)
    #
    #SideA
-   kxs = [  19.8,    17.8, 17.8, 20]
-   kys = [53.466, 47.9714, 10.8, 11]
+   ox = -0.2
+   kxs = [  19.8, 18 + ox, 18 + ox, 20]
+   kys = [53.466, 47.9714,    10.8, 11]
    interpolation.line((kxs[0], kys[0], 0), FSM)
-   for iz in _get_range(11, 26, zStep):
+   for iz in _get_range(h + 6, h + 21, zStep):
       for x, y in zip(kxs, kys):
-         interpolation.line((x, y, iz), FS)
+         interpolation.line((x, y, iz), FS6)
       kxs.reverse()
       kys.reverse()
    interpolation.line((x, y, 0), FSM)
    #SideB
-   kxs = [-20, -17.7, -17.7, -20]
+   ox = -0.2
+   kxs = [-20, -18 - ox, -18 - ox, -20]
    kys = [ 11, 10.8,     62,  62]
    interpolation.line((kxs[0], kys[0], 0), FSM)
-   for iz in _get_range(11, 26, zStep):
+   for iz in _get_range(h + 6, h + 21, zStep):
       for x, y in zip(kxs, kys):
-         interpolation.line((x, y, iz), FS)
+         interpolation.line((x, y, iz), FS6)
       kxs.reverse()
       kys.reverse()
    interpolation.line((x, y, 0), FSM)
@@ -360,13 +358,25 @@ def _run_code_mill_AB1(location, xyzStep):
    interpolation.line((x, 0, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
 
-def _run_code_mill_AB2R(location, xyzStep):
-   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_mill_AB2R(location):
+   h = location[2]
    interpolation.line((location[0], 0, 0), FSM)
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   _run_code_AB_topR(h, xyzStep, True)
-   _run_code_AB_carveR(h, xyzStep, True)
+   _run_code_AB_topR(h, True)
+   _run_code_AB_carveR(h, True)
+   #
+   interpolation.local_end()
+   x, y, z = interpolation.get_location()
+   interpolation.line((x, 0, 0), FSM)
+   interpolation.line((0, 0, 0), FSM)
+
+def _run_code_mill_AB2(location):
+   h = location[2]
+   interpolation.line((location[0], 0, 0), FSM)
+   interpolation.line((location[0], location[1], 0), FSM)
+   interpolation.local_start()
+   _run_code_AB_carve(h, True)
    #
    #
    interpolation.local_end()
@@ -374,33 +384,19 @@ def _run_code_mill_AB2R(location, xyzStep):
    interpolation.line((x, 0, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
 
-def _run_code_mill_AB2(location, xyzStep):
-   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
+def _run_code_cut_A2(location):
+   h, yStep = location[2], 0.4
    interpolation.line((location[0], 0, 0), FSM)
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   _run_code_AB_top(h, xyzStep, True)
-   _run_code_AB_carve(h, xyzStep, True)
-   #
-   #
-   interpolation.local_end()
-   x, y, z = interpolation.get_location()
-   interpolation.line((x, 0, 0), FSM)
-   interpolation.line((0, 0, 0), FSM)
-
-def _run_code_cut_A2(location, xyzStep):
-   h, xStep, yStep, zStep = location[2], xyzStep[0], xyzStep[1], xyzStep[2]
-   interpolation.line((location[0], 0, 0), FSM)
-   interpolation.line((location[0], location[1], 0), FSM)
-   interpolation.local_start()
-   interpolation.line((0, -2, 0), FS)
-   for iz in _get_range(h + 26.5, h + 26.5, zStep):
-      for i, iy in enumerate(_get_range(0, 4, yStep)):
-         interpolation.line((-17, -2, iz), FSM)
-         interpolation.line((-17, iy, iz), FSM)
-         interpolation.line((17, iy, iz), FS)
-         interpolation.line((17, -2, iz), FSM)
-   interpolation.line((0, -2, 0), FS)
+   interpolation.line((0, -2, 0), FS25)
+   iz = h + 26.5
+   for i, iy in enumerate(_get_range(0, 4, yStep)):
+      interpolation.line((-17, -2, iz), FSM)
+      interpolation.line((-17, iy, iz), FSM)
+      interpolation.line((17, iy, iz), FS25)
+      interpolation.line((17, -2, iz), FSM)
+   interpolation.line((0, -2, 0), FS25)
    interpolation.local_end()
 
 def set_data(target):
@@ -429,28 +425,28 @@ def _int_to_dword(value):
 
 def export_data():
    fs = [
-      _run_code_test,         (117, 43, 1),       (1, 1, 0.4), (0, 0),
-      _run_code_mill_A1,      (5.8, 16.9, 1),     (1, 1, 0.4), (0, 14),
+      _run_code_test,         (117, 43, 1),        (0, 0),
+      _run_code_mill_A1,      (5.8, 16.9, 1),      (0, 14),
       #
-      _run_code_mill_B1R,      (213.89, 21.12, 1), (1, 1, 0.4), (0, 0),
-      _run_code_mill_B1,      (213.89, 21.12, 1), (1, 1, 0.4), (0, 0),
+      _run_code_mill_B1R,     (213.89, 21.12, 1),  (0, 0),
+      _run_code_mill_B1,      (213.89, 21.12, 1),  (0, 0),
       #
-      _run_code_mill_D1,      (228.3, 56.9, 1),   (1, 1, 0.4), (0, 0),
+      _run_code_mill_D1,      (228.3, 56.9, 1),    (0, 0),
       #
-      _run_code_mill_AB1R,     (156.43, 20.2, 1),       (4, 1, 0.4), (0, 14),
-      _run_code_mill_AB1,     (156.43, 20.2, 1),       (4, 1, 0.4), (0, 14),
+      _run_code_mill_AB1R,    (156.43, 20.2, 1),   (0, 14),
+      _run_code_mill_AB1,     (156.43, 20.2, 1),   (0, 14),
       #
-      _run_code_mill_AB2R,     (90.9, 81.2, 1),       (4, 1, 0.4), (0, -14),
-      _run_code_mill_AB2,     (90.9, 81.2, 1),       (4, 1, 0.4), (0, -14),
+      _run_code_mill_AB2R,    (90.9, 81.2, 1),     (0, -14),
+      _run_code_mill_AB2,     (90.9, 81.2, 1),     (0, -14),
       #
-      _run_code_cut_A2,       (20, 60, 1),       (1, 0.4, 1),   (0, 10),
+      _run_code_cut_A2,       (20, 60, 1),         (0, 10),
    ]
    print('-Export data')
    timeMinutesTotal = 0
-   for i in range(0, len(fs), 4):
+   for i in range(0, len(fs), 3):
       interpolation.refresh()
-      function, center, xyzStep, setZOffset = fs[i], fs[i + 1], fs[i + 2], fs[i + 3]
-      function(center, xyzStep)
+      function, center, setZOffset = fs[i], fs[i + 1], fs[i + 2]
+      function(center)
       function_name = function.__name__[10:]
       print(function_name)
       _export_data(function_name, center, setZOffset)
@@ -500,21 +496,21 @@ def _export_data(file_name, center, setZOffset):
 def animate(target, timeFactor):
    print('-Animate')
    interpolation.refresh()
-   #_run_code_test((37, 10, 1),              (1, 1, 0.4))
-   #_run_code_mill_A1((6, 16, 1),           (1, 1, 0.4))
+   #_run_code_test((37, 10, 1))
+   #_run_code_mill_A1((6, 16, 1))
    #
-   #_run_code_mill_B1R((214, 20, 1),           (1, 3, 0.4))
-   #_run_code_mill_B1((214, 20, 1),           (1, 3, 0.4))
+   #_run_code_mill_B1R((214, 20, 1))
+   #_run_code_mill_B1((214, 20, 1))
    #
-   #_run_code_mill_D1((228, 56, 1),           (1, 1, 0.4))
+   #_run_code_mill_D1((228, 56, 1))
    #
-   _run_code_mill_AB1R((154, 12, 1),      (4, 1, 0.4))
-   #_run_code_mill_AB1((154, 12, 1),      (4, 1, 0.4))
+   #_run_code_mill_AB1R((154, 12, 1))
+   _run_code_mill_AB1((154, 12, 5))
    #
-   #_run_code_mill_AB2R((97, 73, 1),       (4, 1, 0.4))
-   #_run_code_mill_AB2((97, 73, 1),       (4, 1, 0.4))
+   #_run_code_mill_AB2R((97, 73, 1))
+   #_run_code_mill_AB2((97, 73, 5))
    #
-   #_run_code_cut_A2((22, 63.5, 1),           (1, 0.4, 1))
+   #_run_code_cut_A2((22, 63.5, 1))
    interpolation.check()
    locations, frames = interpolation.animate(target, timeFactor)
    for fcurve in target.animation_data.action.fcurves:
