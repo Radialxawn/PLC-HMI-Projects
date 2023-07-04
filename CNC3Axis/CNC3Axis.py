@@ -14,7 +14,7 @@ importlib.reload(interpolation)
 
 LS = 0.05 # length step
 R6, R16 = 6/2, 16/2 # bit radius
-FSM, FS6, FS16, FS25 = 20, 3, 6, 3 # feed speed: max, d6mm end mill, d16mm end mill, d25mm-2mm cutter
+FSM, FS6, FS16, FS25 = 20, 3, 3, 3 # feed speed: max, d6mm end mill, d16mm end mill, d25mm-2mm cutter
 
 def _get_range(a, b, step):
    if a == b:
@@ -41,23 +41,13 @@ def _get_range(a, b, step):
    result.append(b)
    return result
 
-def _run_code_test_limit(location):
-   for i in range(48):
+def _run_code_test_limit():
+   for _ in range(48):
       interpolation.line((234, 86, 0), FSM)
       interpolation.line((0, 0, 0), FSM)
-      
-def _run_code_test_circle(location):
-   interpolation.line((location[0], location[1], 0), FSM)
-   interpolation.local_start()
-   interpolation.line((-39 - R6, 0, 0), FSM)
-   interpolation.arc((0, 0, 0), (-39 - R6, 0, 0), True, LS, FS6)
-   interpolation.arc((0, 0, 0), (-39 - R6, 0, 0), False, LS, FS6)
-   interpolation.line((0, 0, 0), FSM)
-   interpolation.local_end()
 
 def _run_code_test(location):
-   _run_code_test_limit(location)
-   #_run_code_test_circle(location)
+   _run_code_test_limit()
 
 def _run_code_mill_A1(location):
    h, zStep = location[2], 0.4
@@ -118,11 +108,9 @@ def _run_code_mill_B1(location):
    kzs.append(h + 4.95)
    lastIndex = len(kzs) - 1
    for i, iz in enumerate(kzs):
-      '''
       if i == lastIndex:
-         ox = 0
-         oy = 0
-      '''
+         ox = 0.05
+         oy = 0.05
       interpolation.line((-5 - ox, -20 - oy, iz), FS6)
       #
       interpolation.line((-5 - ox, -18 - oy, iz), FS6)
@@ -504,8 +492,8 @@ def animate(target, timeFactor):
    #
    #_run_code_mill_D1((228, 56, 1))
    #
-   #_run_code_mill_AB1R((154, 12, 1))
-   _run_code_mill_AB1((154, 12, 5))
+   _run_code_mill_AB1R((154, 12, 1))
+   #_run_code_mill_AB1((154, 12, 5))
    #
    #_run_code_mill_AB2R((97, 73, 1))
    #_run_code_mill_AB2((97, 73, 5))
