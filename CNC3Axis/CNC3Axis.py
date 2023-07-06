@@ -199,22 +199,22 @@ def _run_code_mill_D1(location):
    interpolation.line((0, 0, 0), FSM)
 
 def _run_code_AB_topR(h, flipY):
-   xStep, zStep = 5, 0.4
+   xStepMax, zStep = 5, 0.4
    foilRadius = 16.5
    sy = 9 * (flipY and -1 or 1)
-   ey = 63 * (flipY and -1 or 1)
-   my = sy + ey / 2
+   ey = 61.5 * (flipY and -1 or 1)
    kzs = _get_range(h + 0.3, h + 4, zStep)
    lastIndex = len(kzs) - 1
    xSign, ySign = 1, 1
    for i, iz in enumerate(kzs):
-      iw = math.sin(math.acos((foilRadius - (iz - h)) / foilRadius)) * foilRadius * 2 + 1
-      count = math.ceil(iw / xStep)
+      iw = math.sin(math.acos((foilRadius - (iz - h)) / foilRadius)) * foilRadius * 2
+      count = math.ceil(iw / xStepMax)
+      xStep = min((iw + 1) / count, xStepMax)
       if i == lastIndex:
          sy = 1
       x = xSign * (-iw / 2 - R16 - 1)
       y = ySign == 1 and sy or ey
-      interpolation.line((x, y, iz - 2 * zStep), FS16)
+      interpolation.line((x, y, iz - 2 * zStep), FSM)
       interpolation.line((x, y, iz), FS16)
       x = xSign * (-iw / 2 - R16 - xStep)
       j = 0
@@ -231,38 +231,6 @@ def _run_code_AB_topR(h, flipY):
       xSign *= -1
       ySign *= -1
    interpolation.line((x, y, 0), FSM)
-   interpolation.line((0, 0, 0), FSM)
-
-def _run_code_AB_top(h, flipY):
-   xStep, zStep = 4, 0.4
-   foilRadius = 16.5
-   up = True
-   sy = 7 * (flipY and -1 or 1)
-   ey = 65 * (flipY and -1 or 1)
-   firstZ = True
-   kzs = _get_range(h + 0.3, h + 4, zStep)
-   lastIndex = len(kzs) - 1
-   for i, iz in enumerate(kzs):
-      if i == lastIndex:
-         sy = 1
-         firstZ = True
-      id = foilRadius - (iz - h)
-      iw = math.sin(math.acos(id / foilRadius)) * foilRadius
-      iw = max(0, iw - R6 * 0.6)
-      kxs = []
-      kys = []
-      for ix in _get_range(-iw, iw, xStep):
-         kxs.append(ix)
-         kys.append(up and sy or ey)
-         kxs.append(ix)
-         kys.append(up and ey or sy)
-         up = not up
-      for ix, iy in zip(kxs, kys):
-         if firstZ:
-            interpolation.line((ix, iy, 0), FSM)
-            firstZ = False
-         interpolation.line((ix, iy, iz), FS6)
-   interpolation.line((ix, iy, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
 
 def _run_code_AB_carveR(h, flipY):
