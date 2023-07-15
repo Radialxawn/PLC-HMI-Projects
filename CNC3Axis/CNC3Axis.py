@@ -89,40 +89,36 @@ def _run_code_mill_B1(location):
    #4Hole
    interpolation.line((-5 - ox, -20 - oy, 0), FS6)
    kzs = _get_range(h, h + 5, zStep)
-   kzs.append(h + 4.95)
-   lastIndex = len(kzs) - 1
+   fs = FS6
    for i, iz in enumerate(kzs):
-      if i == lastIndex:
-         ox = 0.05
-         oy = 0.05
-      interpolation.line((-5 - ox, -20 - oy, iz), FS6)
+      interpolation.line((-5 - ox, -20 - oy, iz), fs)
       #
-      interpolation.line((-5 - ox, -18 - oy, iz), FS6)
-      interpolation.arc((-5 - ox, -13 - oy, iz), (-9 - ox, -13 - oy, iz), True, LS, FS6)
-      interpolation.line((-9 - ox, -10.5 - oy, iz), FS6)
-      interpolation.line((-11.5 - ox, -10.5 - oy, iz), FS6)
-      interpolation.arc((-11.5 - ox, -6.5 - oy, iz), (-15.5 - ox, -6.5 - oy, iz), True, LS, FS6)
+      interpolation.line((-5 - ox, -18 - oy, iz), fs)
+      interpolation.arc((-5 - ox, -13 - oy, iz), (-9 - ox, -13 - oy, iz), True, LS, fs)
+      interpolation.line((-9 - ox, -10.5 - oy, iz), fs)
+      interpolation.line((-11.5 - ox, -10.5 - oy, iz), fs)
+      interpolation.arc((-11.5 - ox, -6.5 - oy, iz), (-15.5 - ox, -6.5 - oy, iz), True, LS, fs)
       #
-      interpolation.line((-15.5 - ox, 6.5 + oy, iz), FS6)
-      interpolation.arc((-11.5 - ox, 6.5 + oy, iz), (-11.5 - ox, 10.5 + oy, iz), True, LS, FS6)
-      interpolation.line((-9 - ox, 10.5 + oy, iz), FS6)
-      interpolation.line((-9 - ox, 13 + oy, iz), FS6)
-      interpolation.arc((-5 - ox, 13 + oy, iz), (-5 - ox, 18 + oy, iz), True, LS, FS6)
+      interpolation.line((-15.5 - ox, 6.5 + oy, iz), fs)
+      interpolation.arc((-11.5 - ox, 6.5 + oy, iz), (-11.5 - ox, 10.5 + oy, iz), True, LS, fs)
+      interpolation.line((-9 - ox, 10.5 + oy, iz), fs)
+      interpolation.line((-9 - ox, 13 + oy, iz), fs)
+      interpolation.arc((-5 - ox, 13 + oy, iz), (-5 - ox, 18 + oy, iz), True, LS, fs)
       #
-      interpolation.line((5 + ox, 18 + oy, iz), FS6)
-      interpolation.arc((5 + ox, 13 + oy, iz), (9 + ox, 13 + oy, iz), True, LS, FS6)
-      interpolation.line((9 + ox, 10.5 + oy, iz), FS6)
-      interpolation.line((11.5 + ox, 10.5 + oy, iz), FS6)
-      interpolation.arc((11.5 + ox, 6.5 + oy, iz), (15.5 + ox, 6.5 + oy, iz), True, LS, FS6)
+      interpolation.line((5 + ox, 18 + oy, iz), fs)
+      interpolation.arc((5 + ox, 13 + oy, iz), (9 + ox, 13 + oy, iz), True, LS, fs)
+      interpolation.line((9 + ox, 10.5 + oy, iz), fs)
+      interpolation.line((11.5 + ox, 10.5 + oy, iz), fs)
+      interpolation.arc((11.5 + ox, 6.5 + oy, iz), (15.5 + ox, 6.5 + oy, iz), True, LS, fs)
       #
-      interpolation.line((15.5 + ox, -6.5 - oy, iz), FS6)
-      interpolation.arc((11.5 + ox, -6.5 - oy, iz), (11.5 + ox, -10.5 - oy, iz), True, LS, FS6)
-      interpolation.line((9 + ox, -10.5 - oy, iz), FS6)
-      interpolation.line((9 + ox, -13 - oy, iz), FS6)
-      interpolation.arc((5 + ox, -13 - oy, iz), (5 + ox, -18 - oy, iz), True, LS, FS6)
+      interpolation.line((15.5 + ox, -6.5 - oy, iz), fs)
+      interpolation.arc((11.5 + ox, -6.5 - oy, iz), (11.5 + ox, -10.5 - oy, iz), True, LS, fs)
+      interpolation.line((9 + ox, -10.5 - oy, iz), fs)
+      interpolation.line((9 + ox, -13 - oy, iz), fs)
+      interpolation.arc((5 + ox, -13 - oy, iz), (5 + ox, -18 - oy, iz), True, LS, fs)
       #
-      interpolation.line((-5 - ox, -18 - oy, iz), FS6)
-      interpolation.line((-5 - ox, -20 - oy, iz), FS6)
+      interpolation.line((-5 - ox, -18 - oy, iz), fs)
+      interpolation.line((-5 - ox, -20 - oy, iz), fs)
    #Out face
    ox = 0.05
    oy = 0.05
@@ -131,16 +127,20 @@ def _run_code_mill_B1(location):
    kfs = [FSM,   FSM,    FS6, FSM, FS6,  FSM,   FS6, FSM,  FS6]
    final = False
    interpolation.line((kxs[0], kys[0], iz), FS6)
-   for iz in _get_range(h + 5.1, h + 11.9, zStep):
+   for iz in _get_range(h + 5.1, h + 11.8, zStep):
       if (iz >= h + 10.5) and not final:
          kxs.reverse()
          kys.reverse()
          kfs = [FS6, FS6,    FSM, FS6, FSM,  FS6,   FSM, FS6,  FSM]
          final = True
+         ox = 0.15
+         oy = 0.15
       for x, y, f in zip(kxs, kys, kfs):
          dx = x < 0 and -ox or ox
          dy = y < 0 and -oy or oy
          interpolation.line((x + dx, y + dy, iz), f)
+   ox = 0.05
+   oy = 0.05
    kxs.reverse()
    kys.reverse()
    kfs = [FSM,   FSM,    FS6, FSM, FS6,  FSM,   FS6, FSM,  FS6]
@@ -295,8 +295,12 @@ def _run_code_cut_A2(location):
       interpolation.line((-17, iy, iz), FSM)
       interpolation.line((17, iy, iz), FS25)
       interpolation.line((17, -2, iz), FSM)
-   interpolation.line((0, -2, 0), FS25)
+   interpolation.line((0, -2, 0), FSM)
+   #
    interpolation.local_end()
+   x, y, z = interpolation.get_location()
+   interpolation.line((x, 0, 0), FSM)
+   interpolation.line((0, 0, 0), FSM)
 
 def set_data(target):
    _constraint = target.constraints['Limit Location']
@@ -326,7 +330,7 @@ def export_data():
    fs = [
       _run_code_test,         (117, 43, 1),        (0, 0),
       _run_code_mill_A1,      (5.8, 16.9, 1),      (0, 14),
-      _run_code_mill_B1,      (213.89, 21.12, 1),  (0, 0),
+      _run_code_mill_B1,      (213.84, 21.17, 1),  (0, 0),
       _run_code_mill_D1,      (228.3, 56.9, 1),    (0, 0),
       _run_code_mill_AB1,     (156.43, 20.2, 1),   (0, 14),
       _run_code_mill_AB2,     (91.5, 81.2, 1),     (0, -14),
@@ -390,13 +394,13 @@ def animate(target, timeFactor):
    #_run_code_test((37, 10, 1))
    #_run_code_mill_A1((6, 16, 1))
    #
-   #_run_code_mill_B1((214, 20, 1))
+   _run_code_mill_B1((214, 20, 1))
    #
    #_run_code_mill_D1((228, 56, 1))
    #
    #_run_code_mill_AB1((154, 12, 1))
    #
-   _run_code_mill_AB2((97, 73, 1))
+   #_run_code_mill_AB2((97, 73, 1))
    #
    #_run_code_cut_A2((22, 63.5, 1))
    interpolation.check()
