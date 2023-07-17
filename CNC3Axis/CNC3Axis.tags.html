@@ -164,6 +164,10 @@
 			newPLCTag('ArrayData', new ARRAY(INT, 1600), D, 1000);
 			newPLCTag('ArrayStep', BOOL, M, Auto, true);
 			newPLCTag('ArrayStepManual', BOOL, M, Auto, true);
+			newPLCTag('ArrayFeedFactorA', DINT, D, Auto, true);
+			newPLCTag('ArrayFeedFactorB', DINT, D, Auto, true);
+			newPLCTag('DDIVQuotient', DINT, D, Auto, false);
+			newPLCTag('DDIVRemainder', DINT, D, Auto, false);
 
 			generatePLCTagsAxis(XAxis);
 			generatePLCTagsAxis(YAxis);
@@ -273,6 +277,12 @@
 			newHMITag('MoveCenterState', Self, LW, 6);
 			newHMITag(`Start`, Self, LB, iLB++);
 			newHMITag('StartState', Self, LW, 8);
+			newHMITag(`TurnOnOff`, Self, LB, iLB++);
+			arr = ['100', '75', '50']
+			for (var i = 0; i < arr.length; i++) {
+				newHMITag(`ArrayFeedFactor${arr[i]}`, Self, LB, iLB++);
+			}
+			newHMITag('ArrayFeedFactorIndex', Self, LW, 10);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
