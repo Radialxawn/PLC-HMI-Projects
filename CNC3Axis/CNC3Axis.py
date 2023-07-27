@@ -14,7 +14,7 @@ importlib.reload(interpolation)
 
 LS = 0.05 # length step
 R6 = 6/2 # bit radius
-FSM, FS6, FS25 = 20, 5, 3 # feed speed: max, d6mm end mill, d16mm end mill, d25mm-2mm cutter
+FSM, FS6, FS25 = 20, 6, 3 # feed speed: max, d6mm end mill, d16mm end mill, d25mm-2mm cutter
 
 def _get_range(a, b, step):
    if a == b:
@@ -41,33 +41,55 @@ def _get_range(a, b, step):
    result.append(b)
    return result
 
-def _run_code_test_limit():
-   for _ in range(48):
-      interpolation.line((234, 86, 0), FSM)
-      interpolation.line((0, 0, 0), FSM)
-
 def _run_code_test(location):
-   _run_code_test_limit()
+   h, zStep = location[2], 0.5
+   interpolation.line((location[0], 0, 0), FSM)
+   interpolation.line((location[0], location[1], 0), FSM)
+   interpolation.local_start()
+   #
+   for iz in _get_range(0, 1, zStep):
+      interpolation.line((0, 5.5, iz), FSM)
+      interpolation.arc((0, 10, iz), (0, 7.5, iz), True, LS, FS6)
+      interpolation.line((0, 5.5, iz), FSM)
+   #
+   interpolation.local_end()
+   x, y, z = interpolation.get_location()
+   interpolation.line((x, 0, 0), FSM)
+   interpolation.line((0, 0, 0), FSM)
 
 def _run_code_mill_A1(location):
    h, zStep = location[2], 0.4
    interpolation.line((location[0], location[1], 0), FSM)
    interpolation.local_start()
-   kx, ky = -0.3, -11
+   kxs = [0.3,  0.3, -0.3, -0.3]
+   kys = [-7.5, -11,  -11, -7.5]
+   ox = 0
    depth = 21
    for sign in [1, -1]:
       for i, iz in enumerate(_get_range(h, h + depth, zStep)):
          if i == 0:
-            interpolation.line((kx, 0, iz), FSM)
-         interpolation.line((kx, sign * (ky + 4), iz), FS6)
-         interpolation.line((kx, sign * ky, iz), FS6)
-         interpolation.line((-kx, sign * ky, iz), FS6)
-         interpolation.line((-kx, sign * (ky + 4), iz), FS6)
+            interpolation.line((kxs[0], 0, iz), FSM)
+         if iz > h + 18:
+            kys = [-7, -11,  -11, -7]
+         for x, y in zip(kxs, kys):
+            interpolation.line((x + (x < 0 and -ox or ox), sign * y, iz), FS6)
+   #
+   zStep = depth / 3
+   kxs = [0.9,   0.9, 0.3, 0.3, -0.3, -0.3, -0.9, -0.9]
+   kys = [-7.5, -8.9, -10, -11,  -11, -10,  -8.9, -7.5]
+   kf = FS6 / 2
+   kfs = [FSM,    kf,  kf,  kf,   kf,  kf,    kf,   kf]
+   for sign in [1, -1]:
+      for i, iz in enumerate(_get_range(h + zStep, h + depth, zStep)):
+         if i == 0:
+            interpolation.line((kxs[0], 0, iz), FSM)
+         for x, y, f, in zip(kxs, kys, kfs):
+            interpolation.line((x + (x < 0 and -ox or ox), sign * y, iz), f)
    interpolation.line((0, 0, 0), FSM)
    interpolation.local_end()
    x, y, z = interpolation.get_location()
    interpolation.line((x, 0, 0), FSM)
-   interpolation.line((100, 0, 0), FSM)
+   interpolation.line((60, 0, 0), FSM)
 
 def _run_code_mill_B1R(location): # out of working range
    h, zStep = location[2], 0.4
@@ -222,9 +244,14 @@ def _run_code_AB_carve(h, flipY):
    kys = [  4,  10,  40, 46.6807, 41.5718, 9.89692,        2,   4]
    def _carve(signX, signY):
       interpolation.line((signX * kxs[0], signY * kys[0], 0), FSM)
-      for iz in _get_range(h + 4.3, h + 5, 0.3):
+      kzs = _get_range(h + 4.3, h + 5, 0.3)
+      lastIndex = len(kzs) - 1
+      ox = 0.05
+      for i, iz in enumerate(kzs):
+         if i == lastIndex:
+            ox = 0
          for ix, iy in zip(kxs, kys):
-            fx = signX * ix
+            fx = signX * (ix - ox)
             fy = signY * iy
             interpolation.line((fx, fy, iz), FS6)
       interpolation.line((fx, fy, 0), FSM)
@@ -328,7 +355,7 @@ def _int_to_dword(value):
 
 def export_data():
    fs = [
-      _run_code_test,         (117, 43, 1),        (0, 0),
+      _run_code_test,         (213.84, 11.17, 1),  (0, 0),
       _run_code_mill_A1,      (5.8, 16.9, 1),      (0, 14),
       _run_code_mill_B1,      (213.84, 21.17, 1),  (0, 0),
       _run_code_mill_D1,      (228.3, 56.9, 1),    (0, 0),
@@ -391,16 +418,16 @@ def _export_data(file_name, center, setZOffset):
 def animate(target, timeFactor):
    print('-Animate')
    interpolation.refresh()
-   #_run_code_test((37, 10, 1))
+   #_run_code_test((214, 10, 1))
    #_run_code_mill_A1((6, 16, 1))
    #
-   _run_code_mill_B1((214, 20, 1))
+   #_run_code_mill_B1((214, 20, 1))
    #
    #_run_code_mill_D1((228, 56, 1))
    #
    #_run_code_mill_AB1((154, 12, 1))
    #
-   #_run_code_mill_AB2((97, 73, 1))
+   _run_code_mill_AB2((97, 73, 1))
    #
    #_run_code_cut_A2((22, 63.5, 1))
    interpolation.check()
