@@ -109,36 +109,33 @@ def _run_code_mill_B1(location):
    ox = 0.05
    oy = 0.05
    #4Hole
-   interpolation.line((-5 - ox, -20 - oy, 0), FS6)
-   kzs = _get_range(h, h + 5, zStep)
+   holeDepth = 4
+   interpolation.line((-5 - ox, -20 - oy, 0), FSM)
+   mx = 0.2
+   my = 0.2
+   qxs = [ -5 + mx,  -5 + mx,  -9 + mx,    -9 + mx, -11.5, -11.5, -15.5]
+   qys = [-18, -14, -14, -10.5 + my, -10.5 + my,  -6.5 + my,  -6.5 + my]
+   isReversed = False
+   flipXs = [+1, +1, -1, -1]
+   flipYs = [+1, -1, -1, +1]
+   kzs = _get_range(h, h + holeDepth, zStep)
+   kzs.append(h + holeDepth)
    fs = FS6
    for i, iz in enumerate(kzs):
       interpolation.line((-5 - ox, -20 - oy, iz), fs)
-      #
-      interpolation.line((-5 - ox, -18 - oy, iz), fs)
-      interpolation.arc((-5 - ox, -13 - oy, iz), (-9 - ox, -13 - oy, iz), True, LS, fs)
-      interpolation.line((-9 - ox, -10.5 - oy, iz), fs)
-      interpolation.line((-11.5 - ox, -10.5 - oy, iz), fs)
-      interpolation.arc((-11.5 - ox, -6.5 - oy, iz), (-15.5 - ox, -6.5 - oy, iz), True, LS, fs)
-      #
-      interpolation.line((-15.5 - ox, 6.5 + oy, iz), fs)
-      interpolation.arc((-11.5 - ox, 6.5 + oy, iz), (-11.5 - ox, 10.5 + oy, iz), True, LS, fs)
-      interpolation.line((-9 - ox, 10.5 + oy, iz), fs)
-      interpolation.line((-9 - ox, 13 + oy, iz), fs)
-      interpolation.arc((-5 - ox, 13 + oy, iz), (-5 - ox, 18 + oy, iz), True, LS, fs)
-      #
-      interpolation.line((5 + ox, 18 + oy, iz), fs)
-      interpolation.arc((5 + ox, 13 + oy, iz), (9 + ox, 13 + oy, iz), True, LS, fs)
-      interpolation.line((9 + ox, 10.5 + oy, iz), fs)
-      interpolation.line((11.5 + ox, 10.5 + oy, iz), fs)
-      interpolation.arc((11.5 + ox, 6.5 + oy, iz), (15.5 + ox, 6.5 + oy, iz), True, LS, fs)
-      #
-      interpolation.line((15.5 + ox, -6.5 - oy, iz), fs)
-      interpolation.arc((11.5 + ox, -6.5 - oy, iz), (11.5 + ox, -10.5 - oy, iz), True, LS, fs)
-      interpolation.line((9 + ox, -10.5 - oy, iz), fs)
-      interpolation.line((9 + ox, -13 - oy, iz), fs)
-      interpolation.arc((5 + ox, -13 - oy, iz), (5 + ox, -18 - oy, iz), True, LS, fs)
-      #
+      for flipX, flipY in zip(flipXs, flipYs):
+         interpolation.line(((qxs[0] - ox) * flipX, (qys[0] - oy) * flipY, iz), fs)
+         interpolation.arc(((qxs[1] - ox) * flipX, (qys[1] - oy) * flipY, iz), ((qxs[2] - ox) * flipX, (qys[2] - oy) * flipY, iz), True, LS, fs)
+         interpolation.line(((qxs[3] - ox) * flipX, (qys[3] - oy) * flipY, iz), fs)
+         interpolation.line(((qxs[4] - ox) * flipX, (qys[4] - oy) * flipY, iz), fs)
+         interpolation.arc(((qxs[5] - ox) * flipX, (qys[5] - oy) * flipY, iz), ((qxs[6] - ox) * flipX, (qys[6] - oy) * flipY, iz), True, LS, fs)
+         qxs.reverse()
+         qys.reverse()
+         isReversed = not isReversed
+      if isReversed:
+         qxs.reverse()
+         qys.reverse()
+         isReversed = not isReversed
       interpolation.line((-5 - ox, -18 - oy, iz), fs)
       interpolation.line((-5 - ox, -20 - oy, iz), fs)
    #Out face
@@ -149,7 +146,7 @@ def _run_code_mill_B1(location):
    kfs = [FSM,   FSM,    FS6, FSM, FS6,  FSM,   FS6, FSM,  FS6]
    final = False
    interpolation.line((kxs[0], kys[0], iz), FS6)
-   for iz in _get_range(h + 5.1, h + 11.8, zStep):
+   for iz in _get_range(h + holeDepth + 0.1, h + 11.8, zStep):
       if (iz >= h + 10.5) and not final:
          kxs.reverse()
          kys.reverse()
@@ -421,13 +418,13 @@ def animate(target, timeFactor):
    #_run_code_test((214, 10, 1))
    #_run_code_mill_A1((6, 16, 1))
    #
-   #_run_code_mill_B1((214, 20, 1))
+   _run_code_mill_B1((214, 20, 1))
    #
    #_run_code_mill_D1((228, 56, 1))
    #
    #_run_code_mill_AB1((154, 12, 1))
    #
-   _run_code_mill_AB2((97, 73, 1))
+   #_run_code_mill_AB2((97, 73, 1))
    #
    #_run_code_cut_A2((22, 63.5, 1))
    interpolation.check()
