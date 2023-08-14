@@ -120,8 +120,12 @@ def _run_code_mill_B1(location):
    flipYs = [+1, -1, -1, +1]
    kzs = _get_range(h, h + holeDepth, zStep)
    kzs.append(h + holeDepth)
+   lastIndex = len(kzs)
    fs = FS6
    for i, iz in enumerate(kzs):
+      if i == lastIndex:
+         ox = 0.08
+         oy = 0.08
       interpolation.line((-5 - ox, -20 - oy, iz), fs)
       for flipX, flipY in zip(flipXs, flipYs):
          interpolation.line(((qxs[0] - ox) * flipX, (qys[0] - oy) * flipY, iz), fs)
@@ -146,27 +150,21 @@ def _run_code_mill_B1(location):
    kfs = [FSM,   FSM,    FS6, FSM, FS6,  FSM,   FS6, FSM,  FS6]
    final = False
    interpolation.line((kxs[0], kys[0], iz), FS6)
-   for iz in _get_range(h + holeDepth + 0.1, h + 11.8, zStep):
+   for iz in _get_range(h + holeDepth + 0.1, h + 11.7, zStep):
       if (iz >= h + 10.5) and not final:
-         kxs.reverse()
-         kys.reverse()
-         kfs = [FS6, FS6,    FSM, FS6, FSM,  FS6,   FSM, FS6,  FSM]
          final = True
-         ox = 0.15
-         oy = 0.15
+         ox = 0.1
+         oy = 0.1
       for x, y, f in zip(kxs, kys, kfs):
          dx = x < 0 and -ox or ox
          dy = y < 0 and -oy or oy
          interpolation.line((x + dx, y + dy, iz), f)
-   ox = 0.05
-   oy = 0.05
-   kxs.reverse()
-   kys.reverse()
    kfs = [FSM,   FSM,    FS6, FSM, FS6,  FSM,   FS6, FSM,  FS6]
-   for x, y, f in zip(kxs, kys, kfs):
-      dx = x < 0 and -ox or ox
-      dy = y < 0 and -oy or oy
-      interpolation.line((x + dx, y + dy, iz), f)
+   for ox, oy in zip([0, 0, 0], [0, -0.00, -0.01]):
+      for x, y, f in zip(kxs, kys, kfs):
+         dx = x < 0 and -ox or ox
+         dy = y < 0 and -oy or oy
+         interpolation.line((x + dx, y + dy, iz), f)
    #
    interpolation.local_end()
    x, y, z = interpolation.get_location()
@@ -204,41 +202,45 @@ def _run_code_mill_D1(location):
 def _run_code_AB_top(h, flipY):
    xStepMax, zStep = 5, 0.4
    foilRadius = 16.5
-   sy = 12 * (flipY and -1 or 1)
-   ey = 60 * (flipY and -1 or 1)
+   order = [[], [0], [0, 1], [0, 2, 1], [0, 3, 1, 2], [0, 4, 1, 3, 2], [0, 5, 1, 4, 2, 3]]
+   flipFactor = (flipY and -1 or 1)
+   sy = 7.50 * flipFactor
+   ey = 64.5 * flipFactor
    kzs = _get_range(h + 0.3, h + 4, zStep)
    lastIndex = len(kzs) - 1
-   xSign, ySign = 1, 1
    for i, iz in enumerate(kzs):
       iw = math.sin(math.acos((foilRadius - (iz - h)) / foilRadius)) * foilRadius * 2
       count = math.ceil(iw / xStepMax)
-      xStep = min((iw + 1) / count, xStepMax)
+      xStep = min((iw + 2) / count, xStepMax)
       if i == lastIndex:
-         sy = 1
-      x = xSign * (-iw / 2 - R6 - 1)
-      y = ySign == 1 and sy or ey
-      interpolation.line((x, y, iz - 2 * zStep), FSM)
+         sy = -3.5 * flipFactor
+         ey = 64.5 * flipFactor
+      sx = (-iw / 2 - R6 - 1) * flipFactor
+      x = sx
+      y = sy
+      pz = iz - 2 * zStep
+      if i != lastIndex:
+         cd = iw / 2 + R6 + 1
+         cy = (sy + ey) / 2
+         interpolation.line((-cd, cy, pz), FSM)
+         interpolation.line((-cd, cy, iz + 0.02), FS6)
+         interpolation.line((+cd, cy, iz + 0.02), FS6)
+         interpolation.line((+cd, cy, pz), FSM)
+      interpolation.line((x, y, pz), FSM)
       interpolation.line((x, y, iz), FS6)
-      x = xSign * (-iw / 2 - R6 - xStep)
-      j = 0
-      for _ in range(count * 2):
-         x += xSign * xStep
-         y = ySign == 1 and sy or ey
+      for ic in range(count):
+         ico = order[count][ic]
+         icoRemap = ico - (count - 1) / 2
+         x = icoRemap * xStep * flipFactor
          interpolation.line((x, y, iz), FS6)
-         j += 1
-         ySign *= -1
-         if j > count:
-            break
-         else:
-            interpolation.line((x + xSign * xStep, y, iz), FS6)
-      xSign *= -1
-      ySign *= -1
+         y = y == sy and ey or sy
+         interpolation.line((x, y, iz), FS6)
+         x = icoRemap * xStep * flipFactor
+         interpolation.line((x, y, iz), FS6)
    interpolation.line((x, y, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
 
 def _run_code_AB_carve(h, flipY):
-   kxs = [-17, -10, -10,     -17,      -8,      -8, -11.9981, -17]
-   kys = [  4,  10,  40, 46.6807, 41.5718, 9.89692,        2,   4]
    def _carve(signX, signY):
       interpolation.line((signX * kxs[0], signY * kys[0], 0), FSM)
       kzs = _get_range(h + 4.3, h + 5, 0.3)
@@ -252,9 +254,12 @@ def _run_code_AB_carve(h, flipY):
             fy = signY * iy
             interpolation.line((fx, fy, iz), FS6)
       interpolation.line((fx, fy, 0), FSM)
-   _carve(1, flipY and -1 or 1)
-   _carve(-1, flipY and -1 or 1)
-   interpolation.line((0, 0, 0), FSM)
+   kxs = [-17, -10, -10,     -17,      -8,      -8, -11, -17]
+   kys = [  4,  10,  40, 46.6807, 41.5718, 9.89692,   2,   4]
+   _carve(flipY and -1 or 1, flipY and -1 or 1)
+   kxs = [    -17,  -10, -10, -17, -11,      -8,      -8,     -17]
+   kys = [46.6807,   40,  10,   4,   2, 9.89692, 41.5718, 46.6807]
+   _carve(flipY and 1 or -1, flipY and -1 or 1)
 
 def _run_code_mill_AB1(location):
    h, zStep = location[2], 0.4
@@ -265,26 +270,38 @@ def _run_code_mill_AB1(location):
    _run_code_AB_carve(h, False)
    #
    #SideA
-   ox = -0.2
+   isReversed = False
+   ox = -0.15
    kxs = [  19.8, 18 + ox, 18 + ox, 20]
    kys = [53.466, 47.9714,    10.8, 11]
    interpolation.line((kxs[0], kys[0], 0), FSM)
-   for iz in _get_range(h + 10, h + 25, zStep):
+   iz = h + 10
+   for _ in range(100): #_get_range(h + 10, h + 25, zStep):
       for x, y in zip(kxs, kys):
          interpolation.line((x, y, iz), FS6)
       kxs.reverse()
       kys.reverse()
+      isReversed = not isReversed
+      iz += isReversed and zStep / 2 or zStep
+      if iz > h + 25:
+         break
    interpolation.line((x, y, 0), FSM)
    #SideB
-   ox = -0.2
+   isReversed = False
+   ox = -0.15
    kxs = [-20, -18 - ox, -18 - ox, -20]
    kys = [ 11, 10.8,     62,  62]
    interpolation.line((kxs[0], kys[0], 0), FSM)
-   for iz in _get_range(h + 10, h + 25, zStep):
+   iz = h + 10
+   for _ in range(100): #_get_range(h + 10, h + 25, zStep):
       for x, y in zip(kxs, kys):
          interpolation.line((x, y, iz), FS6)
       kxs.reverse()
       kys.reverse()
+      isReversed = not isReversed
+      iz += isReversed and zStep / 2 or zStep
+      if iz > h + 25:
+         break
    interpolation.line((x, y, 0), FSM)
    interpolation.line((0, 0, 0), FSM)
    #
@@ -354,10 +371,10 @@ def export_data():
    fs = [
       _run_code_test,         (213.84, 11.17, 1),  (0, 0),
       _run_code_mill_A1,      (5.8, 16.9, 1),      (0, 14),
-      _run_code_mill_B1,      (213.84, 21.17, 1),  (0, 0),
+      _run_code_mill_B1,      (213.84, 21.22, 1),  (0, 0),
       _run_code_mill_D1,      (228.3, 56.9, 1),    (0, 0),
       _run_code_mill_AB1,     (156.43, 20.2, 1),   (0, 14),
-      _run_code_mill_AB2,     (91.5, 81.2, 1),     (0, -14),
+      _run_code_mill_AB2,     (91.4, 81.2, 1),     (0, -14),
       _run_code_cut_A2,       (20, 60, 1),         (0, 10),
    ]
    print('-Export data')
@@ -418,13 +435,13 @@ def animate(target, timeFactor):
    #_run_code_test((214, 10, 1))
    #_run_code_mill_A1((6, 16, 1))
    #
-   _run_code_mill_B1((214, 20, 1))
+   #_run_code_mill_B1((214, 20, 1))
    #
    #_run_code_mill_D1((228, 56, 1))
    #
-   #_run_code_mill_AB1((154, 12, 1))
+   _run_code_mill_AB1((154, 12, 1))
    #
-   #_run_code_mill_AB2((97, 73, 1))
+   _run_code_mill_AB2((97, 73, 1))
    #
    #_run_code_cut_A2((22, 63.5, 1))
    interpolation.check()
