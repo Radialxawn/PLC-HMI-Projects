@@ -180,22 +180,38 @@ def _run_code_mill_D1(location):
    interpolation.local_start()
    #
    kx = (9.5 - R6 * 2) / 2
+   ky = -3.2
    kxs = [kx,   kx, -kx,  -kx]
-   kys = [-3.5, 26,  26, -3.5]
-   #   
+   kys = [ky, 26.9,  26.9, ky]
+   #
+   final = False
    interpolation.line((kxs[0], kys[0], 0), FS6)
-   for iz in _get_range(h + 0.1, h + 20, zStep):
+   kzs = _get_range(h + 0.1, h + 20, zStep)
+   kzs += [h + 6.5, h + 13.5, h + 20]
+   for iz in kzs:
+      if iz > 18.8 and not final:
+         final = True
+         fzs = [19.3, 20, 21]
+         interpolation.line((0, ky, fzs[0]), FS6)
+         for fz in fzs:
+            interpolation.line((0, ky, fz), FS6)
+            interpolation.line((0, 23, fz), FS6)
+            interpolation.line((0, ky, fz), FS6)
+         interpolation.line((0, ky, fz), FS6)
       for x, y in zip(kxs, kys):
          interpolation.line((x, y, iz), FS6)
    interpolation.line((0, 0, 0), FS6)
    #
-   for _ in range(1):
-      interpolation.line((kxs[0], kys[0], 0), FS6)
-      for iz in _get_range(h + 5, h + 21, zStep * 10):
-         for x, y in zip(kxs, kys):
-            interpolation.line((x, y, iz), FS6)
-   interpolation.line((0, 0, 0), FS6)
+   kx = -(10 + R6 - 0.1)
+   ky = 17
+   interpolation.line((kx, ky, 0), FSM)
+   interpolation.line((kx, ky, 15), FS6)
+   interpolation.line(((kx + 0.25), ky - 1, 15), FS6 / 2)
+   interpolation.line(((kx + 0.25), ky + 1, 15), FS6 / 2)
+   interpolation.line((kx, ky, 15), FS6)
+   interpolation.line((kx, ky, 0), FS6)
    #
+   interpolation.line((0, 0, 0), FS6)
    interpolation.local_end()
    x, y, z = interpolation.get_location()
    interpolation.line((x, 0, 0), FSM)
@@ -381,7 +397,7 @@ def export_data():
       _run_code_test,         (213.84, 11.17, 1),  (0, 0),
       _run_code_mill_A1,      (5.8, 16.9, 1),      (0, 14),
       _run_code_mill_B1,      (213.84, 21.22, 1),  (0, 0),
-      _run_code_mill_D1,      (228.3, 56.9, 1),    (0, 0),
+      _run_code_mill_D1,      (228.2, 56, 1),    (0, 0),
       _run_code_mill_AB1,     (156.43, 20.2, 1),   (0, 14),
       _run_code_mill_AB2,     (91.4, 81.2, 1),     (0, -14),
       _run_code_cut_A2,       (20, 60, 1),         (0, 10),
