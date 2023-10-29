@@ -69,14 +69,14 @@
 		function getById(id) { return document.getElementById(id); }
 
 		const AllDevicesUsed = '-AllDevicesUsed-';
-		const PLC1 = 'PLC1', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW';
+		const PLC1 = 'PLC1', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW';
 		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y';
 		const XAxis = 'XX', YAxis = 'YY', ZAxis = 'ZZ';
 		const Auto = -1;
 		let PLCTags = { [AllDevicesUsed]: { M: [], D: [], X: [], Y: [] } };
 		let PLCTagsTable = document.getElementById('plc-tags');
 		let PLCTagsString = '';
-		let HMITags = { [AllDevicesUsed]: { LB: [], LW: [] } };
+		let HMITags = { [AllDevicesUsed]: { LB: [], LW: [], RW: [] } };
 		let HMITagsTable = document.getElementById('hmi-tags');
 		let HMITagsString = '';
 		let errorString = '';
@@ -135,9 +135,13 @@
 		function generatePLCTags() {
 			PLCTagsString += `"CNC3Axis"\n`;
 			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
+			newPLCTag('MachineReady', BOOL, M, Auto, true);
 			newPLCTag('Run', BOOL, M, Auto, true);
 			newPLCTag('RunStop', BOOL, M, Auto, true);
 			newPLCTag('RunState', INT, D, Auto, true);
+			newPLCTag('DataSynced', BOOL, M, Auto, true);
+			newPLCTag('AccelTime', INT, D, Auto, true);
+			newPLCTag('DecelTime', INT, D, Auto, true);
 			generatePLCTagsAxis(XAxis);
 			generatePLCTagsAxis(YAxis);
 		}
@@ -204,6 +208,8 @@
 			newPLCTag(lb('LimitP'), BOOL, M, xyz(8343, 8353, 8363));
 			newPLCTag(lb('Busy'), BOOL, M, xyz(8340, 8350, 8360));
 			newPLCTag(lb('Pos'), DINT, D, xyz(8340, 8350, 8360));
+			newPLCTag(lb('AccelTime'), INT, D, xyz(8348, 8358, 8368));
+			newPLCTag(lb('DecelTime'), INT, D, xyz(8349, 8359, 8369));
 			newPLCTag(lb('PosView'), DINT, D, Auto, true);
 			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
 			newPLCTag(lb('Feed'), DINT, D, Auto, true);
@@ -220,7 +226,11 @@
 		function generateHMITags() {
 			var iLB = 0
 			newHMITag('Initializing', Self, LB, iLB++);
-			newHMITag('Test', Self, LB, iLB++);
+			newHMITag('AxisXSliderToPLC', Self, LB, iLB++);
+			newHMITag('AxisXMillimeter', Self, LW, 0);
+			newHMITag('AxisXMicrometer', Self, LW, 1);
+			newHMITag('AccelTime', Self, RW, 0);
+			newHMITag('DecelTime', Self, RW, 1);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
