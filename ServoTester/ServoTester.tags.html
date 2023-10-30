@@ -136,10 +136,11 @@
 			PLCTagsString += `"CNC3Axis"\n`;
 			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
 			newPLCTag('MachineReady', BOOL, M, Auto, true);
+			newPLCTag('GetOriginDone', BOOL, M, Auto, true);
+			newPLCTag('DataSynced', BOOL, M, Auto, true);
 			newPLCTag('Run', BOOL, M, Auto, true);
 			newPLCTag('RunStop', BOOL, M, Auto, true);
 			newPLCTag('RunState', INT, D, Auto, true);
-			newPLCTag('DataSynced', BOOL, M, Auto, true);
 			newPLCTag('AccelTime', INT, D, Auto, true);
 			newPLCTag('DecelTime', INT, D, Auto, true);
 			generatePLCTagsAxis(XAxis);
