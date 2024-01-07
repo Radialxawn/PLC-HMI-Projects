@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<style>
+	.button-flat {
+		align-items: center;
+		text-align: center;
+		text-decoration: none;
+		font-family: consolas;
+		border: 0;
+		font-size: 150%;
+		color: #FFF;
+		background: #0CADA7;
+		padding: 8px 8px;
+		display: inline-block;
+		white-space: nowrap;
+		border-radius: 5px;
+		margin: 10px 0;
+	}
+
+	.button-flat:hover {
+		background: #0A948F;
+	}
+
+	table {
+		border-spacing: 2px;
+	}
+
+	table td {
+		border: 2px solid rgb(81, 38, 211);
+		border-radius: 3px;
+		padding: 2px;
+		text-align: center;
+	}
+
+	.wrapper {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		column-gap: 8px;
+	}
+</style>
+
+<body>
+	<p id="error" style="white-space: pre;color: crimson;font-size: 13px;"></p>
+	<div class="wrapper">
+		<div>
+			<button class="button-flat" style="width: 100%;" onclick="copy(PLCTagsString)">Copy PLC Tags (Pass to GXWorks2 generated file)</button>
+			<table id="plc-tags" style="font-size: 13px;font-family: consolas;width: 100%;">
+				<tr style="background-color: gray;">
+					<td style="width: 45%;">Name</td>
+					<td style="width: 45%;">Type</td>
+					<td style="width: 10%;">Device</td>
+				</tr>
+			</table>
+		</div>
+		<div>
+			<button class="button-flat" style="width: 100%;" onclick="copy(HMITagsString)">Copy HMI Tags</button>
+			<table id="hmi-tags" style="font-size: 13px;font-family: consolas;width: 100%;">
+				<tr style="background-color: gray;">
+					<td style="width: 45%;">Name</td>
+					<td style="width: 45%;">PLC</td>
+					<td style="width: 10%;">Device</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<script>
+		function setById(id, value) { document.getElementById(id).innerHTML = value; }
+		function getById(id) { return document.getElementById(id); }
+
+		const AllDevicesUsed = '-AllDevicesUsed-';
+		const PLC1 = 'PLC1', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW';
+		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y';
+		const XAxis = 'XX', YAxis = 'YY', ZAxis = 'ZZ', AAxis = 'AA';
+		const Auto = -1, NoUse = -2;
+		let PLCTags = { [AllDevicesUsed]: { M: [], D: [], X: [], Y: [] } };
+		let PLCTagsTable = document.getElementById('plc-tags');
+		let PLCTagsString = '';
+		let HMITags = { [AllDevicesUsed]: { LB: [], LW: [], RW: [] } };
+		let HMITagsTable = document.getElementById('hmi-tags');
+		let HMITagsString = '';
+		let errorString = '';
+
+		function generate() {
+			let toIgnore = [];
+			for (var i = 0; i < 31; i++) {
+				toIgnore.push(10 * i + 8, 10 * i + 9);
+			}
+			PLCTags[AllDevicesUsed][X].push(...toIgnore);
+			PLCTags[AllDevicesUsed][Y].push(...toIgnore);
+			generatePLCTags();
+			generateHMITags();
+			printDebug();
+		}
+
+		function printDebug() {
+			for (var key in PLCTags) {
+				let PLCTag = PLCTags[key];
+				if (PLCTag.name == undefined) {
+					continue;
+				}
+				let PLCRow = PLCTagsTable.insertRow(PLCTagsTable.rows.length);
+				PLCRow.insertCell(0).innerHTML = PLCTag.name;
+				PLCRow.insertCell(1).innerHTML = PLCTag.type;
+				PLCRow.insertCell(2).innerHTML = `${PLCTag.deviceName}${PLCTag.deviceIndex}`;
+
+				let HMIKey = `-${PLCTag.name}`;
+				let HMIRow = HMITagsTable.insertRow(HMITagsTable.rows.length);
+				if (HMITags.hasOwnProperty(HMIKey)) {
+					let HMITag = HMITags[HMIKey];
+					HMIRow.insertCell(0).innerHTML = HMITag.name;
+					HMIRow.insertCell(1).innerHTML = HMITag.plcName;
+					HMIRow.insertCell(2).innerHTML = `${HMITag.deviceName}${HMITag.deviceIndex}`;
+					PLCRow.style.backgroundColor = '#92ed6b';
+					HMIRow.style.backgroundColor = '#92ed6b';
+					HMITag.drawn = true;
+				} else {
+					for (var i = 0; i < 3; i++) {
+						HMIRow.insertCell(i).innerHTML = 'ø';
+						HMIRow.cells[i].style.visibility = 'hidden';
+					}
+				}
+			}
+
+			for (var key in HMITags) {
+				let HMITag = HMITags[key];
+				if (HMITag.name == undefined) {
+					continue;
+				}
+				if (HMITag.drawn != true) {
+					let HMIRow = HMITagsTable.insertRow(HMITagsTable.rows.length);
+					HMIRow.insertCell(0).innerHTML = HMITag.name;
+					HMIRow.insertCell(1).innerHTML = HMITag.plcName;
+					HMIRow.insertCell(2).innerHTML = `${HMITag.deviceName}${HMITag.deviceIndex}`;
+				}
+			}
+
+			setById('error', errorString);
+		}
+
+		function generatePLCTags() {
+			PLCTagsString += `"KemNghiaDrillV2"\n`;
+			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
+			generatePLCTagsAxis(XAxis);
+			generatePLCTagsAxis(YAxis);
+			newPLCTag('MachineReady', BOOL, M, Auto, true);
+			newPLCTag('GetOriginDone', BOOL, M, Auto, true);
+			newPLCTag('DataSynced', BOOL, M, Auto, true);
+			newPLCTag('Run', BOOL, M, Auto, true);
+			newPLCTag('RunStop', BOOL, M, Auto, true);
+			newPLCTag('AccelTime', INT, D, Auto, true);
+			newPLCTag('DecelTime', INT, D, Auto, true);
+			newPLCTag('PositionArray', new ARRAY(DINT, 8), D, 1000);
+			for (k of ['', 'FoilExtract', 'Drill', 'FoilOut']) {
+				newPLCTag(`RunState${k}`, INT, D, Auto, true);
+			}			
+			for (k of ['FoilExtract']) {
+				for (a of ['Top', 'Bot']) {
+					for (b of ['N', 'P']) {
+						newPLCTag(`${k}${a}${b}`, BOOL, M, Auto, false);
+					}
+					for (b of ['N', 'P']) {
+						newPLCTag(`${k}${a}${b}I`, BOOL, X, Auto, false);
+					}
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}O`, BOOL, Y, Auto, false);
+				}
+			}
+			for (k of ['Drill']) {
+				newPLCTag(k, BOOL, M, Auto, true);
+				newPLCTag(k + 'O', BOOL, Y, Auto, false);
+			}
+			for (k of ['FoilOut']) {
+				for (a of ['']) {
+					for (b of ['N', 'P']) {
+						newPLCTag(`${k}${a}${b}`, BOOL, M, Auto, false);
+					}
+					for (b of ['N', 'P']) {
+						newPLCTag(`${k}${a}${b}I`, BOOL, X, Auto, false);
+					}
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}O`, BOOL, Y, Auto, false);
+				}
+			}
+			for (k of ['AirBurst']) {
+				newPLCTag(k, BOOL, M, Auto, true);
+				newPLCTag(k + 'O', BOOL, Y, Auto, false);
+			}
+		}
+
+		class ARRAY {
+			constructor(type, length) {
+				this.type = type;
+				this.length = length;
+			}
+			toString() { return `ARRAY [0..${this.length - 1}] OF ${this.type}`; }
+		}
+
+		function PLCTagsAutoIndex(deviceName) {
+			let devicesUsed = PLCTags[AllDevicesUsed][deviceName];
+			for (i = 0; i < 256; i++) {
+				if (devicesUsed.includes(i)) { continue; }
+				return i;
+			}
+			return 0;
+		}
+
+		function PLCTagsCheck(deviceName, deviceIndex) {
+			let allDevicesUsed = PLCTags[AllDevicesUsed];
+			if (allDevicesUsed.hasOwnProperty(deviceName) == false) { return; }
+			let devicesUsed = allDevicesUsed[deviceName];
+			if (devicesUsed.includes(deviceIndex)) {
+				errorString += `PLCTags overlap device ${deviceName}${deviceIndex}\n`;
+			}
+			devicesUsed.push(deviceIndex);
+		}
+
+		function newPLCTag(name, type, deviceName, deviceIndex, syncHMI) {
+			if (deviceIndex == NoUse) {
+				return;
+			}
+			deviceName = deviceName == undefined ? '' : deviceName;
+			deviceIndex = deviceIndex == undefined ? '' : deviceIndex;
+			/*auto index*/
+			if (deviceIndex == Auto) {
+				deviceIndex = PLCTagsAutoIndex(deviceName);
+			}
+			/*auto index*/
+			/*check*/
+			if (PLCTags.hasOwnProperty(name)) { errorString += `PLCTags already has ${name}\n`; }
+			let wordCount = type == DINT || type.type == DINT ? 2 : 1;
+			if (type instanceof ARRAY) {
+				for (i = 0; i < type.length * wordCount; i++) {
+					PLCTagsCheck(deviceName, deviceIndex + i);
+				}
+			} else {
+				for (i = 0; i < wordCount; i++) {
+					PLCTagsCheck(deviceName, deviceIndex + i);
+				}
+			}
+			/*check*/
+			PLCTags[name] = { name: name, type: type, deviceName: deviceName, deviceIndex: deviceIndex };
+			PLCTagsString += `"VAR_GLOBAL"	"${name}"	"${type}"	""	"${deviceName}${deviceIndex}"	""	""	""	""	""	""\n`;
+			if (syncHMI == true) {
+				newHMITag(`-${name}`, PLC1, deviceName, deviceIndex);
+			}
+		}
+
+		function generatePLCTagsAxis(name) {
+			let lb = function (n) { return `${name}${n}`; }
+			let xyz = function (x, y, z) { return name == XAxis ? x : name == YAxis ? y : z; }
+			newPLCTag(lb('LimitN'), BOOL, M, xyz(8344, 8354, 8364));
+			newPLCTag(lb('LimitP'), BOOL, M, xyz(8343, 8353, 8363));
+			newPLCTag(lb('Busy'), BOOL, M, xyz(8340, 8350, 8360));
+			newPLCTag(lb('InterruptInverse'), BOOL, M, xyz(8347, 8357, 8367));
+			newPLCTag(lb('Pos'), DINT, D, xyz(8340, 8350, 8360));
+			newPLCTag(lb('AccelTime'), INT, D, xyz(8348, 8358, 8368));
+			newPLCTag(lb('DecelTime'), INT, D, xyz(8349, 8359, 8369));
+			newPLCTag(lb('PosView'), DINT, D, Auto, true);
+			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
+			newPLCTag(lb('Feed'), DINT, D, Auto, true);
+			newPLCTag(lb('TarR'), BOOL, M, Auto, true);
+			newPLCTag(lb('TarRSkip'), INT, D, Auto, false);
+			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
+			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
+			newPLCTag(lb('On'), BOOL, M, Auto, true);
+			newPLCTag(lb('Run'), BOOL, M, Auto, true);
+			newPLCTag(lb('Direction'), BOOL, M, Auto);
+			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, 2));
+			newPLCTag(lb('MaxI'), BOOL, X, xyz(NoUse, 5, 6));
+			newPLCTag(lb('ReadyI'), BOOL, X, xyz(10, 11, 12));
+			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
+			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
+			newPLCTag(lb('OnO'), BOOL, Y, xyz(2, 6, 7));
+		}
+
+		function generateHMITags() {
+			var iLB = 0
+			newHMITag('Initializing', Self, LB, iLB++);
+			newHMITag('AxisXSliderToPLC', Self, LB, iLB++);
+			newHMITag('AxisXMillimeter', Self, LW, 0);
+			newHMITag('AxisXMicrometer', Self, LW, 1);
+			newHMITag('AccelTime', Self, RW, 0);
+			newHMITag('DecelTime', Self, RW, 1);
+		}
+
+		function HMITagsCheck(deviceName, deviceIndex) {
+			let allDevicesUsed = HMITags[AllDevicesUsed];
+			if (allDevicesUsed.hasOwnProperty(deviceName) == false) { return; }
+			let devicesUsed = allDevicesUsed[deviceName];
+			if (devicesUsed.includes(deviceIndex)) {
+				errorString += `HMITags overlap device ${deviceName}${deviceIndex}\n`;
+			}
+			devicesUsed.push(deviceIndex);
+		}
+
+		function newHMITag(name, plcName, deviceName, deviceIndex) {
+			/**/
+			if (HMITags.hasOwnProperty(name)) { errorString += `HMITags already has ${name}\n`; }
+			/**/
+			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
+			HMITagsString += `${name},${plcName},${deviceName},${deviceIndex}\n`;
+			HMITagsCheck(deviceName, deviceIndex)
+		}
+
+		generate();
+
+		function copy(text) {
+			const temp = document.createElement('textarea');
+			temp.value = text;
+			document.body.appendChild(temp);
+			temp.select();
+			document.execCommand('copy');
+			document.body.removeChild(temp);
+		}
+	</script>
+
+</body>
+
+</html>
