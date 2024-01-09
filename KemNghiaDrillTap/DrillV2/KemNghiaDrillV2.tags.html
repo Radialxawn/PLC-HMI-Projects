@@ -148,8 +148,6 @@
 			newPLCTag('DataSynced', BOOL, M, Auto, true);
 			newPLCTag('Run', BOOL, M, Auto, true);
 			newPLCTag('RunStop', BOOL, M, Auto, true);
-			newPLCTag('AccelTime', INT, D, Auto, true);
-			newPLCTag('DecelTime', INT, D, Auto, true);
 			newPLCTag('PositionArray', new ARRAY(DINT, 8), D, 1000);
 			for (k of ['', 'Disc', 'FoilExtract', 'Drill', 'FoilOut']) {
 				newPLCTag(`RunState${k}`, INT, D, Auto, true);
@@ -165,10 +163,10 @@
 			for (k of ['FoilExtract']) {
 				for (a of ['Top', 'Bot']) {
 					for (b of ['N', 'P']) {
-						newPLCTag(`${k}${a}${b}`, BOOL, M, Auto, false);
+						newPLCTag(`${k}${a}${b}`, BOOL, M, Auto, true);
 					}
 					for (b of ['N', 'P']) {
-						newPLCTag(`${k}${a}${b}I`, BOOL, X, Auto, false);
+						newPLCTag(`${k}${a}${b}I`, BOOL, X, Auto, true);
 					}
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}O`, BOOL, Y, Auto, false);
@@ -193,15 +191,15 @@
 				}
 				newPLCTag(k + 'ZOrigin', DINT, D, Auto, true);
 				newPLCTag(k + 'ZStart', DINT, D, Auto, true);
-				newPLCTag(k + 'ZEnd', DINT, D, Auto, true);
+				newPLCTag(k + 'ZDepth', DINT, D, Auto, true);
 			}
 			for (k of ['FoilOut']) {
 				for (a of ['']) {
 					for (b of ['N', 'P']) {
-						newPLCTag(`${k}${a}${b}`, BOOL, M, Auto, false);
+						newPLCTag(`${k}${a}${b}`, BOOL, M, Auto, true);
 					}
 					for (b of ['N', 'P']) {
-						newPLCTag(`${k}${a}${b}I`, BOOL, X, Auto, false);
+						newPLCTag(`${k}${a}${b}I`, BOOL, X, Auto, true);
 					}
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}O`, BOOL, Y, Auto, false);
@@ -302,14 +300,10 @@
 		function generateHMITags() {
 			var iLB = 0
 			newHMITag('Initializing', Self, LB, iLB++);
-			newHMITag('AxisXSliderToPLC', Self, LB, iLB++);
-			newHMITag('AxisXMillimeter', Self, LW, 0);
-			newHMITag('AxisXMicrometer', Self, LW, 1);
-			newHMITag('AccelTime', Self, RW, 0);
-			newHMITag('DecelTime', Self, RW, 1);
-			newHMITag('DrillStart', Self, RW, 2);
-			newHMITag('DrillEnd', Self, RW, 3);
-			newHMITag('FoilExtractBackDelay', Self, RW, 4);
+			newHMITag('DrillStart', Self, RW, 0);
+			newHMITag('DrillDepth', Self, RW, 2);
+			newHMITag('FoilExtractTopBackDelay', Self, RW, 4);
+			newHMITag('FoilExtractBotBackDelay', Self, RW, 5);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
