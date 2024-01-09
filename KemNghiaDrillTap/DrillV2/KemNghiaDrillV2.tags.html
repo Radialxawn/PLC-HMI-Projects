@@ -151,9 +151,17 @@
 			newPLCTag('AccelTime', INT, D, Auto, true);
 			newPLCTag('DecelTime', INT, D, Auto, true);
 			newPLCTag('PositionArray', new ARRAY(DINT, 8), D, 1000);
-			for (k of ['', 'FoilExtract', 'Drill', 'FoilOut']) {
+			for (k of ['', 'Disc', 'FoilExtract', 'Drill', 'FoilOut']) {
 				newPLCTag(`RunState${k}`, INT, D, Auto, true);
-			}			
+				newPLCTag(`RunState${k}Next`, BOOL, M, Auto, true);
+			}
+			for (k of ['Disc']) {
+				newPLCTag(`${k}DRVIOffset`, DINT, D, Auto);
+				newPLCTag(`${k}DRVIOffsetBefore`, DINT, D, Auto);
+				newPLCTag(`${k}DRVIFrequency`, DINT, D, Auto);
+				newPLCTag(`${k}SectorCount`, INT, D, Auto);
+				newPLCTag(`${k}StepCount`, INT, D, Auto, true);
+			}
 			for (k of ['FoilExtract']) {
 				for (a of ['Top', 'Bot']) {
 					for (b of ['N', 'P']) {
@@ -164,6 +172,7 @@
 					}
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}O`, BOOL, Y, Auto, false);
+					newPLCTag(`${k}${a}BackDelay`, INT, D, Auto, true);
 				}
 			}
 			for (k of ['Drill']) {
@@ -174,10 +183,13 @@
 					newPLCTag(k + a + 'O', BOOL, Y, Auto, false);
 				}
 				for (a of ['ZOriginGet']) {
-					newPLCTag(k + a + 'ReadyPI', BOOL, X, Auto, true);
+					newPLCTag(k + a + 'EnablePI', BOOL, X, Auto, true);
 					newPLCTag(k + a + 'Enable', BOOL, M, Auto, true);
+					newPLCTag(k + a + 'EnableN', BOOL, M, Auto, true);
+					newPLCTag(k + a + 'EnableP', BOOL, M, Auto, true);
 					newPLCTag(k + a + 'EnableO', BOOL, Y, Auto, true);
 					newPLCTag(k + a + 'I', BOOL, X, Auto, true);
+					newPLCTag(k + a + 'Done', BOOL, M, Auto, true);
 				}
 				newPLCTag(k + 'ZOrigin', DINT, D, Auto, true);
 				newPLCTag(k + 'ZStart', DINT, D, Auto, true);
@@ -295,6 +307,9 @@
 			newHMITag('AxisXMicrometer', Self, LW, 1);
 			newHMITag('AccelTime', Self, RW, 0);
 			newHMITag('DecelTime', Self, RW, 1);
+			newHMITag('DrillStart', Self, RW, 2);
+			newHMITag('DrillEnd', Self, RW, 3);
+			newHMITag('FoilExtractBackDelay', Self, RW, 4);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
