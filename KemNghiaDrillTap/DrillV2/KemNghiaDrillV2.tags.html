@@ -169,6 +169,19 @@
 			for (k of ['Drill']) {
 				newPLCTag(k, BOOL, M, Auto, true);
 				newPLCTag(k + 'O', BOOL, Y, Auto, false);
+				for (a of ['Hold']) {
+					newPLCTag(k + a, BOOL, M, Auto, true);
+					newPLCTag(k + a + 'O', BOOL, Y, Auto, false);
+				}
+				for (a of ['ZOriginGet']) {
+					newPLCTag(k + a + 'ReadyPI', BOOL, X, Auto, true);
+					newPLCTag(k + a + 'Enable', BOOL, M, Auto, true);
+					newPLCTag(k + a + 'EnableO', BOOL, Y, Auto, true);
+					newPLCTag(k + a + 'I', BOOL, X, Auto, true);
+				}
+				newPLCTag(k + 'ZOrigin', DINT, D, Auto, true);
+				newPLCTag(k + 'ZStart', DINT, D, Auto, true);
+				newPLCTag(k + 'ZEnd', DINT, D, Auto, true);
 			}
 			for (k of ['FoilOut']) {
 				for (a of ['']) {
@@ -266,9 +279,9 @@
 			newPLCTag(lb('On'), BOOL, M, Auto, true);
 			newPLCTag(lb('Run'), BOOL, M, Auto, true);
 			newPLCTag(lb('Direction'), BOOL, M, Auto);
-			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, 2));
-			newPLCTag(lb('MaxI'), BOOL, X, xyz(NoUse, 5, 6));
-			newPLCTag(lb('ReadyI'), BOOL, X, xyz(10, 11, 12));
+			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, 2), true);
+			newPLCTag(lb('MaxI'), BOOL, X, xyz(NoUse, 5, 6), true);
+			newPLCTag(lb('ReadyI'), BOOL, X, xyz(10, 11, 12), true);
 			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
 			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
 			newPLCTag(lb('OnO'), BOOL, Y, xyz(2, 6, 7));
