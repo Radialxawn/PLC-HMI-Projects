@@ -1,0 +1,4 @@
+FX3U-32MT
+VFD Delta
+HMI Delta
+Servo Delta
