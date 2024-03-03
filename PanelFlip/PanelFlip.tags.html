@@ -53,7 +53,7 @@
 			</table>
 		</div>
 		<div>
-			<button class="button-flat" style="width: 100%;" onclick="copy(HMITagsString)">Copy HMI Tags (Weintek)</button>
+			<button class="button-flat" style="width: 100%;" onclick="copy(HMITagsString)">Copy HMI Tags</button>
 			<table id="hmi-tags" style="font-size: 13px;font-family: consolas;width: 100%;">
 				<tr style="background-color: gray;">
 					<td style="width: 45%;">Name</td>
@@ -70,10 +70,10 @@
 
 		const AllDevicesUsed = '-AllDevicesUsed-';
 		const PLC1 = 'PLC1', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW';
-		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y';
+		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y', TC = 'TC';
 		const XAxis = 'XX', YAxis = 'YY', ZAxis = 'ZZ', AAxis = 'AA';
 		const Auto = -1, NoUse = -2;
-		let PLCTags = { [AllDevicesUsed]: { M: [], D: [], X: [], Y: [] } };
+		let PLCTags = { [AllDevicesUsed]: { M: [], D: [], X: [], Y: [], TC: [] } };
 		let PLCTagsTable = document.getElementById('plc-tags');
 		let PLCTagsString = '';
 		let HMITags = { [AllDevicesUsed]: { LB: [], LW: [], RW: [] } };
@@ -94,7 +94,7 @@
 		}
 
 		function printDebug() {
-			deviceNameColors = {X: '#e89a5f', Y: '#5fd1e8'};
+			deviceNameColors = {X: '#e89a5f', Y: '#5fd1e8', TC: '#e86de0'};
 
 			for (var key in PLCTags) {
 				let PLCTag = PLCTags[key];
@@ -148,6 +148,7 @@
 			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
 			generatePLCTagsAxis(XAxis);
 			newPLCTag('MachineReady', BOOL, M, Auto, true);
+			newPLCTag('MachineReadyTimer', BOOL, TC, Auto);
 			for (k of ['Run', 'RunStop']) {
 				newPLCTag(k, BOOL, M, Auto, true);
 			}
@@ -158,21 +159,40 @@
 				newPLCTag(`RunState${k}Next`, BOOL, M, Auto);
 			}
 			for (k of ['Base']) {
+				newPLCTag(`${k}Surface`, BOOL, M, Auto, true);
+				newPLCTag(`${k}SurfaceI`, BOOL, X, Auto, true);
+				newPLCTag(`${k}Min`, BOOL, M, Auto, true);
+				newPLCTag(`${k}MinI`, BOOL, X, Auto, true);
+				newPLCTag(`${k}Max`, BOOL, M, Auto, true);
 				newPLCTag(`${k}MaxI`, BOOL, X, Auto, true);
-				newPLCTag(`${k}Rise`, BOOL, M, Auto, true);
-				newPLCTag(`${k}RiseO`, BOOL, Y, Auto, true);
+				newPLCTag(`${k}MoveDirection`, INT, D, Auto, true);
+				newPLCTag(`${k}MoveUpO`, BOOL, Y, Auto, true);
+				newPLCTag(`${k}MoveDownO`, BOOL, Y, Auto, true);
 			}
 			for (k of ['Grab']) {
+				newPLCTag(`${k}MoveSpeed`, DINT, D, Auto, true);
 				for (a of ['Position']) {
 					newPLCTag(`${k}${a}Start`, DINT, D, Auto, true);
 					newPLCTag(`${k}${a}End`, DINT, D, Auto, true);
 				}
-				newPLCTag(`${k}On`, BOOL, M, Auto, true);
-				newPLCTag(`${k}OnO`, BOOL, Y, Auto, true);
+				for (a of ['Down']) {
+					newPLCTag(`${k}${a}Min`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}MinI`, BOOL, X, Auto, true);
+					newPLCTag(`${k}${a}Max`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}MaxI`, BOOL, X, Auto, true);
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}O`, BOOL, Y, Auto);
+				}
+				for (a of ['On']) {
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}O`, BOOL, Y, Auto);
+				}
 			}
 			for (k of ['Flip']) {
-				newPLCTag(`${k}FoilInI`, BOOL, X, Auto, true);
-				newPLCTag(`${k}EndI`, BOOL, X, Auto, true);
+				newPLCTag(`${k}FoilIn`, BOOL, M, Auto, true);
+				newPLCTag(`${k}FoilInI`, BOOL, X, Auto);
+				newPLCTag(`${k}End`, BOOL, M, Auto, true);
+				newPLCTag(`${k}EndI`, BOOL, X, Auto);
 				for (a of ['Spindle']) {
 					for (b of ['RW']) {
 						newPLCTag(`${k}${a}${b}Index`, INT, D, Auto, true);
