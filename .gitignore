@@ -3,3 +3,4 @@
 **/[Bb]ackup*
 __pycache__/
 **/*autosave.kra
+**/*.bak

@@ -159,10 +159,10 @@
 			for (k of ['Flip']) {
 				newPLCTag(`${k}FoilIn`, BOOL, M, Auto, true);
 				newPLCTag(`${k}FoilInI`, BOOL, X, Auto);
-				newPLCTag(`${k}FoilInICatch`, BOOL, M, 8170 + PLCTags[`${k}FoilInI`].deviceIndex);
+				newPLCTag(`${k}FoilInIPulseCatch`, BOOL, M, 8170 + PLCTags[`${k}FoilInI`].deviceIndex);
 				newPLCTag(`${k}End`, BOOL, M, Auto, true);
 				newPLCTag(`${k}EndI`, BOOL, X, Auto);
-				newPLCTag(`${k}EndICatch`, BOOL, M, 8170 + PLCTags[`${k}EndI`].deviceIndex);
+				newPLCTag(`${k}EndIPulseCatch`, BOOL, M, 8170 + PLCTags[`${k}EndI`].deviceIndex);
 				for (a of ['Spindle']) {
 					for (b of ['RW']) {
 						newPLCTag(`${k}${a}${b}Index`, INT, D, Auto, true);
@@ -211,8 +211,8 @@
 				}
 			}
 			for (k of ['Base']) {
-				newPLCTag(`${k}Surface`, BOOL, M, Auto, true);
-				newPLCTag(`${k}SurfaceI`, BOOL, X, Auto);
+				newPLCTag(`${k}Foil`, BOOL, M, Auto, true);
+				newPLCTag(`${k}FoilI`, BOOL, X, Auto);
 				newPLCTag(`${k}Min`, BOOL, M, Auto, true);
 				newPLCTag(`${k}MinI`, BOOL, X, Auto);
 				newPLCTag(`${k}Max`, BOOL, M, Auto, true);
@@ -302,7 +302,7 @@
 			newPLCTag(lb('Run'), BOOL, M, Auto, true);
 			newPLCTag(lb('Direction'), BOOL, M, Auto);
 			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, 2), true);
-			newPLCTag(lb('MaxI'), BOOL, X, xyz(NoUse, 5, 6), true);
+			newPLCTag(lb('MaxI'), BOOL, X, xyz(4, 5, 6), true);
 			newPLCTag(lb('ReadyI'), BOOL, X, xyz(10, 11, 12), true);
 			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
 			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
