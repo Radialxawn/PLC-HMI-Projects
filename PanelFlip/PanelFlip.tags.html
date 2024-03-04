@@ -152,50 +152,21 @@
 			for (k of ['Run', 'RunStop']) {
 				newPLCTag(k, BOOL, M, Auto, true);
 			}
-			newPLCTag('RunStart', BOOL, M, Auto, true);
-			newPLCTag('RunAuto', BOOL, M, Auto, true);
 			for (k of ['', 'Base', 'Grab', 'Flip']) {
 				newPLCTag(`RunState${k}`, INT, D, Auto, true);
 				newPLCTag(`RunState${k}Next`, BOOL, M, Auto);
 			}
-			for (k of ['Base']) {
-				newPLCTag(`${k}Surface`, BOOL, M, Auto, true);
-				newPLCTag(`${k}SurfaceI`, BOOL, X, Auto, true);
-				newPLCTag(`${k}Min`, BOOL, M, Auto, true);
-				newPLCTag(`${k}MinI`, BOOL, X, Auto, true);
-				newPLCTag(`${k}Max`, BOOL, M, Auto, true);
-				newPLCTag(`${k}MaxI`, BOOL, X, Auto, true);
-				newPLCTag(`${k}MoveDirection`, INT, D, Auto, true);
-				newPLCTag(`${k}MoveUpO`, BOOL, Y, Auto, true);
-				newPLCTag(`${k}MoveDownO`, BOOL, Y, Auto, true);
-			}
-			for (k of ['Grab']) {
-				newPLCTag(`${k}MoveSpeed`, DINT, D, Auto, true);
-				for (a of ['Position']) {
-					newPLCTag(`${k}${a}Start`, DINT, D, Auto, true);
-					newPLCTag(`${k}${a}End`, DINT, D, Auto, true);
-				}
-				for (a of ['Down']) {
-					newPLCTag(`${k}${a}Min`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}MinI`, BOOL, X, Auto, true);
-					newPLCTag(`${k}${a}Max`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}MaxI`, BOOL, X, Auto, true);
-					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}O`, BOOL, Y, Auto);
-				}
-				for (a of ['On']) {
-					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}O`, BOOL, Y, Auto);
-				}
-			}
 			for (k of ['Flip']) {
 				newPLCTag(`${k}FoilIn`, BOOL, M, Auto, true);
 				newPLCTag(`${k}FoilInI`, BOOL, X, Auto);
+				newPLCTag(`${k}FoilInICatch`, BOOL, M, 8170 + PLCTags[`${k}FoilInI`].deviceIndex);
 				newPLCTag(`${k}End`, BOOL, M, Auto, true);
 				newPLCTag(`${k}EndI`, BOOL, X, Auto);
+				newPLCTag(`${k}EndICatch`, BOOL, M, 8170 + PLCTags[`${k}EndI`].deviceIndex);
 				for (a of ['Spindle']) {
 					for (b of ['RW']) {
 						newPLCTag(`${k}${a}${b}Index`, INT, D, Auto, true);
+						newPLCTag(`${k}${a}${b}Lock`, BOOL, M, Auto);
 						var keys = ['WriteFrequency', 'WriteRun', 'ReadData'];
 						var nearest = 2;
 						for (var i in [2, 4, 8, 16, 32]) {
@@ -206,16 +177,49 @@
 						}
 						for (var i = 0; i <= keys.length; i++) {
 							var key = i < keys.length ? keys[i] : `Dummy${i}`;
-							newPLCTag(`${k}${a}${b}${key}`, INT, M, Auto, true);
+							newPLCTag(`${k}${a}${b}${key}`, INT, M, Auto);
 						}
+						newPLCTag(`${k}${a}${b}${keys[0]}Data`, INT, D, 200, true);
+						newPLCTag(`${k}${a}${b}${keys[1]}Data`, INT, D, 201, true);
 					}
 					for (b of ['Data']) {
 						newPLCTag(`${k}${a}${b}Frequency`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}Current`, INT, D, Auto, true);
+						newPLCTag(`${k}${a}${b}SettingFrequency`, INT, D, Auto, true);
 						newPLCTag(`${k}${a}${b}DCBUSVoltage`, INT, D, Auto, true);
 						newPLCTag(`${k}${a}${b}Voltage`, INT, D, Auto, true);
+						newPLCTag(`${k}${a}${b}Current`, INT, D, Auto, true);
 					}
 				}
+			}
+			for (k of ['Grab']) {
+				newPLCTag(`${k}MoveSpeed`, DINT, D, Auto, true);
+				for (a of ['Position']) {
+					newPLCTag(`${k}${a}Start`, DINT, D, Auto, true);
+					newPLCTag(`${k}${a}End`, DINT, D, Auto, true);
+				}
+				for (a of ['Down']) {
+					newPLCTag(`${k}${a}Min`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}MinI`, BOOL, X, Auto);
+					newPLCTag(`${k}${a}Max`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}MaxI`, BOOL, X, Auto);
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}O`, BOOL, Y, Auto);
+				}
+				for (a of ['On']) {
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}O`, BOOL, Y, Auto);
+				}
+			}
+			for (k of ['Base']) {
+				newPLCTag(`${k}Surface`, BOOL, M, Auto, true);
+				newPLCTag(`${k}SurfaceI`, BOOL, X, Auto);
+				newPLCTag(`${k}Min`, BOOL, M, Auto, true);
+				newPLCTag(`${k}MinI`, BOOL, X, Auto);
+				newPLCTag(`${k}Max`, BOOL, M, Auto, true);
+				newPLCTag(`${k}MaxI`, BOOL, X, Auto);
+				newPLCTag(`${k}MoveDirection`, INT, D, Auto, true);
+				newPLCTag(`${k}MoveUpO`, BOOL, Y, Auto);
+				newPLCTag(`${k}MoveDownO`, BOOL, Y, Auto);
 			}
 		}
 
@@ -306,12 +310,12 @@
 		}
 
 		function generateHMITags() {
-			var iLB = 0
-			newHMITag('Initializing', Self, LB, iLB++);
-			newHMITag('TempA', Self, RW, 0);
-			newHMITag('TempB', Self, RW, 2);
-			newHMITag('TempC', Self, RW, 4);
-			newHMITag('TempD', Self, RW, 5);
+			// var iLB = 0
+			// newHMITag('Initializing', Self, LB, iLB++);
+			// newHMITag('TempA', Self, RW, 0);
+			// newHMITag('TempB', Self, RW, 2);
+			// newHMITag('TempC', Self, RW, 4);
+			// newHMITag('TempD', Self, RW, 5);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
@@ -327,10 +331,24 @@
 		function newHMITag(name, plcName, deviceName, deviceIndex) {
 			/**/
 			if (HMITags.hasOwnProperty(name)) { errorString += `HMITags already has ${name}\n`; }
-			/**/
+			/*Weintek/
 			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
 			HMITagsString += `${name},${plcName},${deviceName},${deviceIndex}\n`;
 			HMITagsCheck(deviceName, deviceIndex)
+			/*Delta*/
+			if (HMITagsString == '') {
+				HMITagsString += 'Define Name,Type,Address,Description\n'
+			}
+			var deviveType = function (name) {
+				if (name == D) {
+					return 'WORD';
+				}
+				return 'BIT';
+			}
+			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
+			HMITagsString += `${name},${deviveType(deviceName)},{PLC}0@${deviceName}${deviceIndex},\n`;
+			HMITagsCheck(deviceName, deviceIndex)
+			/**/
 		}
 
 		generate();

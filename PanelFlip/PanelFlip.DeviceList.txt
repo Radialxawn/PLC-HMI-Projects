@@ -1,4 +1,4 @@
 FX3U-32MT
-VFD Delta
-HMI Delta
-Servo Delta
+HMI Delta DOP-107DV
+VFD INVT GD20-0R7G-4
+Servo Delta ASDA-B2-3023-B
