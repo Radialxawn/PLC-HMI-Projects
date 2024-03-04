@@ -94,6 +94,8 @@
 		}
 
 		function printDebug() {
+			deviceNameColors = {X: '#e89a5f', Y: '#5fd1e8', TC: '#e86de0'};
+
 			for (var key in PLCTags) {
 				let PLCTag = PLCTags[key];
 				if (PLCTag.name == undefined) {
@@ -103,7 +105,7 @@
 				PLCRow.insertCell(0).innerHTML = PLCTag.name;
 				PLCRow.insertCell(1).innerHTML = PLCTag.type;
 				PLCRow.insertCell(2).innerHTML = `${PLCTag.deviceName}${PLCTag.deviceIndex}`;
-
+				
 				let HMIKey = `-${PLCTag.name}`;
 				let HMIRow = HMITagsTable.insertRow(HMITagsTable.rows.length);
 				if (HMITags.hasOwnProperty(HMIKey)) {
@@ -111,14 +113,17 @@
 					HMIRow.insertCell(0).innerHTML = HMITag.name;
 					HMIRow.insertCell(1).innerHTML = HMITag.plcName;
 					HMIRow.insertCell(2).innerHTML = `${HMITag.deviceName}${HMITag.deviceIndex}`;
-					PLCRow.style.backgroundColor = '#92ed6b';
-					HMIRow.style.backgroundColor = '#92ed6b';
+					PLCRow.style.backgroundColor = HMIRow.style.backgroundColor = '#7ae876';
 					HMITag.drawn = true;
 				} else {
 					for (var i = 0; i < 3; i++) {
 						HMIRow.insertCell(i).innerHTML = 'ø';
 						HMIRow.cells[i].style.visibility = 'hidden';
 					}
+				}
+				
+				if (deviceNameColors.hasOwnProperty(PLCTag.deviceName)) {
+					PLCRow.style.backgroundColor = HMIRow.style.backgroundColor = deviceNameColors[PLCTag.deviceName];
 				}
 			}
 
@@ -289,7 +294,7 @@
 			newPLCTag(lb('Run'), BOOL, M, Auto, true);
 			newPLCTag(lb('Direction'), BOOL, M, Auto);
 			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, 2), true);
-			newPLCTag(lb('MaxI'), BOOL, X, xyz(NoUse, 5, 6), true);
+			newPLCTag(lb('AlarmI'), BOOL, X, xyz(4, 5, 6), true);
 			newPLCTag(lb('ReadyI'), BOOL, X, xyz(10, 11, 12), true);
 			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
 			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
