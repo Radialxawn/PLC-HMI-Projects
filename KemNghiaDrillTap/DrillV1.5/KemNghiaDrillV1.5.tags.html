@@ -70,10 +70,10 @@
 
 		const AllDevicesUsed = '-AllDevicesUsed-';
 		const PLC = 'PLC', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW';
-		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y', TC = 'TC';
+		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y', TC = 'TC', TN = 'TN';
 		const XAxis = 'XX', YAxis = 'YY', ZAxis = 'ZZ', AAxis = 'AA';
 		const Auto = -1, NoUse = -2;
-		let PLCTags = { [AllDevicesUsed]: { M: [], D: [], X: [], Y: [], TC: [] } };
+		let PLCTags = { [AllDevicesUsed]: { M: [], D: [], X: [], Y: [], TC: [], TN: [] } };
 		let PLCTagsTable = document.getElementById('plc-tags');
 		let PLCTagsString = '';
 		let HMITags = { [AllDevicesUsed]: { LB: [], LW: [], RW: [] } };
@@ -94,7 +94,7 @@
 		}
 
 		function printDebug() {
-			deviceNameColors = {X: '#e89a5f', Y: '#5fd1e8', TC: '#e86de0'};
+			deviceNameColors = {X: '#e89a5f', Y: '#5fd1e8', TC: '#e86de0', TN: '#e89ee3'};
 
 			for (var key in PLCTags) {
 				let PLCTag = PLCTags[key];
@@ -153,9 +153,17 @@
 				newPLCTag(k, BOOL, M, Auto, true);
 				newPLCTag(k + 'I', BOOL, X, Auto, true);
 			}
-			newPLCTag('RunStart', BOOL, M, Auto, true);
-			newPLCTag('RunAuto', BOOL, M, Auto, true);
-			newPLCTag('RunAutoEnableTimer', BOOL, TC, Auto);
+			for (k of ['Run']) {
+				newPLCTag(`${k}Start`, BOOL, M, Auto, true);
+				newPLCTag(`${k}Auto`, BOOL, M, Auto, true);
+				newPLCTag(`${k}AutoEnableTimer`, BOOL, TC, Auto);
+				for (a of ['Test']) {
+					newPLCTag(`${k}${a}`, BOOL, M, Auto);
+					var timerIndex = 246;
+					newPLCTag(`${k}${a}MeasureTimer`, BOOL, TC, timerIndex);
+					newPLCTag(`${k}${a}MeasureTimerValue`, INT, TN, timerIndex);
+				}
+			}
 			newPLCTag('PositionArray', new ARRAY(DINT, 8), D, 1000);
 			for (k of ['', 'Disc', 'FoilExtract', 'Drill', 'FoilOut']) {
 				newPLCTag(`RunState${k}`, INT, D, Auto, true);
@@ -167,8 +175,13 @@
 				newPLCTag(`${k}DRVIFrequency`, DINT, D, Auto);
 				newPLCTag(`${k}SectorCount`, INT, D, Auto);
 				newPLCTag(`${k}StepCount`, INT, D, Auto, true);
-				newPLCTag(`${k}Test`, BOOL, M, Auto);
-				newPLCTag(`${k}TestTimer`, BOOL, TC, Auto);
+				for (a of ['Test']) {
+					newPLCTag(`${k}${a}`, BOOL, M, Auto);
+					newPLCTag(`${k}${a}DelayTimer`, BOOL, TC, Auto);
+					var timerIndex = 247;
+					newPLCTag(`${k}${a}MeasureTimer`, BOOL, TC, timerIndex);
+					newPLCTag(`${k}${a}MeasureTimerValue`, INT, TN, timerIndex);
+				}
 			}
 			for (k of ['FoilExtract']) {
 				for (a of ['Top', 'Bot']) {
