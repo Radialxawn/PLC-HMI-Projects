@@ -150,8 +150,8 @@
 			newPLCTag('MachineReady', BOOL, M, Auto, true);
 			newPLCTag('MachineReadyTimer', BOOL, TC, Auto);
 			for (k of ['Run', 'RunStop']) {
-				newPLCTag(k, BOOL, M, Auto, true);
-				newPLCTag(k + 'I', BOOL, X, Auto, true);
+				newPLCTag(`${k}`, BOOL, M, Auto, true);
+				newPLCTag(`${k}I`, BOOL, X, Auto, true);
 			}
 			for (k of ['Run']) {
 				newPLCTag(`${k}Start`, BOOL, M, Auto, true);
@@ -197,25 +197,26 @@
 					newPLCTag(`${k}${a}BackDelay`, INT, D, Auto);
 				}
 				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
+				newPLCTag(`${k}TimerDelay`, INT, D, Auto);
 			}
 			for (k of ['Drill']) {
-				newPLCTag(k, BOOL, M, Auto, true);
-				newPLCTag(k + 'O', BOOL, Y, Auto, false);
+				newPLCTag(`${k}`, BOOL, M, Auto, true);
+				newPLCTag(`${k}O`, BOOL, Y, Auto, false);
 				for (a of ['Hold']) {
-					newPLCTag(k + a, BOOL, M, Auto, true);
-					newPLCTag(k + a + 'O', BOOL, Y, Auto, false);
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}O`, BOOL, Y, Auto, false);
 				}
-				for (b of ['N', 'P']) {
-					newPLCTag(`${k}${b}`, BOOL, M, Auto, true);
+				for (a of ['N', 'P']) {
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 				}
-				for (b of ['N', 'P']) {
-					newPLCTag(`${k}${b}I`, BOOL, X, Auto, true);
+				for (a of ['N', 'P']) {
+					newPLCTag(`${k}${a}I`, BOOL, X, Auto, true);
 				}
 				for (a of ['Ignore']) {
-					newPLCTag(k + a, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}EnableTimer`, BOOL, TC, Auto);
 					newPLCTag(`${k}${a}DisableTimer`, BOOL, TC, Auto);
-					newPLCTag(k + a + 'O', BOOL, Y, 17, false);
+					newPLCTag(`${k}${a}O`, BOOL, Y, 17, false);
 				}
 				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
 			}
@@ -233,9 +234,9 @@
 				}
 			}
 			for (k of ['AirBurst']) {
-				newPLCTag(k, BOOL, M, Auto, true);
-				newPLCTag(k + 'O', BOOL, Y, Auto, false);
-				newPLCTag(k + 'Timer', BOOL, TC, Auto);
+				newPLCTag(`${k}`, BOOL, M, Auto, true);
+				newPLCTag(`${k}O`, BOOL, Y, Auto, false);
+				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
 			}
 		}
 
