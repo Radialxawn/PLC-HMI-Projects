@@ -69,7 +69,7 @@
 		function getById(id) { return document.getElementById(id); }
 
 		const AllDevicesUsed = '-AllDevicesUsed-';
-		const PLC1 = 'PLC1', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW';
+		const PLC = 'PLC', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW';
 		const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y', TC = 'TC';
 		const XAxis = 'XX', YAxis = 'YY', ZAxis = 'ZZ', AAxis = 'AA';
 		const Auto = -1, NoUse = -2;
@@ -167,6 +167,8 @@
 				newPLCTag(`${k}DRVIFrequency`, DINT, D, Auto);
 				newPLCTag(`${k}SectorCount`, INT, D, Auto);
 				newPLCTag(`${k}StepCount`, INT, D, Auto, true);
+				newPLCTag(`${k}Test`, BOOL, M, Auto);
+				newPLCTag(`${k}TestTimer`, BOOL, TC, Auto);
 			}
 			for (k of ['FoilExtract']) {
 				for (a of ['Top', 'Bot']) {
@@ -278,7 +280,7 @@
 			PLCTags[name] = { name: name, type: type, deviceName: deviceName, deviceIndex: deviceIndex };
 			PLCTagsString += `"VAR_GLOBAL"	"${name}"	"${type}"	""	"${deviceName}${deviceIndex}"	""	""	""	""	""	""\n`;
 			if (syncHMI == true) {
-				newHMITag(`-${name}`, PLC1, deviceName, deviceIndex);
+				newHMITag(`-${name}`, PLC, deviceName, deviceIndex);
 			}
 		}
 
