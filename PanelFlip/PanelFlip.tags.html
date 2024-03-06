@@ -149,11 +149,7 @@
 			generatePLCTagsAxis(XAxis);
 			newPLCTag('MachineReady', BOOL, M, Auto, true);
 			newPLCTag('MachineReadyTimer', BOOL, TC, Auto);
-			for (k of ['Data']) {
-				newPLCTag(`${k}Synced`, BOOL, M, Auto, true);
-				newPLCTag(`${k}GrabMoveAccelTime`, INT, D, Auto, true);
-				newPLCTag(`${k}GrabMoveDecelTime`, INT, D, Auto, true);
-			}
+			newPLCTag(`DataSynced`, BOOL, M, Auto, true);
 			for (k of ['Run', 'RunStop']) {
 				newPLCTag(k, BOOL, M, Auto, true);
 			}
@@ -201,6 +197,8 @@
 					newPLCTag(`${k}${a}Start`, DINT, D, Auto, true);
 					newPLCTag(`${k}${a}End`, DINT, D, Auto, true);
 					newPLCTag(`${k}${a}Speed`, DINT, D, Auto, true);
+					newPLCTag(`${k}${a}AccelTime`, INT, D, Auto, true);
+					newPLCTag(`${k}${a}DecelTime`, INT, D, Auto, true);
 				}
 				for (a of ['Down']) {
 					newPLCTag(`${k}${a}Min`, BOOL, M, Auto, true);
@@ -322,7 +320,7 @@
 				newHMITag(`${k}End`, Self, '$M', 4);
 				newHMITag(`${k}Speed`, Self, '$M', 6);
 			}
-			newHMITag(`FlipHz`, Self, '$M', 8);
+			newHMITag(`FlipSpindleHz`, Self, '$M', 8);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
