@@ -170,9 +170,10 @@
 				newPLCTag(`RunState${k}Next`, BOOL, M, Auto, true);
 			}
 			for (k of ['Disc']) {
-				newPLCTag(`${k}DRVIOffset`, DINT, D, Auto);
-				newPLCTag(`${k}DRVIOffsetBefore`, DINT, D, Auto);
-				newPLCTag(`${k}DRVIFrequency`, DINT, D, Auto);
+				newPLCTag(`${k}DVITStartFrequency`, DINT, D, Auto);
+				newPLCTag(`${k}DVITOffset`, DINT, D, Auto);
+				newPLCTag(`${k}DVITOffsetBefore`, DINT, D, Auto);
+				newPLCTag(`${k}DVITFrequency`, DINT, D, Auto);
 				newPLCTag(`${k}SectorCount`, INT, D, Auto);
 				newPLCTag(`${k}StepCount`, INT, D, Auto, true);
 				for (a of ['Test']) {
