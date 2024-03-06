@@ -149,6 +149,11 @@
 			generatePLCTagsAxis(XAxis);
 			newPLCTag('MachineReady', BOOL, M, Auto, true);
 			newPLCTag('MachineReadyTimer', BOOL, TC, Auto);
+			for (k of ['Data']) {
+				newPLCTag(`${k}Synced`, BOOL, M, Auto, true);
+				newPLCTag(`${k}GrabMoveAccelTime`, INT, D, Auto, true);
+				newPLCTag(`${k}GrabMoveDecelTime`, INT, D, Auto, true);
+			}
 			for (k of ['Run', 'RunStop']) {
 				newPLCTag(k, BOOL, M, Auto, true);
 			}
@@ -179,8 +184,8 @@
 							var key = i < keys.length ? keys[i] : `Dummy${i}`;
 							newPLCTag(`${k}${a}${b}${key}`, INT, M, Auto);
 						}
-						newPLCTag(`${k}${a}${b}${keys[0]}Data`, INT, D, 200, true);
-						newPLCTag(`${k}${a}${b}${keys[1]}Data`, INT, D, 201, true);
+						newPLCTag(`${k}${a}${b}${keys[0]}Data`, INT, D, Auto, true);
+						newPLCTag(`${k}${a}${b}${keys[1]}Data`, INT, D, Auto, true);
 					}
 					for (b of ['Data']) {
 						newPLCTag(`${k}${a}${b}Frequency`, INT, D, Auto, true);
@@ -192,10 +197,10 @@
 				}
 			}
 			for (k of ['Grab']) {
-				newPLCTag(`${k}MoveSpeed`, DINT, D, Auto, true);
-				for (a of ['Position']) {
+				for (a of ['Move']) {
 					newPLCTag(`${k}${a}Start`, DINT, D, Auto, true);
 					newPLCTag(`${k}${a}End`, DINT, D, Auto, true);
+					newPLCTag(`${k}${a}Speed`, DINT, D, Auto, true);
 				}
 				for (a of ['Down']) {
 					newPLCTag(`${k}${a}Min`, BOOL, M, Auto, true);
@@ -310,12 +315,14 @@
 		}
 
 		function generateHMITags() {
-			// var iLB = 0
-			// newHMITag('Initializing', Self, LB, iLB++);
-			// newHMITag('TempA', Self, RW, 0);
-			// newHMITag('TempB', Self, RW, 2);
-			// newHMITag('TempC', Self, RW, 4);
-			// newHMITag('TempD', Self, RW, 5);
+			for (k of ['GrabMove']) {
+				newHMITag(`${k}AccelTime`, Self, '$M', 0);
+				newHMITag(`${k}DecelTime`, Self, '$M', 1);
+				newHMITag(`${k}Start`, Self, '$M', 2);
+				newHMITag(`${k}End`, Self, '$M', 4);
+				newHMITag(`${k}Speed`, Self, '$M', 6);
+			}
+			newHMITag(`FlipHz`, Self, '$M', 8);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
@@ -340,14 +347,20 @@
 				HMITagsString += 'Define Name,Type,Address,Description\n'
 			}
 			var deviveType = function (name) {
-				if (name == D) {
+				if (name == D || name == '$' || name == '$M') {
 					return 'WORD';
 				}
 				return 'BIT';
 			}
-			HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
-			HMITagsString += `${name},${deviveType(deviceName)},{PLC}0@${deviceName}${deviceIndex},\n`;
-			HMITagsCheck(deviceName, deviceIndex)
+			if (plcName == Self) {
+				HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
+				HMITagsString += `${name},${deviveType(deviceName)},${deviceName}${deviceIndex},\n`;
+				HMITagsCheck(deviceName, deviceIndex)
+			} else {
+				HMITags[name] = { name: name, plcName: plcName, deviceName: deviceName, deviceIndex: deviceIndex }
+				HMITagsString += `${name},${deviveType(deviceName)},{${PLC}}0@${deviceName}${deviceIndex},\n`;
+				HMITagsCheck(deviceName, deviceIndex)
+			}
 			/**/
 		}
 
