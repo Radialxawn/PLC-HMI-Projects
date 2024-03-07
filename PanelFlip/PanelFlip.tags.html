@@ -149,7 +149,7 @@
 			generatePLCTagsAxis(XAxis);
 			newPLCTag('MachineReady', BOOL, M, Auto, true);
 			newPLCTag('MachineReadyTimer', BOOL, TC, Auto);
-			newPLCTag(`DataSynced`, BOOL, M, Auto, true);
+			newPLCTag(`DataState`, INT, D, Auto, true);
 			for (k of ['Run', 'RunStop']) {
 				newPLCTag(k, BOOL, M, Auto, true);
 			}
