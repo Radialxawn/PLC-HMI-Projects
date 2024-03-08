@@ -164,21 +164,18 @@
 				newPLCTag(`${k}End`, BOOL, M, Auto, true);
 				newPLCTag(`${k}EndI`, BOOL, X, Auto);
 				newPLCTag(`${k}EndIPulseCatch`, BOOL, M, 8170 + PLCTags[`${k}EndI`].deviceIndex);
-				for (a of ['Spindle']) {
+			}
+			for (k of ['RS485']) {
+				newPLCTag(`${k}Index`, INT, D, Auto, true);
+				newPLCTag(`${k}Lock`, BOOL, M, Auto, true);
+			}
+			var rs485distributionRW = [];
+			for (k of ['Spindle']) {
+				for (a of ['Flip', 'Belt']) {
 					for (b of ['RW']) {
-						newPLCTag(`${k}${a}${b}Index`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}Lock`, BOOL, M, Auto);
 						var keys = ['WriteFrequency', 'WriteRun', 'ReadData'];
-						var nearest = 2;
-						for (var i in [2, 4, 8, 16, 32]) {
-							if (keys.length < i) {
-								nearest = i;
-								break;
-							}
-						}
-						for (var i = 0; i <= keys.length; i++) {
-							var key = i < keys.length ? keys[i] : `Dummy${i}`;
-							newPLCTag(`${k}${a}${b}${key}`, INT, M, Auto);
+						for (key of keys) {
+							rs485distributionRW.push(`${k}${a}${key}`);
 						}
 						newPLCTag(`${k}${a}${b}${keys[0]}Data`, INT, D, Auto, true);
 						newPLCTag(`${k}${a}${b}${keys[1]}Data`, INT, D, Auto, true);
@@ -190,6 +187,18 @@
 						newPLCTag(`${k}${a}${b}Voltage`, INT, D, Auto, true);
 						newPLCTag(`${k}${a}${b}Current`, INT, D, Auto, true);
 					}
+				}
+			}
+			for (k of ['RS485']) {
+				var nearest = 2;
+				for (var i = 0; i < 6; i++) {
+					if (rs485distributionRW.length > nearest) {
+						nearest *= 2;
+					}
+				}
+				for (var i = 0; i < nearest; i++) {
+					var key = i < rs485distributionRW.length ? rs485distributionRW[i] : `Dummy${i}`;
+					newPLCTag(`${k}${key}`, INT, M, Auto);
 				}
 			}
 			for (k of ['Grab']) {
@@ -320,7 +329,8 @@
 				newHMITag(`${k}End`, Self, '$M', 4);
 				newHMITag(`${k}Speed`, Self, '$M', 6);
 			}
-			newHMITag(`FlipSpindleHz`, Self, '$M', 8);
+			newHMITag(`SpindleFlipHz`, Self, '$M', 8);
+			newHMITag(`SpindleBeltHz`, Self, '$M', 9);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
