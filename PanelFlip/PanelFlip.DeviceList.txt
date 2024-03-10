@@ -2,3 +2,22 @@ FX3U-32MT
 HMI Delta DOP-107DV
 VFD INVT GD20-0R7G-4
 Servo Delta ASDA-B2-3023-B
+
+Servo Wire:
+	sign - 37 - brown black							Y4
+	pulse - 41 - orange black						Y0
+	+24V - 11,35 - pink, blue
+	+0V - 14 - white
+	DI1 - 9 - blue black          -P2.10 = 101 -> servo on			Y2
+	DI6 - 32 - brown              -P2.15 = 102 -> cw limit
+	DI7 - 31 - purple             -P2.16 = 123 -> ccw limit
+	DI8 - 30 - black              -P2.17 = 121 -> emg
+	DO1- - 6 - grey black         -P2.18 = 101 -> ready                 	0V
+	DO1+ - 7 - dark green                                               	X10
+	DO2- - 4 - red black          -P2.19 = 107 -> alarm                 	0V
+	DO2+ - 5 - orange                                                   	X4
+
+note:
+	output pump
+	input base empty -> stop when base empty
+	
