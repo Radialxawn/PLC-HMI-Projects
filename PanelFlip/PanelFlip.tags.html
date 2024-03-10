@@ -221,17 +221,19 @@
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}O`, BOOL, Y, Auto);
 				}
+				for (a of ['Pump']) {
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}O`, BOOL, Y, Auto);
+				}
+				for (a of ['Manual']) {
+					newPLCTag(`${k}${a}Enable`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}NextStep`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}Flag`, BOOL, M, Auto);
+				}
 			}
 			for (k of ['Base']) {
-				newPLCTag(`${k}Foil`, BOOL, M, Auto, true);
-				newPLCTag(`${k}FoilI`, BOOL, X, Auto);
-				newPLCTag(`${k}Min`, BOOL, M, Auto, true);
-				newPLCTag(`${k}MinI`, BOOL, X, Auto);
-				newPLCTag(`${k}Max`, BOOL, M, Auto, true);
-				newPLCTag(`${k}MaxI`, BOOL, X, Auto);
-				newPLCTag(`${k}MoveDirection`, INT, D, Auto, true);
-				newPLCTag(`${k}MoveUpO`, BOOL, Y, Auto);
-				newPLCTag(`${k}MoveDownO`, BOOL, Y, Auto);
+				newPLCTag(`${k}Empty`, BOOL, M, Auto, true);
+				newPLCTag(`${k}EmptyI`, BOOL, X, Auto);
 			}
 			newPLCTag(`MirrorI`, BOOL, X, Auto, true);
 		}
