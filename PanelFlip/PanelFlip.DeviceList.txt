@@ -17,7 +17,5 @@ Servo Wire:
 	DO2- - 4 - red black          -P2.19 = 107 -> alarm                 	0V
 	DO2+ - 5 - orange                                                   	X4
 
-note:
-	output pump
-	input base empty -> stop when base empty
+Servo electronic gear ratio = 32/10
 	

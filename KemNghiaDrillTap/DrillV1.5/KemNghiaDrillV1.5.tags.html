@@ -190,7 +190,7 @@
 						newPLCTag(`${k}${a}${b}`, BOOL, M, Auto, true);
 						newPLCTag(`${k}${a}${b}Timer`, BOOL, TC, Auto);
 					}
-					for (b of ['N', 'P']) {
+					for (b of ['P']) {
 						newPLCTag(`${k}${a}${b}I`, BOOL, X, Auto, true);
 					}
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
@@ -201,12 +201,17 @@
 				newPLCTag(`${k}TimerDelay`, INT, D, Auto);
 			}
 			for (k of ['Drill']) {
-				newPLCTag(`${k}`, BOOL, M, Auto, true);
-				newPLCTag(`${k}O`, BOOL, Y, Auto, false);
 				for (a of ['Hold']) {
+					newPLCTag(`${k}${a}N`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}NTimer`, BOOL, TC, Auto);
+					newPLCTag(`${k}${a}P`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}PTimer`, BOOL, TC, Auto);
+					newPLCTag(`${k}${a}PI`, BOOL, X, Auto, false);
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}O`, BOOL, Y, Auto, false);
 				}
+				newPLCTag(`${k}`, BOOL, M, Auto, true);
+				newPLCTag(`${k}O`, BOOL, Y, Auto, false);
 				for (a of ['N', 'P']) {
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 				}
@@ -233,11 +238,6 @@
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}O`, BOOL, Y, Auto, false);
 				}
-			}
-			for (k of ['AirBurst']) {
-				newPLCTag(`${k}`, BOOL, M, Auto, true);
-				newPLCTag(`${k}O`, BOOL, Y, Auto, false);
-				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
 			}
 		}
 
