@@ -171,6 +171,7 @@
 			}
 			for (k of ['Disc']) {
 				newPLCTag(`${k}DVITStartFrequency`, DINT, D, Auto);
+				newPLCTag(`${k}DVITStartOffset`, DINT, D, Auto);
 				newPLCTag(`${k}DVITOffset`, DINT, D, Auto);
 				newPLCTag(`${k}DVITOffsetBefore`, DINT, D, Auto);
 				newPLCTag(`${k}DVITFrequency`, DINT, D, Auto);
