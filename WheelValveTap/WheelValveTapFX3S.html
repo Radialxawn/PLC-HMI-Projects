@@ -147,95 +147,14 @@
 			PLCTagsString += `"PanelFlip"\n`;
 			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
 			generatePLCTagsAxis(XAxis);
-			newPLCTag('MachineReady', BOOL, M, Auto, true);
-			newPLCTag('MachineReadyTimer', BOOL, TC, Auto);
-			newPLCTag(`DataState`, INT, D, Auto, true);
-			for (k of ['Run', 'RunStop']) {
-				newPLCTag(k, BOOL, M, Auto, true);
-			}
-			for (k of ['', 'Base', 'Grab', 'Flip']) {
-				newPLCTag(`RunState${k}`, INT, D, Auto, true);
-				newPLCTag(`RunState${k}Next`, BOOL, M, Auto);
-			}
-			for (k of ['Flip']) {
-				newPLCTag(`${k}FoilIn`, BOOL, M, Auto, true);
-				newPLCTag(`${k}FoilInI`, BOOL, X, Auto);
-				newPLCTag(`${k}FoilInIPulseCatch`, BOOL, M, 8170 + PLCTags[`${k}FoilInI`].deviceIndex);
-				newPLCTag(`${k}End`, BOOL, M, Auto, true);
-				newPLCTag(`${k}EndI`, BOOL, X, Auto);
-				newPLCTag(`${k}EndIPulseCatch`, BOOL, M, 8170 + PLCTags[`${k}EndI`].deviceIndex);
-			}
-			for (k of ['RS485']) {
-				newPLCTag(`${k}Index`, INT, D, Auto, true);
-				newPLCTag(`${k}Lock`, BOOL, M, Auto, true);
-			}
-			var rs485distributionRW = [];
-			for (k of ['Spindle']) {
-				for (a of ['Flip', 'Belt']) {
-					for (b of ['RW']) {
-						var keys = ['WriteFrequency', 'WriteRun', 'ReadData'];
-						for (key of keys) {
-							rs485distributionRW.push(`${k}${a}${key}`);
-						}
-						newPLCTag(`${k}${a}${b}${keys[0]}Data`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}${keys[1]}Data`, INT, D, Auto, true);
-					}
-					for (b of ['Data']) {
-						newPLCTag(`${k}${a}${b}Frequency`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}SettingFrequency`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}DCBUSVoltage`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}Voltage`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}Current`, INT, D, Auto, true);
-					}
-				}
-			}
-			for (k of ['RS485']) {
-				var nearest = 2;
-				for (var i = 0; i < 6; i++) {
-					if (rs485distributionRW.length > nearest) {
-						nearest *= 2;
-					}
-				}
-				for (var i = 0; i < nearest; i++) {
-					var key = i < rs485distributionRW.length ? rs485distributionRW[i] : `Dummy${i}`;
-					newPLCTag(`${k}${key}`, INT, M, Auto);
-				}
-			}
-			for (k of ['Grab']) {
-				for (a of ['Move']) {
-					newPLCTag(`${k}${a}Start`, DINT, D, Auto, true);
-					newPLCTag(`${k}${a}End`, DINT, D, Auto, true);
-					newPLCTag(`${k}${a}Speed`, DINT, D, Auto, true);
-					newPLCTag(`${k}${a}AccelTime`, INT, D, Auto, true);
-					newPLCTag(`${k}${a}DecelTime`, INT, D, Auto, true);
-				}
-				for (a of ['Down']) {
-					newPLCTag(`${k}${a}Min`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}MinI`, BOOL, X, Auto);
-					newPLCTag(`${k}${a}Max`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}MaxI`, BOOL, X, Auto);
-					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}O`, BOOL, Y, 5);
-				}
-				for (a of ['On']) {
-					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}O`, BOOL, Y, 6);
-				}
-				for (a of ['Pump']) {
-					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}O`, BOOL, Y, 7);
-				}
-				for (a of ['Manual']) {
-					newPLCTag(`${k}${a}Enable`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}NextStep`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}Flag`, BOOL, M, Auto);
-				}
-			}
-			for (k of ['Base']) {
-				newPLCTag(`${k}Empty`, BOOL, M, Auto, true);
-				newPLCTag(`${k}EmptyI`, BOOL, X, Auto);
-			}
-			newPLCTag(`MirrorI`, BOOL, X, Auto, true);
+			generatePLCTagsAxis(YAxis);
+			newPLCTag('Run', BOOL, M, Auto);
+			newPLCTag('RunStop', BOOL, M, Auto);
+			newPLCTag('RunState', INT, D, Auto);
+			newPLCTag('RunStateNext', BOOL, M, Auto);
+			newPLCTag('RunSwitchI', BOOL, X, Auto);
+			newPLCTag('Tap', BOOL, M, Auto);
+			newPLCTag('TapI', BOOL, X, Auto);
 		}
 
 		class ARRAY {
@@ -311,14 +230,11 @@
 			newPLCTag(lb('Feed'), DINT, D, Auto, true);
 			newPLCTag(lb('TarR'), BOOL, M, Auto, true);
 			newPLCTag(lb('TarRSkip'), INT, D, Auto, false);
-			newPLCTag(lb('ManualN'), BOOL, M, Auto, true);
-			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
 			newPLCTag(lb('On'), BOOL, M, Auto, true);
 			newPLCTag(lb('Run'), BOOL, M, Auto, true);
 			newPLCTag(lb('Direction'), BOOL, M, Auto);
-			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, 2), true);
-			newPLCTag(lb('AlarmI'), BOOL, X, xyz(4, 5, 6), true);
-			newPLCTag(lb('ReadyI'), BOOL, X, xyz(10, 11, 12), true);
+			newPLCTag(lb('MinI'), BOOL, X, xyz(0, NoUse, NoUse), true);
+			newPLCTag(lb('MaxI'), BOOL, X, xyz(1, NoUse, NoUse), true);
 			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
 			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
 			newPLCTag(lb('OnO'), BOOL, Y, xyz(2, 6, 7));
