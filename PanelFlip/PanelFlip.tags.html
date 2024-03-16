@@ -168,6 +168,20 @@
 			for (k of ['RS485']) {
 				newPLCTag(`${k}Index`, INT, D, Auto, true);
 				newPLCTag(`${k}Lock`, BOOL, M, Auto, true);
+				newPLCTag(`${k}SlaveAddress`, INT, D, Auto);
+				newPLCTag(`${k}Command`, INT, D, Auto);
+				newPLCTag(`${k}CommandAddressH`, INT, D, Auto);
+				newPLCTag(`${k}CommandAddressL`, INT, D, Auto);
+				newPLCTag(`${k}CommandValueH`, INT, D, Auto);
+				newPLCTag(`${k}CommandValueL`, INT, D, Auto);
+				newPLCTag(`${k}CRCH`, INT, D, Auto);
+				newPLCTag(`${k}CRCL`, INT, D, Auto);
+				for (var i = 0; i < 20; i++) {
+					newPLCTag(`${k}DataSend${i}`, INT, D, Auto);
+				}
+				for (var i = 0; i < 20; i++) {
+					newPLCTag(`${k}DataReceive${i}`, INT, D, Auto);
+				}
 			}
 			var rs485distributionRW = [];
 			for (k of ['Spindle']) {

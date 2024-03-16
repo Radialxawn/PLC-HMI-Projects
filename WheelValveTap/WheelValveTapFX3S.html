@@ -235,9 +235,9 @@
 			newPLCTag(lb('Direction'), BOOL, M, Auto);
 			newPLCTag(lb('MinI'), BOOL, X, xyz(0, NoUse, NoUse), true);
 			newPLCTag(lb('MaxI'), BOOL, X, xyz(1, NoUse, NoUse), true);
-			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
-			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
-			newPLCTag(lb('OnO'), BOOL, Y, xyz(2, 6, 7));
+			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, NoUse));
+			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, NoUse));
+			newPLCTag(lb('OnO'), BOOL, Y, xyz(2, 3, NoUse));
 		}
 
 		function generateHMITags() {
