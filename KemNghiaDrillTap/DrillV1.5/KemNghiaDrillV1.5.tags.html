@@ -177,6 +177,7 @@
 				newPLCTag(`${k}DVITFrequency`, DINT, D, Auto);
 				newPLCTag(`${k}SectorCount`, INT, D, Auto);
 				newPLCTag(`${k}StepCount`, INT, D, Auto, true);
+				newPLCTag(`${k}DelayTimer`, BOOL, TC, Auto);
 				for (a of ['Test']) {
 					newPLCTag(`${k}${a}`, BOOL, M, Auto);
 					newPLCTag(`${k}${a}DelayTimer`, BOOL, TC, Auto);
@@ -207,7 +208,7 @@
 					newPLCTag(`${k}${a}NTimer`, BOOL, TC, Auto);
 					newPLCTag(`${k}${a}P`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}PTimer`, BOOL, TC, Auto);
-					newPLCTag(`${k}${a}PI`, BOOL, X, Auto, false);
+					newPLCTag(`${k}${a}NI`, BOOL, X, Auto, false);
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}O`, BOOL, Y, Auto, false);
 				}
