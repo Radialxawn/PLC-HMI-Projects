@@ -164,7 +164,13 @@
 					newPLCTag(`${k}${a}MeasureTimerValue`, INT, TN, timerIndex);
 				}
 			}
-			newPLCTag('PositionArray', new ARRAY(DINT, 8), D, 1000);
+			for (k of ['Position']) {
+				newPLCTag(`${k}Array`, new ARRAY(DINT, 8), D, 1000);
+				newPLCTag(`${k}Feed`, DINT, D, Auto);
+				newPLCTag(`${k}Spacing`, DINT, D, Auto);
+				newPLCTag(`${k}Offset`, DINT, D, Auto);
+				newPLCTag(`${k}OffsetChanged`, BOOL, M, Auto);
+			}
 			for (k of ['', 'Disc', 'FoilExtract', 'Drill', 'FoilOut']) {
 				newPLCTag(`RunState${k}`, INT, D, Auto, true);
 				newPLCTag(`RunState${k}Next`, BOOL, M, Auto, true);

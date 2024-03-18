@@ -167,40 +167,21 @@
 			}
 			for (k of ['RS485']) {
 				newPLCTag(`${k}Index`, INT, D, Auto, true);
-				newPLCTag(`${k}Lock`, BOOL, M, Auto, true);
-				newPLCTag(`${k}RunRS`, BOOL, M, Auto);
-				newPLCTag(`${k}SlaveAddress`, INT, D, Auto);
-				newPLCTag(`${k}Command`, INT, D, Auto);
-				newPLCTag(`${k}CommandAddressH`, INT, D, Auto);
-				newPLCTag(`${k}CommandAddressL`, INT, D, Auto);
-				newPLCTag(`${k}CommandValueH`, INT, D, Auto);
-				newPLCTag(`${k}CommandValueL`, INT, D, Auto);
-				newPLCTag(`${k}CRCH`, INT, D, Auto);
-				newPLCTag(`${k}CRCL`, INT, D, Auto);
+				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
+				newPLCTag(`${k}RW`, `${k}RW`, '');
 				for (var i = 0; i < 20; i++) {
-					newPLCTag(`${k}DataSend${i}`, INT, D, Auto);
+					newPLCTag(`${k}Send${i}`, INT, D, Auto);
 				}
 				for (var i = 0; i < 20; i++) {
-					newPLCTag(`${k}DataReceive${i}`, INT, D, Auto);
+					newPLCTag(`${k}Receive${i}`, INT, D, Auto);
 				}
 			}
 			var rs485distributionRW = [];
 			for (k of ['Spindle']) {
 				for (a of ['Flip', 'Belt']) {
-					for (b of ['RW']) {
-						var keys = ['WriteFrequency', 'WriteRun', 'ReadData'];
-						for (key of keys) {
-							rs485distributionRW.push(`${k}${a}${key}`);
-						}
-						newPLCTag(`${k}${a}${b}${keys[0]}Data`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}${keys[1]}Data`, INT, D, Auto, true);
-					}
-					for (b of ['Data']) {
-						newPLCTag(`${k}${a}${b}Frequency`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}SettingFrequency`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}DCBUSVoltage`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}Voltage`, INT, D, Auto, true);
-						newPLCTag(`${k}${a}${b}Current`, INT, D, Auto, true);
+					var keys = ['_W_Hz', '_W_Run', '_R_Hz'];
+					for (key of keys) {
+						rs485distributionRW.push(`${k}${a}${key}`);
 					}
 				}
 			}
@@ -211,8 +192,11 @@
 						nearest *= 2;
 					}
 				}
+				for (var i = 0; i < rs485distributionRW.length; i++) {
+					newPLCTag(`${rs485distributionRW[i]}Value${i}`, INT, D, Auto, true);
+				}
 				for (var i = 0; i < nearest; i++) {
-					var key = i < rs485distributionRW.length ? rs485distributionRW[i] : `Dummy${i}`;
+					var key = i < rs485distributionRW.length ? `${rs485distributionRW[i]}${i}` : `Dummy${i}`;
 					newPLCTag(`${k}${key}`, BOOL, M, Auto);
 				}
 			}
@@ -251,6 +235,7 @@
 				newPLCTag(`${k}EmptyI`, BOOL, X, Auto);
 			}
 			newPLCTag(`MirrorI`, BOOL, X, Auto, true);
+			newPLCTag(`M8012PLS`, BOOL, M, Auto);
 		}
 
 		class ARRAY {
@@ -332,8 +317,10 @@
 			newPLCTag(lb('Run'), BOOL, M, Auto, true);
 			newPLCTag(lb('Direction'), BOOL, M, Auto);
 			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, 2), true);
-			newPLCTag(lb('AlarmI'), BOOL, X, xyz(4, 5, 6), true);
-			newPLCTag(lb('ReadyI'), BOOL, X, xyz(10, 11, 12), true);
+			newPLCTag(lb('AlarmI'), BOOL, X, xyz(4, NoUse, NoUse), true);
+			newPLCTag(lb('ReadyI'), BOOL, X, xyz(10, NoUse, NoUse), true);
+			newPLCTag(lb('LimitNI'), BOOL, X, xyz(11, NoUse, NoUse));
+			newPLCTag(lb('LimitPI'), BOOL, X, xyz(12, NoUse, NoUse));
 			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
 			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
 			newPLCTag(lb('OnO'), BOOL, Y, xyz(2, 6, 7));
