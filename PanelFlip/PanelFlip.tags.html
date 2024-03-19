@@ -178,10 +178,9 @@
 			}
 			var rs485distributionRW = [];
 			for (k of ['Spindle']) {
-				for (a of ['Flip', 'Belt']) {
-					var keys = ['_W_Hz', '_W_Run', '_R_Hz'];
-					for (key of keys) {
-						rs485distributionRW.push(`${k}${a}${key}`);
+				for (a of ['_W_Hz', '_W_Run', '_R_Hz', '_R_SetHz', '_R_BusV', '_R_OutV', '_R_OutC']) {
+					for (b of ['Flip', 'Belt']) {
+						rs485distributionRW.push(`${k}${b}${a}`);
 					}
 				}
 			}
