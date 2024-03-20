@@ -178,11 +178,13 @@
 			}
 			var rs485distributionRW = [];
 			for (k of ['Spindle']) {
+				var arr = ['Flip', 'Belt'];
 				for (a of ['_W_Hz', '_W_Run', '_R_Hz', '_R_SetHz', '_R_BusV', '_R_OutV', '_R_OutC']) {
-					for (b of ['Flip', 'Belt']) {
+					for (b of arr) {
 						rs485distributionRW.push(`${k}${b}${a}`);
 					}
 				}
+				newPLCTag(`${k}${arr[1]}StartTimer`, BOOL, TC, Auto);
 			}
 			for (k of ['RS485']) {
 				var nearest = 2;
