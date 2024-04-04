@@ -187,15 +187,10 @@
 				newPLCTag(`${k}${arr[1]}StartTimer`, BOOL, TC, Auto);
 			}
 			for (k of ['RS485']) {
-				var nearest = 2;
-				for (var i = 0; i < 6; i++) {
-					if (rs485distributionRW.length > nearest) {
-						nearest *= 2;
-					}
-				}
 				for (var i = 0; i < rs485distributionRW.length; i++) {
 					newPLCTag(`${rs485distributionRW[i]}Value${i}`, INT, D, Auto, true);
 				}
+				var nearest = nearestPowerOf2(rs485distributionRW.length);
 				for (var i = 0; i < nearest; i++) {
 					var key = i < rs485distributionRW.length ? `${rs485distributionRW[i]}${i}` : `Dummy${i}`;
 					newPLCTag(`${k}${key}`, BOOL, M, Auto);
@@ -218,8 +213,16 @@
 					newPLCTag(`${k}${a}O`, BOOL, Y, 5);
 				}
 				for (a of ['On']) {
-					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}O`, BOOL, Y, 6);
+					arrY = [6, 10, 11, 12, 13];
+					for (var i = 0; i < arrY.length; i++) {
+						newPLCTag(`${k}${a}${i + 1}`, BOOL, M, Auto, true);
+					}
+					for (var i = 0; i < arrY.length; i++) {
+						newPLCTag(`${k}${a}${i + 1}O`, BOOL, Y, arrY[i]);
+					}
+					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
+					newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto, true);
+					newPLCTag(`${k}${a}Index`, INT, D, Auto);
 				}
 				for (a of ['Pump']) {
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
@@ -264,6 +267,16 @@
 				errorString += `PLCTags overlap device ${deviceName}${deviceIndex}\n`;
 			}
 			devicesUsed.push(deviceIndex);
+		}
+
+		function nearestPowerOf2(value) {
+			var nearest = 2;
+			for (var i = 0; i < 6; i++) {
+				if (value > nearest) {
+					nearest *= 2;
+				}
+			}
+			return nearest;
 		}
 
 		function newPLCTag(name, type, deviceName, deviceIndex, syncHMI) {
@@ -339,6 +352,7 @@
 			}
 			newHMITag(`SpindleFlipHz`, Self, '$M', 8);
 			newHMITag(`SpindleBeltHz`, Self, '$M', 9);
+			newHMITag(`GrabOnDelay`, Self, '$M', 10);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
