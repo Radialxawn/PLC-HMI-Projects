@@ -1,21 +1,42 @@
-FX3U-32MT
+FX3U-48MT
+FX3U-485BD
 HMI Delta DOP-107DV
-VFD INVT GD20-0R7G-4
+/////
 Servo Delta ASDA-B2-3023-B
-
-Servo Wire:
+-Wire:
 	sign - 37 - brown black							Y4
 	pulse - 41 - orange black						Y0
 	+24V - 11,35 - pink, blue
 	+0V - 14 - white
-	DI1 - 9 - blue black          -P2.10 = 101 -> servo on			Y2
-	DI6 - 32 - brown              -P2.15 = 102 -> cw limit
-	DI7 - 31 - purple             -P2.16 = 123 -> ccw limit
-	DI8 - 30 - black              -P2.17 = 121 -> emg
-	DO1- - 6 - grey black         -P2.18 = 101 -> ready                 	0V
+	DI1 - 9 - blue black          -P2.10 = 1_01 -> servo on	(NO)		Y2
+	DI6 - 32 - brown              -P2.15 = 1_02 -> cw limit (NO)
+	DI7 - 31 - purple             -P2.16 = 1_23 -> ccw limit (NO)
+	DI8 - 30 - black              -P2.17 = 1_21 -> emg (NO)
+	DO1- - 6 - grey black         -P2.18 = 1_01 -> ready (NO)               0V
 	DO1+ - 7 - dark green                                               	X10
-	DO2- - 4 - red black          -P2.19 = 107 -> alarm                 	0V
+	DO2- - 4 - red black          -P2.19 = 1_07 -> alarm                 	0V
 	DO2+ - 5 - orange                                                   	X4
+-Note: Test servo cw and ccw limit to synchronize with PLC cw and ccw limit
+-Parameter:
+	P1.00 = 2 (pulse + direction)
+	P1.01 = 1_00 (ccw direction_position mode)
+	P1.44 = 100, P1.45 = 3 -> 160000 ppr / (100 / 3) = 4800 ppr
+/////
+VFD INVT GD20-0R7G-4
+-Wire:
+	RS485+ to FX3U-485BD (RDA, SDA)
+	RS485- to FX3U-485BD (RDB, SDB)
+-Parameter:
+	P14.00 = (Flip = 1, Belt = 2) (slave address)
+	P14.01 = 3 (baudrate 9600 bps)
+	P14.02 = 1 (ModbusRTU 8/1/E)
+	P14.03 = 5 (retry count)
+	P14.04 = 0.0
+	~
+	P00.01 = (Flip = 1 (control run via terminal), Belt = 2 (control run via RS485))
+	P00.06 = 8 (set frequency via RS485)
+	P00.09 = 0
 
-Servo electronic gear ratio = 32/10
+
+
 	
