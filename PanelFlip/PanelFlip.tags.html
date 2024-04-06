@@ -186,7 +186,8 @@
 				}
 				newPLCTag(`${k}${arr[0]}Run`, BOOL, M, Auto, true);
 				newPLCTag(`${k}${arr[0]}RunO`, BOOL, Y, 14);
-				newPLCTag(`${k}${arr[1]}StartTimer`, BOOL, TC, Auto);
+				newPLCTag(`${k}${arr[1]}Run`, BOOL, M, Auto, true);
+				newPLCTag(`${k}${arr[1]}RunO`, BOOL, Y, 15);
 			}
 			for (k of ['RS485']) {
 				for (var i = 0; i < rs485distributionRW.length; i++) {
