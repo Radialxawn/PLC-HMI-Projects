@@ -209,11 +209,15 @@
 				}
 				for (a of ['Down']) {
 					newPLCTag(`${k}${a}Min`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}MinI`, BOOL, X, Auto);
+					newPLCTag(`${k}${a}MinI`, BOOL, X, 5);
 					newPLCTag(`${k}${a}Max`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}MaxI`, BOOL, X, Auto);
+					newPLCTag(`${k}${a}MaxI`, BOOL, X, 6);
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}O`, BOOL, Y, 5);
+					for (b of ['A', 'B', 'C', 'D']) {
+						newPLCTag(`${k}${a}${b}Timer`, BOOL, TC, Auto);
+						newPLCTag(`${k}${a}${b}TimerDelay`, INT, D, Auto, true);
+					}
 				}
 				for (a of ['On']) {
 					arrY = [6, 10, 11, 12, 13];
@@ -231,15 +235,12 @@
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}O`, BOOL, Y, 7);
 				}
-				for (a of ['Manual']) {
-					newPLCTag(`${k}${a}Enable`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}NextStep`, BOOL, M, Auto, true);
-					newPLCTag(`${k}${a}Flag`, BOOL, M, Auto);
-				}
+				newPLCTag(`${k}ManualEnable`, BOOL, M, Auto, true);
+				newPLCTag(`${k}StepReady`, BOOL, M, Auto, true);
 			}
 			for (k of ['Base']) {
 				newPLCTag(`${k}Empty`, BOOL, M, Auto, true);
-				newPLCTag(`${k}EmptyI`, BOOL, X, Auto);
+				newPLCTag(`${k}EmptyI`, BOOL, X, 3);
 			}
 			newPLCTag(`MirrorI`, BOOL, X, Auto, true);
 			newPLCTag(`M8012PLS`, BOOL, M, Auto);
@@ -356,6 +357,10 @@
 			newHMITag(`SpindleFlipHz`, Self, '$M', 8);
 			newHMITag(`SpindleBeltHz`, Self, '$M', 9);
 			newHMITag(`GrabOnDelay`, Self, '$M', 10);
+			var index = 11;
+			for (k of ['A', 'B', 'C', 'D']) {
+				newHMITag(`GrabDown${k}Delay`, Self, '$M', index++);
+			}
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {

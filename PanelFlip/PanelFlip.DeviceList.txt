@@ -33,7 +33,7 @@ VFD INVT GD20-0R7G-4
 	P14.03 = 5 (retry count)
 	P14.04 = 0.0
 	~
-	P00.01 = (Flip = 1 (control run via terminal), Belt = 2 (control run via RS485))
+	P00.01 = 1 (control run via terminal)
 	P00.06 = 8 (set frequency via RS485)
 	P00.09 = 0
 
