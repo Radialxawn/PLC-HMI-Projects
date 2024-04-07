@@ -244,6 +244,13 @@
 			}
 			newPLCTag(`MirrorI`, BOOL, X, Auto, true);
 			newPLCTag(`M8012PLS`, BOOL, M, Auto);
+			for (k of ['Test']) {
+				for (a of ['GrabDown']) {
+					newPLCTag(`${k}${a}Enable`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}MinTimer`, BOOL, TC, Auto);
+					newPLCTag(`${k}${a}MaxTimer`, BOOL, TC, Auto);
+				}
+			}
 		}
 
 		class ARRAY {
