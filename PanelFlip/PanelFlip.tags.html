@@ -150,7 +150,7 @@
 			newPLCTag('MachineReady', BOOL, M, Auto, true);
 			newPLCTag('MachineReadyTimer', BOOL, TC, Auto);
 			newPLCTag(`DataState`, INT, D, Auto, true);
-			for (k of ['Run', 'RunStop']) {
+			for (k of ['Run', 'RunStop', 'RunReset']) {
 				newPLCTag(k, BOOL, M, Auto, true);
 			}
 			for (k of ['', 'Base', 'Grab', 'Flip']) {

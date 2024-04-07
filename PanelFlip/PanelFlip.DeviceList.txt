@@ -36,6 +36,9 @@ VFD INVT GD20-0R7G-4
 	P00.01 = 1 (control run via terminal)
 	P00.06 = 8 (set frequency via RS485)
 	P00.09 = 0
+	~
+	P00.11 = (Flip = 0.0, Belt = 0.5) (accel time)
+	P00.12 = (Flip = 0.0, Belt = 0.5) (decel time)
 
 
 
