@@ -214,9 +214,11 @@
 					newPLCTag(`${k}${a}MaxI`, BOOL, X, 6);
 					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
 					newPLCTag(`${k}${a}O`, BOOL, Y, 5);
-					for (b of ['A', 'B', 'C', 'D']) {
+					for (b of ['A', 'B', 'C', 'D', 'CX']) {
 						newPLCTag(`${k}${a}${b}Timer`, BOOL, TC, Auto);
-						newPLCTag(`${k}${a}${b}TimerDelay`, INT, D, Auto, true);
+						if (b != 'CX') {
+							newPLCTag(`${k}${a}${b}TimerDelay`, INT, D, Auto, true);
+						}
 					}
 				}
 				for (a of ['On']) {
