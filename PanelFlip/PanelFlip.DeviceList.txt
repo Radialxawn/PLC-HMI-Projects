@@ -9,18 +9,36 @@ Servo Delta ASDA-B2-3023-B
 	+24V - 11,35 - pink, blue
 	+0V - 14 - white
 	DI1 - 9 - blue black          -P2.10 = 1_01 -> servo on	(NO)		Y2
-	DI6 - 32 - brown              -P2.15 = 1_02 -> cw limit (NO)
-	DI7 - 31 - purple             -P2.16 = 1_23 -> ccw limit (NO)
+	DI6 - 32 - brown              -P2.15 = 0_22 -> cw limit (NC)
+	DI7 - 31 - purple             -P2.16 = 0_23 -> ccw limit (NC)
 	DI8 - 30 - black              -P2.17 = 1_21 -> emg (NO)
 	DO1- - 6 - grey black         -P2.18 = 1_01 -> ready (NO)               0V
 	DO1+ - 7 - dark green                                               	X10
 	DO2- - 4 - red black          -P2.19 = 1_07 -> alarm                 	0V
 	DO2+ - 5 - orange                                                   	X4
--Note: Test servo cw and ccw limit to synchronize with PLC cw and ccw limit
 -Parameter:
 	P1.00 = 2 (pulse + direction)
 	P1.01 = 1_00 (ccw direction_position mode)
-	P1.44 = 100, P1.45 = 3 -> 160000 ppr / (100 / 3) = 4800 ppr
+	P1.44 = 100, P1.45 = 3 -> 160000 ppr / (50 / 3) = 9600 ppr
+Servo Delta ASDA-B3-3023-L
+-Wire:
+	sign - 37 - brown black							Y4
+	pulse - 41 - green							Y0
+	+24V - 11,35,36 - brown, white, dark green black
+	+0V - 19,29,40 - ?, blue, ?
+	DI1 - 9 - blue black          -P2.10 = 1_01 -> servo on	(NO)		Y2
+	DI4 - 8 - pink                -P2.13 = 0_22 -> cw limit (NC)
+	DI2 - 10 - black              -P2.11 = 0_23 -> ccw limit (NC)
+	DI3 - 34 - purple             -P2.12 = 1_21 -> emg (NO)
+	DO1- - 6 - grey black         -P2.18 = 1_01 -> ready (NO)               0V
+	DO1+ - 7 - dark green                                               	X10
+	DO2- - 4 - yellow black       -P2.19 = 1_07 -> alarm                 	0V
+	DO2+ - 5 - orange                                                   	X4
+-Parameter:
+	P1.000 = 2 (pulse + direction)
+	P1.001 = 1_00 (ccw direction_position mode)
+	P1.044 = 262144, P1.045 = 75 -> 16777216 ppr / (262144 / 150) = 9600 ppr
+-Note: Test servo cw and ccw limit to synchronize with PLC cw and ccw limit
 /////
 VFD INVT GD20-0R7G-4
 -Wire:
