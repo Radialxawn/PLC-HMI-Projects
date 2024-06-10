@@ -328,6 +328,7 @@
 			let xyz = function (x, y, z) { return name == XAxis ? x : name == YAxis ? y : z; }
 			newPLCTag(lb('LimitN'), BOOL, M, xyz(8344, 8354, 8364));
 			newPLCTag(lb('LimitP'), BOOL, M, xyz(8343, 8353, 8363));
+			newPLCTag(lb('Stop'), BOOL, M, xyz(8349, 8359, 8369));
 			newPLCTag(lb('Busy'), BOOL, M, xyz(8340, 8350, 8360));
 			newPLCTag(lb('InterruptInverse'), BOOL, M, xyz(8347, 8357, 8367));
 			newPLCTag(lb('Pos'), DINT, D, xyz(8340, 8350, 8360));
@@ -370,6 +371,8 @@
 			for (k of ['A', 'B', 'C', 'D']) {
 				newHMITag(`GrabDown${k}Delay`, Self, '$M', index++);
 			}
+			newHMITag(`ErrorValue`, Self, '$', 0);
+			newHMITag(`ErrorTemp`, Self, '$', 1);
 		}
 
 		function HMITagsCheck(deviceName, deviceIndex) {
