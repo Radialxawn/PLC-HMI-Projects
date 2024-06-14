@@ -161,6 +161,7 @@
 				newPLCTag(`${k}FoilIn`, BOOL, M, Auto, true);
 				newPLCTag(`${k}FoilInI`, BOOL, X, Auto);
 				newPLCTag(`${k}FoilInIPulseCatch`, BOOL, M, 8170 + PLCTags[`${k}FoilInI`].deviceIndex);
+				newPLCTag(`${k}FoilInIDenoiseTimer`, BOOL, TC, Auto);
 				newPLCTag(`${k}End`, BOOL, M, Auto, true);
 				newPLCTag(`${k}EndI`, BOOL, X, Auto);
 				newPLCTag(`${k}EndIPulseCatch`, BOOL, M, 8170 + PLCTags[`${k}EndI`].deviceIndex);
