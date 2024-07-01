@@ -164,6 +164,7 @@
 						newPLCTag(`${k}${a}${b}`, BOOL, M, Auto);
 						newPLCTag(`${k}${a}${b}I`, BOOL, X, Auto);
 						newPLCTag(`${k}${a}${b}Timer`, BOOL, TC, Auto);
+						newPLCTag(`${k}${a}${b}TimerDelay`, INT, D, Auto);
 					}
 					//newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
 					//newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto);
@@ -181,7 +182,7 @@
 						newPLCTag(`${k}${a}${b}Timer`, BOOL, TC, Auto);
 					}
 					//newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
-					//newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto);
+					newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto);
 					newPLCTag(`${k}${a}`, BOOL, M, Auto);
 					newPLCTag(`${k}${a}O`, BOOL, Y, Auto);
 				}
