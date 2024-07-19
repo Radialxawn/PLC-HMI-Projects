@@ -254,18 +254,6 @@
 					newPLCTag(`${k}${a}MaxTimer`, BOOL, TC, Auto);
 				}
 			}
-			//???
-			newPLCTag(`GrabManualEnableOnI`, BOOL, X, Auto, true);
-			newPLCTag(`GrabManualEnableOffI`, BOOL, X, Auto, true);
-			newPLCTag('RunI', BOOL, X, Auto, true);
-			newPLCTag('AutoI', BOOL, X, Auto, true);
-			newPLCTag('LayerCount', DINT, D, Auto, true);
-			for (k of ['GrabDropAir']) {
-				newPLCTag(`${k}`, BOOL, M, Auto, true);
-				newPLCTag(`${k}O`, BOOL, Y, 16);
-				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
-				newPLCTag(`${k}TimerDelay`, INT, D, Auto, true);
-			}
 		}
 
 		class ARRAY {
@@ -358,13 +346,13 @@
 			newPLCTag(lb('ManualP'), BOOL, M, Auto, true);
 			newPLCTag(lb('On'), BOOL, M, Auto, true);
 			newPLCTag(lb('Run'), BOOL, M, Auto, true);
-			newPLCTag(lb('Direction'), BOOL, M, Auto, true);
+			newPLCTag(lb('Direction'), BOOL, M, Auto);
 			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, 2), true);
 			newPLCTag(lb('AlarmI'), BOOL, X, xyz(4, NoUse, NoUse), true);
 			newPLCTag(lb('ReadyI'), BOOL, X, xyz(10, NoUse, NoUse), true);
 			newPLCTag(lb('LimitNI'), BOOL, X, xyz(11, NoUse, NoUse));
 			newPLCTag(lb('LimitPI'), BOOL, X, xyz(12, NoUse, NoUse));
-			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2), true);
+			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
 			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
 			newPLCTag(lb('OnO'), BOOL, Y, xyz(2, 6, 7));
 		}
@@ -384,7 +372,6 @@
 			for (k of ['A', 'B', 'C', 'D']) {
 				newHMITag(`GrabDown${k}Delay`, Self, '$M', index++);
 			}
-			newHMITag(`GrabDropAirDelay`, Self, '$M', index++);
 			newHMITag(`ErrorValue`, Self, '$', 0);
 			newHMITag(`ErrorTemp`, Self, '$', 1);
 		}
