@@ -245,7 +245,8 @@
 				newPLCTag(`${k}Empty`, BOOL, M, Auto, true);
 				newPLCTag(`${k}EmptyI`, BOOL, X, 3);
 			}
-			newPLCTag(`MirrorI`, BOOL, X, Auto, true);
+			newPLCTag(`BaseTopI`, BOOL, X, Auto);
+			newPLCTag(`Mirror`, BOOL, M, Auto);
 			newPLCTag(`M8012PLS`, BOOL, M, Auto);
 			for (k of ['Test']) {
 				for (a of ['GrabDown']) {
@@ -273,7 +274,6 @@
 			//base
 			for (k of ['Base']) {
 				newPLCTag(`${k}Top`, BOOL, M, Auto, true);
-				newPLCTag(`${k}TopI`, BOOL, X, Auto);
 				newPLCTag(`${k}Bottom`, BOOL, M, Auto, true);
 				newPLCTag(`${k}BottomI`, BOOL, X, Auto);
 				newPLCTag(`${k}Direction`, INT, D, Auto, true);
