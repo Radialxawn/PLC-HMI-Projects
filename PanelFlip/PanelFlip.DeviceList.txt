@@ -19,7 +19,7 @@ Servo Delta ASDA-B2-3023-B
 -Parameter:
 	P1.00 = 2 (pulse + direction)
 	P1.01 = 1_00 (ccw direction_position mode)
-	P1.44 = 100, P1.45 = 3 -> 160000 ppr / (50 / 3) = 9600 ppr
+	P1.44 = 500, P1.45 = 3 -> 160000 ppr / (500 / 3) = 960 ppr
 Servo Delta ASDA-B3-3023-L
 -Wire:
 	sign - 37 - brown black							Y4
@@ -37,7 +37,7 @@ Servo Delta ASDA-B3-3023-L
 -Parameter:
 	P1.000 = 2 (pulse + direction)
 	P1.001 = 1_00 (ccw direction_position mode)
-	P1.044 = 262144, P1.045 = 75 -> 16777216 ppr / (131072 / 75) = 9600 ppr
+	P1.044 = 1310720, P1.045 = 75 -> 16777216 ppr / (1310720 / 75) = 960 ppr
 -Note: Test servo cw and ccw limit to synchronize with PLC cw and ccw limit
 /////
 VFD INVT GD20-0R7G-4

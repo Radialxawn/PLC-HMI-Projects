@@ -254,17 +254,31 @@
 					newPLCTag(`${k}${a}MaxTimer`, BOOL, TC, Auto);
 				}
 			}
-			//???
+			//update
 			newPLCTag(`GrabManualEnableOnI`, BOOL, X, Auto, true);
 			newPLCTag(`GrabManualEnableOffI`, BOOL, X, Auto, true);
 			newPLCTag('RunI', BOOL, X, Auto, true);
+			newPLCTag('RunFromHMI', BOOL, M, Auto, true);
 			newPLCTag('AutoI', BOOL, X, Auto, true);
 			newPLCTag('LayerCount', DINT, D, Auto, true);
 			for (k of ['GrabDropAir']) {
-				newPLCTag(`${k}`, BOOL, M, Auto, true);
-				newPLCTag(`${k}O`, BOOL, Y, 16);
-				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
+				var ys = [16, 17, 20, 21, 22]
+				for (a of [1, 2, 3, 4, 5]) {
+					newPLCTag(`${k}${a}`, BOOL, M, Auto, true);
+					newPLCTag(`${k}${a}O`, BOOL, Y, ys[a - 1]);
+					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
+				}
 				newPLCTag(`${k}TimerDelay`, INT, D, Auto, true);
+			}
+			//base
+			for (k of ['Base']) {
+				newPLCTag(`${k}Top`, BOOL, M, Auto, true);
+				newPLCTag(`${k}TopI`, BOOL, X, Auto);
+				newPLCTag(`${k}Bottom`, BOOL, M, Auto, true);
+				newPLCTag(`${k}BottomI`, BOOL, X, Auto);
+				newPLCTag(`${k}Direction`, INT, D, Auto, true);
+				newPLCTag(`${k}UpO`, BOOL, Y, 23, true);
+				newPLCTag(`${k}DownO`, BOOL, Y, 24, true);
 			}
 		}
 
