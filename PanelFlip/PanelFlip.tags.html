@@ -257,9 +257,10 @@
 			}
 			//update
 			newPLCTag(`GrabManualEnableOnI`, BOOL, X, Auto, true);
-			newPLCTag(`GrabManualEnableOffI`, BOOL, X, Auto, true);
+			newPLCTag(`RunResetI`, BOOL, X, Auto, true);
 			newPLCTag('RunI', BOOL, X, Auto, true);
 			newPLCTag('RunFromHMI', BOOL, M, Auto, true);
+			newPLCTag('RunResetFromHMI', BOOL, M, Auto, true);
 			newPLCTag('AutoI', BOOL, X, Auto, true);
 			newPLCTag('LayerCount', DINT, D, Auto, true);
 			for (k of ['GrabDropAir']) {
@@ -275,11 +276,14 @@
 			for (k of ['Base']) {
 				newPLCTag(`${k}Top`, BOOL, M, Auto, true);
 				newPLCTag(`${k}Bottom`, BOOL, M, Auto, true);
+				newPLCTag(`${k}BottomTimer`, BOOL, TC, Auto);
 				newPLCTag(`${k}BottomI`, BOOL, X, Auto);
 				newPLCTag(`${k}Direction`, INT, D, Auto, true);
 				newPLCTag(`${k}UpO`, BOOL, Y, 23, true);
 				newPLCTag(`${k}DownO`, BOOL, Y, 24, true);
 			}
+			newPLCTag(`DummyBOOL`, BOOL, M, Auto, true);
+			newPLCTag(`DummyINT`, INT, D, Auto, true);
 		}
 
 		class ARRAY {
