@@ -166,16 +166,23 @@
 				for (a of ['P']) {
 					newPLCTag(`${k}${a}I`, BOOL, X, Auto);
 				}
-				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
-				newPLCTag(`${k}TimerDelay`, INT, D, Auto);
+				for (a of ['N']) {
+					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
+					newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto);
+				}
 				newPLCTag(`${k}`, BOOL, M, Auto);
 				newPLCTag(`${k}O`, BOOL, Y, Auto);
 			}
+			newPLCTag(`Overload`, BOOL, M, Auto);
 			newPLCTag(`OverloadI`, BOOL, X, Auto);
+			newPLCTag(`AirBurst`, BOOL, M, Auto);
+			newPLCTag(`AirBurstO`, BOOL, Y, Auto);
+			newPLCTag(`AirBurstTimer`, BOOL, TC, Auto);
 			newPLCTag(`WorkFeedTravel`, DINT, D, Auto);
 			newPLCTag(`WorkFeedTap`, DINT, D, Auto);
 			newPLCTag(`TravelArray`, new ARRAY(DINT, 2), D, Auto);
-			newPLCTag(`TravelIndex`, INT, D, Auto);
+			newPLCTag(`TravelArrayIndex`, INT, D, Auto);
+			newPLCTag(`TapDoneCount`, INT, D, Auto);
 		}
 
 		class ARRAY {
@@ -255,8 +262,8 @@
 			newPLCTag(lb('Run'), BOOL, M, Auto, true);
 			newPLCTag(lb('Direction'), BOOL, M, Auto);
 			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, NoUse), true);
-			newPLCTag(lb('MaxI'), BOOL, X, xyz(NoUse, 2, NoUse), true);
-			newPLCTag(lb('ReadyI'), BOOL, X, xyz(3, 4, NoUse), true);
+			newPLCTag(lb('MaxI'), BOOL, X, xyz(2, 3, NoUse), true);
+			newPLCTag(lb('ReadyI'), BOOL, X, xyz(4, 5, NoUse), true);
 			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, NoUse));
 			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, NoUse));
 			newPLCTag(lb('OnO'), BOOL, Y, xyz(2, 3, NoUse));
