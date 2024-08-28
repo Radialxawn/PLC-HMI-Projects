@@ -1,15 +1,21 @@
 FX3U-32MT
 	X0 	xx min		-> xinje SO2
-	X2	xx max
 	X4 	xx ready	-> xinje SO1
 	X1	yy min
-	X3	yy max
 	X5	yy ready	-> hcfa Ready
-	X6 	run
-	X7 	run stop
-	X10 	top p
-	X11	bot p
+	X2 	run
+	X3 	run stop
+
+	X6 	extract top p
+	X7	extract bot p
+	X10	clamp p
+	X11	supply p
 	X12	overload
+	X13	full
+
+	X14	begin 1
+	X15	speed 1
+	X16	speed 2
 	--------
 	Y0	xx pulse
 	Y4	xx dir
@@ -19,7 +25,11 @@ FX3U-32MT
 	Y3	yy on		-> hcfa Enable
 	Y6	top
 	Y7	bot
-	Y10	air burst
+	Y10 clamp
+	Y11 supply
+	Y12 oil pump
+	Y13 air burst
+
 Xinje DS5C-20P7-PTA
 	P0-00 Set to 0 to disable Modbus
 	P0-01 Control mode (6: Position external)
@@ -38,15 +48,11 @@ Xinje DS5C-20P7-PTA
 		P5-70 Ready type (0: valid if no alarm, 1: valid if enable and no alarm)
 		P5-41 = n.0001 -> SO1 terminal NO signal servo ready
 		P5-48 = n.0002 -> SO2 terminal NO signal z phase
+
 HCFA SV-X3EA150A-A2
-	3, 28, 29 -> COM+, Pulse+, Direction+
-	12 -> COM-
-	27 -> Pulse-
-	31 -> Direction-
-	4 -> DI1 -> Servo enable
-	13 -> DO1 -> Servo ready
-	
-	
-
-
-
+	3, 28, 29 -> COM+, Pulse+, Direction+ <- red
+	12 -> COM- <- black
+	27 -> Pulse- <- yellow
+	31 -> Direction- <- green
+	4 -> DI1 -> Servo enable <- brown
+	14 -> DO2 -> Servo ready <- white
