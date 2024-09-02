@@ -1,13 +1,13 @@
 FX3U-32MT
 	X0 	xx min		-> xinje SO2
 	X4 	xx ready	-> xinje SO1
-	X1	yy min
-	X5	yy ready	-> hcfa Ready
+	X1		yy min
+	X5		yy ready	-> hcfa Ready
 	X2 	run
 	X3 	run stop
 
 	X6 	extract top p
-	X7	extract bot p
+	X7		extract bot p
 	X10	clamp p
 	X11	supply p
 	X12	overload
@@ -16,6 +16,8 @@ FX3U-32MT
 	X14	begin 1
 	X15	speed 1
 	X16	speed 2
+
+	X17	air ready
 	--------
 	Y0	xx pulse
 	Y4	xx dir

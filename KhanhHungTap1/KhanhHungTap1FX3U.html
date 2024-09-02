@@ -162,13 +162,11 @@
 			for (k of ['FoilExtractTop', 'FoilExtractBot', 'FoilClamp', 'FoilSupply']) {
 				for (a of ['N', 'P']) {
 					newPLCTag(`${k}${a}`, BOOL, M, Auto);
+					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
+					newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto);
 				}
 				for (a of ['P']) {
 					newPLCTag(`${k}${a}I`, BOOL, X, Auto);
-				}
-				for (a of ['N']) {
-					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
-					newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto);
 				}
 				newPLCTag(`${k}`, BOOL, M, Auto);
 				newPLCTag(`${k}O`, BOOL, Y, Auto);
@@ -188,7 +186,8 @@
 			}
 			for (k of ['WorkFeed']) {
 				newPLCTag(`${k}Spin`, DINT, D, Auto);
-				newPLCTag(`${k}Tap`, DINT, D, Auto);
+				newPLCTag(`${k}TapDown`, DINT, D, Auto);
+				newPLCTag(`${k}TapUp`, DINT, D, Auto);
 			}
 			for (k of ['FoilFull']) {
 				newPLCTag(`${k}`, BOOL, M, Auto);
@@ -204,9 +203,22 @@
 			}
 			for (k of ['Setting']) {
 				newPLCTag(`${k}TapBegin`, DINT, D, Auto);
-				newPLCTag(`${k}TapBegin1I`, BOOL, X, Auto);
+				newPLCTag(`${k}FoilSupplyI`, BOOL, X, Auto);
 				newPLCTag(`${k}TapSpeed1I`, BOOL, X, Auto);
 				newPLCTag(`${k}TapSpeed2I`, BOOL, X, Auto);
+			}
+			for (k of ['Air']) {
+				newPLCTag(`${k}Ready`, BOOL, M, Auto);
+				newPLCTag(`${k}ReadyI`, BOOL, X, Auto);
+			}
+			newPLCTag(`TapCount`, DINT, D, Auto);
+			newPLCTag(`TapCountAtSupplyEnd`, DINT, D, Auto);
+			for (k of ['Stop']) {
+				newPLCTag(`${k}Tap`, BOOL, M, Auto);
+				newPLCTag(`${k}TapTimer`, BOOL, TC, Auto);
+				newPLCTag(`${k}Clamp`, BOOL, M, Auto);
+				newPLCTag(`${k}ClampPLS`, BOOL, M, Auto);
+				newPLCTag(`${k}ClampTimer`, BOOL, TC, Auto);
 			}
 		}
 
