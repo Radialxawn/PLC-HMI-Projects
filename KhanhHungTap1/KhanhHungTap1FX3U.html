@@ -220,6 +220,10 @@
 				newPLCTag(`${k}ClampPLS`, BOOL, M, Auto);
 				newPLCTag(`${k}ClampTimer`, BOOL, TC, Auto);
 			}
+			for (k of ['FoilSupply']) {
+				newPLCTag(`${k}PTimeoutTimer`, BOOL, TC, Auto);
+				newPLCTag(`${k}PTimeoutTimerDelay`, INT, D, Auto);
+			}
 		}
 
 		class ARRAY {
