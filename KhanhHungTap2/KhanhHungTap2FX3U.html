@@ -144,13 +144,14 @@
 		}
 
 		function generatePLCTags() {
-			PLCTagsString += `"BacNinhTap"\n`;
+			PLCTagsString += `"None"\n`;
 			PLCTagsString += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
 			//for (k of [1, 2]) {
 			//	newPLCTag(`VR${k}`, INT, D, 8030 - 1 + k);
 			//}
 			generatePLCTagsAxis(XAxis);
 			generatePLCTagsAxis(YAxis);
+			generatePLCTagsAxis(ZAxis);
 			for (k of ['Run', 'RunStop']) {
 				newPLCTag(`${k}`, BOOL, M, Auto);
 				newPLCTag(`${k}I`, BOOL, X, Auto);
@@ -159,42 +160,35 @@
 				newPLCTag(`${k}State`, INT, D, Auto);
 				newPLCTag(`${k}StateNext`, BOOL, M, Auto);
 			}
-			for (k of ['FoilExtractTop', 'FoilExtractBot', 'FoilClamp', 'FoilSupply']) {
+			const iterable = new Map([
+				['FoilExtractDrop', []],
+				['FoilExtractPush', []],
+				['FoilClamp', ['N', 'P']],
+				['FoilSupply', []],
+				]);
+			for (const [k, v] of iterable) {
 				for (a of ['N', 'P']) {
 					newPLCTag(`${k}${a}`, BOOL, M, Auto);
 					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
 					newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto);
 				}
-				for (a of ['P']) {
+				for (a of v) {
 					newPLCTag(`${k}${a}I`, BOOL, X, Auto);
 				}
 				newPLCTag(`${k}`, BOOL, M, Auto);
 				newPLCTag(`${k}O`, BOOL, Y, Auto);
 			}
-			for (k of ['Overload']) {
-				newPLCTag(`${k}`, BOOL, M, Auto);
-				newPLCTag(`${k}I`, BOOL, X, Auto);
-			}
-			for (k of ['OilPump']) {
-				newPLCTag(`${k}`, BOOL, M, Auto);
-				newPLCTag(`${k}O`, BOOL, Y, Auto);
-			}
-			for (k of ['AirBurst']) {
-				newPLCTag(`${k}`, BOOL, M, Auto);
-				newPLCTag(`${k}O`, BOOL, Y, Auto);
-				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
-			}
 			for (k of ['WorkFeed']) {
 				newPLCTag(`${k}Spin`, DINT, D, Auto);
-				newPLCTag(`${k}TapDown`, DINT, D, Auto);
-				newPLCTag(`${k}TapUp`, DINT, D, Auto);
+				newPLCTag(`${k}TapSpin`, DINT, D, Auto);
+				newPLCTag(`${k}TapSpinUp`, DINT, D, Auto);
 			}
 			for (k of ['FoilFull']) {
 				newPLCTag(`${k}`, BOOL, M, Auto);
 				newPLCTag(`${k}I`, BOOL, X, Auto);
 				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
 			}
-			newPLCTag(`SpinArray`, new ARRAY(DINT, 6), D, Auto);
+			newPLCTag(`SpinArray`, new ARRAY(DINT, 8), D, Auto);
 			newPLCTag(`SpinArrayIndex`, INT, D, Auto);
 			for (k of ['SpinTest']) {
 				newPLCTag(`${k}`, BOOL, M, Auto);
@@ -202,15 +196,18 @@
 				newPLCTag(`${k}TimerDelay`, INT, D, Auto);
 			}
 			for (k of ['Setting']) {
-				newPLCTag(`${k}TapBegin`, DINT, D, Auto);
+				newPLCTag(`${k}TapPitchI`, BOOL, X, Auto);
+				newPLCTag(`${k}TapPitch`, DINT, D, Auto);
+				newPLCTag(`${k}TapSpinSpeed1I`, BOOL, X, Auto);
+				newPLCTag(`${k}TapSpinSpeed2I`, BOOL, X, Auto);
+				newPLCTag(`${k}TapTravelBegin`, DINT, D, Auto);
 				newPLCTag(`${k}FoilSupplyI`, BOOL, X, Auto);
-				newPLCTag(`${k}TapSpeed1I`, BOOL, X, Auto);
-				newPLCTag(`${k}TapSpeed2I`, BOOL, X, Auto);
 			}
 			for (k of ['Air']) {
 				newPLCTag(`${k}Ready`, BOOL, M, Auto);
 				newPLCTag(`${k}ReadyI`, BOOL, X, Auto);
 			}
+			newPLCTag(`TapMoveToTravelBegin`, BOOL, M, Auto);
 			newPLCTag(`TapCount`, DINT, D, Auto);
 			newPLCTag(`TapCountAtSupplyEnd`, DINT, D, Auto);
 			for (k of ['Stop']) {
@@ -291,6 +288,7 @@
 		function generatePLCTagsAxis(name) {
 			let lb = function (n) { return `${name}${n}`; }
 			let xyz = function (x, y, z) { return name == XAxis ? x : name == YAxis ? y : z; }
+			let xyz_name = function (x, y, z) { return name == XAxis ? x : name == YAxis ? y : z; }
 			newPLCTag(lb('LimitN'), BOOL, M, xyz(8344, 8354, 8364));
 			newPLCTag(lb('LimitP'), BOOL, M, xyz(8343, 8353, 8363));
 			newPLCTag(lb('Busy'), BOOL, M, xyz(8340, 8350, 8360));
@@ -301,17 +299,18 @@
 			newPLCTag(lb('PosView'), DINT, D, Auto, true);
 			newPLCTag(lb('TarPos'), DINT, D, Auto, true);
 			newPLCTag(lb('Feed'), DINT, D, Auto, true);
+			newPLCTag(lb(xyz_name('PPR', 'PPM', 'PPR')), DINT, D, Auto, true);
 			newPLCTag(lb('TarR'), BOOL, M, Auto, true);
 			newPLCTag(lb('TarRSkip'), INT, D, Auto, false);
-			newPLCTag(lb('On'), BOOL, M, Auto, true);
+			newPLCTag(lb('On'), BOOL, M, xyz(Auto, Auto, NoUse), true);
 			newPLCTag(lb('Run'), BOOL, M, Auto, true);
 			newPLCTag(lb('Direction'), BOOL, M, Auto);
 			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, NoUse), true);
 			newPLCTag(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse), true);
-			newPLCTag(lb('ReadyI'), BOOL, X, xyz(4, 5, NoUse), true);
-			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, NoUse));
-			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, NoUse));
-			newPLCTag(lb('OnO'), BOOL, Y, xyz(2, 3, NoUse));
+			newPLCTag(lb('ReadyI'), BOOL, X, xyz(4, 5, 6), true);
+			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
+			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
+			newPLCTag(lb('OnO'), BOOL, Y, xyz(3, 7, 10));
 		}
 
 		function generateHMITags() {
