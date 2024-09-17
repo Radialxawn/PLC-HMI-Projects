@@ -66,3 +66,13 @@ FATEK SD3-200-C812
 	No.36.0 Denominator = B
 		A / B = servo ppr / command ppr = 131072 / command ppr
 		1000 command ppr -> A = 32768, B = 250
+	----- Wire
+	24V -> 		1, 3, 28, 29
+	0V -> 		2, 12, 9(ccw), 10(cw), 20(srdy-)
+	servo on -> 	4
+	servo ready -> 	19
+	pulse -> 	27
+	direction -> 	31
+	
+	
+	
