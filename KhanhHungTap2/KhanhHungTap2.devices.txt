@@ -1,36 +1,42 @@
 FX3U-32MT
 	X0 	xx min		-> xinje SO2
 	X4 	xx ready	-> xinje SO1
-	X1		yy min
-	X5		yy ready	-> hcfa Ready
+	---
+	X1	yy min		-> ee-sx672
+	X5	yy ready	-> xinje SO1
+	---
+	X6	zz ready	-> yellow
+	---
 	X2 	run
 	X3 	run stop
-
-	X6 	extract top p
-	X7		extract bot p
+	---
+	X7 	clamp n
 	X10	clamp p
-	X11	supply p
-	X12	overload
-	X13	full
-
-	X14	begin 1
-	X15	speed 1
-	X16	speed 2
-
-	X17	air ready
+	X13	foil full
+	---
+	X12	pitch (1.0/1.27)
+	X13	speed 1
+	X14	speed 2
+	X15	supply (on/off)
+	---
+	X16	air ready
 	--------
-	Y0	xx pulse
-	Y4	xx dir
-	Y2	xx on		-> xinje SI1
-	Y1	yy pulse
-	Y5	yy dir
-	Y3	yy on		-> hcfa Enable
-	Y6	top
-	Y7	bot
-	Y10 clamp
-	Y11 supply
-	Y12 oil pump
-	Y13 air burst
+	Y0	xx pulse	-> p-
+	Y4	xx dir		-> d-
+	Y3	xx on		-> xinje SI1
+	---
+	Y1	yy pulse	-> p-
+	Y5	yy dir		-> d-
+	Y7	yy on		-> xinje SI1
+	---
+	Y2	yy pulse	-> blue
+	Y6	yy dir		-> white
+	Y10	yy on		-> green
+	---
+	Y11	extract drop
+	Y12	extract push
+	Y13	clamp
+	Y14	supply
 
 Xinje DS5C-20P7-PTA
 	P0-00 Set to 0 to disable Modbus
@@ -67,12 +73,12 @@ FATEK SD3-200-C812
 		A / B = servo ppr / command ppr = 131072 / command ppr
 		1000 command ppr -> A = 32768, B = 250
 	----- Wire
-	24V -> 		1, 3, 28, 29
-	0V -> 		2, 12, 9(ccw), 10(cw), 20(srdy-)
-	servo on -> 	4
-	servo ready -> 	19
-	pulse -> 	27
-	direction -> 	31
+	24V -> 		1, 3, 28, 29				-> red
+	0V -> 		2, 12, 9(ccw), 10(cw), 20(srdy-)	-> black
+	servo on -> 	4					-> green
+	servo ready -> 	19					-> yellow
+	pulse -> 	27					-> blue
+	direction -> 	31					-> white
 	
 	
 	
