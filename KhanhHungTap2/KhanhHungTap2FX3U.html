@@ -180,7 +180,8 @@
 			}
 			for (k of ['WorkFeed']) {
 				newPLCTag(`${k}Spin`, DINT, D, Auto);
-				newPLCTag(`${k}TapSpin`, DINT, D, Auto);
+				newPLCTag(`${k}TapTravelFast`, DINT, D, Auto);
+				newPLCTag(`${k}TapSpinDown`, DINT, D, Auto);
 				newPLCTag(`${k}TapSpinUp`, DINT, D, Auto);
 			}
 			for (k of ['FoilFull']) {
@@ -190,18 +191,17 @@
 			}
 			newPLCTag(`SpinArray`, new ARRAY(DINT, 8), D, Auto);
 			newPLCTag(`SpinArrayIndex`, INT, D, Auto);
-			for (k of ['SpinTest']) {
-				newPLCTag(`${k}`, BOOL, M, Auto);
-				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
-				newPLCTag(`${k}TimerDelay`, INT, D, Auto);
-			}
 			for (k of ['Setting']) {
 				newPLCTag(`${k}TapPitchI`, BOOL, X, Auto);
 				newPLCTag(`${k}TapPitch`, DINT, D, Auto);
 				newPLCTag(`${k}TapSpinSpeed1I`, BOOL, X, Auto);
 				newPLCTag(`${k}TapSpinSpeed2I`, BOOL, X, Auto);
-				newPLCTag(`${k}TapTravelBegin`, DINT, D, Auto);
 				newPLCTag(`${k}FoilSupplyI`, BOOL, X, Auto);
+				newPLCTag(`${k}TapTravelLength1I`, BOOL, X, Auto);
+				newPLCTag(`${k}TapTravelLength2I`, BOOL, X, Auto);
+				newPLCTag(`${k}TapTravelBegin`, DINT, D, Auto);
+				newPLCTag(`${k}TapTravelFast`, DINT, D, Auto);
+				newPLCTag(`${k}TapTravelEnd`, DINT, D, Auto);
 			}
 			for (k of ['Air']) {
 				newPLCTag(`${k}Ready`, BOOL, M, Auto);
@@ -224,6 +224,14 @@
 			for (k of ['XXOff']) {
 				newPLCTag(`${k}`, BOOL, M, Auto);
 				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
+			}
+			for (k of ['Test']) {
+				for (a of ['Spin']) {
+					newPLCTag(`${k}${a}`, BOOL, M, Auto);
+					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
+					newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto);
+				}
+				newPLCTag(`${k}All`, BOOL, M, Auto);
 			}
 		}
 
@@ -307,6 +315,7 @@
 			newPLCTag(lb('Direction'), BOOL, M, Auto);
 			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, NoUse), true);
 			newPLCTag(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse), true);
+			newPLCTag(lb('Ready'), BOOL, M, xyz(Auto, Auto, NoUse), true);
 			newPLCTag(lb('ReadyI'), BOOL, X, xyz(4, 5, 6), true);
 			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
 			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));

@@ -18,8 +18,10 @@ FX3U-32MT
 	X13	speed 1
 	X14	speed 2
 	X15	supply (on/off)
+	X16	travel 1
+	X17	travel 2
 	---
-	X16	air ready
+	X20	air ready
 	--------
 	Y0	xx pulse	-> p-
 	Y4	xx dir		-> d-
@@ -40,8 +42,10 @@ FX3U-32MT
 
 Xinje DS5C-20P7-PTA
 	P0-00 Set to 0 to disable Modbus
-	P0-01 Control mode (6: Position external)
+	P0-01 Control mode 1 (6: Position external) main
+	P0-02 Control mode 2 (6: Position external)
 	P0-03 Enable mode (0: Not enable, 1: I/O enable, 2: Software enable, F1-05 or software, 3: Fieldbus enable)
+	P0-04 Rigidity level
 	P0-05 Direction (0: Positive, 1: Negative)
 	P0-10 Pulse signal (0: CW/CCW, 1: AB phase, 2: Pulse + dir)
 	----- Set ppr
