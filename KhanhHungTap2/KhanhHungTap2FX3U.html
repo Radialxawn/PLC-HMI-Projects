@@ -225,13 +225,24 @@
 				newPLCTag(`${k}`, BOOL, M, Auto);
 				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
 			}
+			for (k of ['FoilExtractPush']) {
+				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
+				newPLCTag(`${k}TimerDelay`, INT, D, Auto);
+			}
 			for (k of ['Test']) {
 				for (a of ['Spin']) {
 					newPLCTag(`${k}${a}`, BOOL, M, Auto);
 					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
 					newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto);
 				}
-				newPLCTag(`${k}All`, BOOL, M, Auto);
+				for (a of ['IgnoreZZ']) {
+					newPLCTag(`${k}${a}`, BOOL, M, Auto);
+				}
+				for (a of ['FoilTime']) {
+					newPLCTag(`${k}${a}`, BOOL, M, Auto);
+					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
+					newPLCTag(`${k}${a}Value`, INT, D, Auto);
+				}
 			}
 		}
 
