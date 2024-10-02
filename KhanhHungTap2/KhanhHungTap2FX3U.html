@@ -200,6 +200,7 @@
 				newPLCTag(`${k}TapTravelLength1I`, BOOL, X, Auto);
 				newPLCTag(`${k}TapTravelLength2I`, BOOL, X, Auto);
 				newPLCTag(`${k}TapTravelBegin`, DINT, D, Auto);
+				newPLCTag(`${k}TapTravelBeginOffset`, DINT, D, Auto);
 				newPLCTag(`${k}TapTravelFast`, DINT, D, Auto);
 				newPLCTag(`${k}TapTravelEnd`, DINT, D, Auto);
 			}
@@ -237,11 +238,6 @@
 				}
 				for (a of ['IgnoreZZ']) {
 					newPLCTag(`${k}${a}`, BOOL, M, Auto);
-				}
-				for (a of ['FoilTime']) {
-					newPLCTag(`${k}${a}`, BOOL, M, Auto);
-					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
-					newPLCTag(`${k}${a}Value`, INT, D, Auto);
 				}
 			}
 		}

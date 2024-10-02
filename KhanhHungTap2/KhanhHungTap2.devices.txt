@@ -68,7 +68,7 @@ FATEK SD3-200-C812
 	No.3.0 command mode = 1 (pulse train)
 	No.9.0 operation mode = 0 (I/O CN1)
 	No.32.0 input pulse form = 0 (pulse and direction)
-	No.32.1 rotational direction = (0 -CCW, 1 +CCW)
+	No.32.1 rotational direction = 0 (0 -CCW, 1 +CCW)
 	No.32.2 interpolation = (0 disable, 1 enable)
 	No.32.3 input logic = (0 rise, 1 fall)
 	No.33.0 input filter = 4
