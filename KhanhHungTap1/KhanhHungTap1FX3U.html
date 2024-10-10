@@ -159,14 +159,16 @@
 				newPLCTag(`${k}State`, INT, D, Auto);
 				newPLCTag(`${k}StateNext`, BOOL, M, Auto);
 			}
-			for (k of ['FoilExtractTop', 'FoilExtractBot', 'FoilClamp', 'FoilSupply']) {
+			for (k of ['FoilExtractPush', 'FoilClamp', 'FoilSupply']) {
 				for (a of ['N', 'P']) {
 					newPLCTag(`${k}${a}`, BOOL, M, Auto);
 					newPLCTag(`${k}${a}Timer`, BOOL, TC, Auto);
 					newPLCTag(`${k}${a}TimerDelay`, INT, D, Auto);
 				}
 				for (a of ['P']) {
-					newPLCTag(`${k}${a}I`, BOOL, X, Auto);
+					if (k == 'FoilClamp') {
+						newPLCTag(`${k}${a}I`, BOOL, X, Auto);
+					}
 				}
 				newPLCTag(`${k}`, BOOL, M, Auto);
 				newPLCTag(`${k}O`, BOOL, Y, Auto);
@@ -174,15 +176,6 @@
 			for (k of ['Overload']) {
 				newPLCTag(`${k}`, BOOL, M, Auto);
 				newPLCTag(`${k}I`, BOOL, X, Auto);
-			}
-			for (k of ['OilPump']) {
-				newPLCTag(`${k}`, BOOL, M, Auto);
-				newPLCTag(`${k}O`, BOOL, Y, Auto);
-			}
-			for (k of ['AirBurst']) {
-				newPLCTag(`${k}`, BOOL, M, Auto);
-				newPLCTag(`${k}O`, BOOL, Y, Auto);
-				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
 			}
 			for (k of ['WorkFeed']) {
 				newPLCTag(`${k}Spin`, DINT, D, Auto);
@@ -227,6 +220,11 @@
 			for (k of ['XXOff']) {
 				newPLCTag(`${k}`, BOOL, M, Auto);
 				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
+			}
+			for (k of ['ErrorReset']) {
+				newPLCTag(`${k}`, BOOL, M, Auto);
+				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
+				newPLCTag(`${k}O`, BOOL, Y, Auto);
 			}
 		}
 
@@ -306,9 +304,12 @@
 			newPLCTag(lb('On'), BOOL, M, Auto, true);
 			newPLCTag(lb('Run'), BOOL, M, Auto, true);
 			newPLCTag(lb('Direction'), BOOL, M, Auto);
+			//Input
 			newPLCTag(lb('MinI'), BOOL, X, xyz(0, 1, NoUse), true);
 			newPLCTag(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse), true);
 			newPLCTag(lb('ReadyI'), BOOL, X, xyz(4, 5, NoUse), true);
+			newPLCTag(lb('InTorqueI'), BOOL, X, xyz(2, 3, NoUse), true);
+			//Output
 			newPLCTag(lb('PulseO'), BOOL, Y, xyz(0, 1, NoUse));
 			newPLCTag(lb('DirectionO'), BOOL, Y, xyz(4, 5, NoUse));
 			newPLCTag(lb('OnO'), BOOL, Y, xyz(2, 3, NoUse));
