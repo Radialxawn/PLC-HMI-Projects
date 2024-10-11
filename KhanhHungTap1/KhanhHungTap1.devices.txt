@@ -49,7 +49,7 @@ Xinje DS5C-20P7-PTA
 		P5-70 Ready type (0: valid if no alarm, 1: valid if enable and no alarm)
 		P5-41 = n.0001 -> SO1 terminal NO -> servo ready
 		P5-48 = n.0002 -> SO2 terminal NO -> z phase
-		P5-42 = n.0003 -> SO3 terminal NO -> in torque limit
+		P5-42 = n.0013 -> SO3 terminal NC -> in torque limit
 	----- Set limit
 	P5-25	= n.0000 for internal forward torque limit
 	P5-26	= n.0000 for internal reverse torque limit
@@ -64,7 +64,7 @@ HCFA SV-X3EA150A-A2
 	4 -> DI1 -> servo enable (P04.01 = 1, P04.11 = 0(NO)) <- brown
 	8 -> DI5 -> error reset (P04.05 = 2, P04.15 = 0(NO)) <- other green
 	14 -> DO2 -> servo ready (P04.22 = 1, P04.32 = 0(NO)) <- white
-	17 -> DO5 -> in torque limit (P04.25 = 9, P04.35 = 0(NO)) <- other white
+	17 -> DO5 -> in torque limit (P04.25 = 9, P04.35 = 1(NC)) <- other white
 	----- Limit
 	P03.08 torque limit source (0 = internal)
 	P03.09 internal forward torque limit (value * 0.1%)
