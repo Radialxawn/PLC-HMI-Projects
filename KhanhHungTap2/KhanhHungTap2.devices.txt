@@ -65,7 +65,7 @@ Xinje DS5C-20P7-PTA
       P5-41 = n.0001 -> SO1 terminal NO -> servo ready
          P5-70 ready type (0: valid if no alarm, 1: valid if enable and no alarm)
       P5-48 = n.0002 -> SO2 terminal NO -> z phase
-      P5-42 = n.0013 -> SO3 terminal NC -> in torque
+      P5-42 = n.0003 -> SO3 terminal NO -> in torque
    P0-25	Resistor power (watt)
    P0-26	Resistor value (ohm)
    ----- Set torque limit
