@@ -240,6 +240,15 @@
 					newPLCTag(`${k}${a}`, BOOL, M, Auto);
 				}
 			}
+			for (k of ['XX', 'YY', 'ZZ']) {
+				newPLCTag(`${k}InTorqueI`, BOOL, X, Auto);
+				newPLCTag(`${k}OverTorque`, BOOL, M, Auto);
+			}
+			for (k of ['ErrorReset']) {
+				newPLCTag(`${k}`, BOOL, M, Auto);
+				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
+				newPLCTag(`${k}O`, BOOL, Y, Auto);
+			}
 		}
 
 		class ARRAY {

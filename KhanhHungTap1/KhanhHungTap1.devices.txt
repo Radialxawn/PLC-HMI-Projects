@@ -61,10 +61,10 @@ HCFA SV-X3EA150A-A2
 	12 -> COM- <- black
 	27 -> Pulse- <- yellow
 	31 -> Direction- <- green
-	4 -> DI1 -> Servo enable (P04.01 = 1, P04.11 = 0(NO)) <- brown
-	8 -> DI5 -> Error reset (P04.05 = 2, P04.15 = 0(NO)) <- other green
-	14 -> DO2 -> Servo ready (P04.22 = 1, P04.32 = 0(NO)) <- white
-	18 -> DO6 -> In torque limit (P04.26 = 9, P04.36 = 0(NO)) <- other white
+	4 -> DI1 -> servo enable (P04.01 = 1, P04.11 = 0(NO)) <- brown
+	8 -> DI5 -> error reset (P04.05 = 2, P04.15 = 0(NO)) <- other green
+	14 -> DO2 -> servo ready (P04.22 = 1, P04.32 = 0(NO)) <- white
+	17 -> DO5 -> in torque limit (P04.25 = 9, P04.35 = 1(NC)) <- other white
 	----- Limit
 	P03.08 torque limit source (0 = internal)
 	P03.09 internal forward torque limit (value * 0.1%)
