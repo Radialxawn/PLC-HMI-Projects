@@ -226,6 +226,11 @@
 				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
 				newPLCTag(`${k}O`, BOOL, Y, Auto);
 			}
+			for (k of ['Alert']) {
+				newPLCTag(`${k}`, BOOL, M, Auto);
+				newPLCTag(`${k}Timer`, BOOL, TC, Auto);
+				newPLCTag(`${k}O`, BOOL, Y, Auto);
+			}
 		}
 
 		class ARRAY {

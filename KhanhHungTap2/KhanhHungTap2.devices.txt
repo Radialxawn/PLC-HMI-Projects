@@ -101,7 +101,6 @@ FATEK SD3-200-C812
    servo ready ->	19                      -> yellow
    pulse -> 27                            -> blue
    direction -> 31                        -> white
+   alarm reset          -> 5  -> tbd
    torque limit select  -> 11 -> tbd
    in torque limit      -> 17 -> tbd
-   
-   
