@@ -4,7 +4,7 @@ function print(data) {
    console.log(data);
 }
 
-const PLC = 'PLC', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW';
+const PLC = 'PLC', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW', $M = '$M', $ = '$';
 const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y', TC = 'TC';
 const XAxis = 'XX', YAxis = 'YY', ZAxis = 'ZZ', AAxis = 'AA';
 const Auto = -1, NoUse = -2;
@@ -18,6 +18,12 @@ class ARRAY {
    }
    toString() { return `ARRAY [0..${this.length - 1}] OF ${this.type}`; }
 }
+
+const ControllerType = Object.freeze({
+   FX3U: 'FX3U',
+   Weintek: 'Weintek',
+   Delta: 'Delta'
+});
 
 class Controller {
    type = '';
@@ -33,25 +39,24 @@ class Controller {
       var is_plc = false;
       var project_name = __dirname.split('\\').pop();
       switch (_type_) {
-         case 'FX3U':
+         case ControllerType.FX3U:
             is_plc = true;
             this.csv += `${project_name}\n`;
 			   this.csv += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
             this.encoding = 'UTF16LE';
-            this.tags = {};
-            this.devices_used = {
-               [X]: [], [Y]: [], [M]: [], [D]: [], [TC]: []
-            };
+            this.devices_used[X] = [];
+            this.devices_used[Y] = [];
             for (var i = 0; i < 32; i++) {
                var to_ignore = [i * 10 + 8, i * 10 + 9];
                this.devices_used[X].push(...to_ignore);
                this.devices_used[Y].push(...to_ignore);
             }
             break;
-         case 'Weintek':
+         case ControllerType.Weintek:
             this.csv_data = '';
+            this.encoding = 'UTF16LE';
             break;
-         case 'Delta':
+         case ControllerType.Delta:
             this.csv += 'Define Name,Type,Address,Description\n';
             break;
       }
@@ -72,27 +77,54 @@ class Controller {
       if (this.tags.hasOwnProperty(_name_)) {
          this.error += `${this.type} already has ${_name_}\n`;
       }
-      let count = 1;
-      if (_type_ instanceof ARRAY) {
-         if (_type_.type == DINT) {
-            count = 2;
-         }
-         for (var i = 0; i < _type_.length * count; i++) {
-            this._tag_check(_device_name_, _device_index_ + i);
-         }
-      } else {
-         if (_type_ == DINT) {
-            count = 2;
-         }
-         for (var i = 0; i < count; i++) {
-            this._tag_check(_device_name_, _device_index_ + i);
-         }
+      switch (this.type) {
+         case ControllerType.FX3U:
+            let count = 1;
+            if (_type_ instanceof ARRAY) {
+               if (_type_.type == DINT) {
+                  count = 2;
+               }
+               for (var i = 0; i < _type_.length * count; i++) {
+                  this._tag_check(_device_name_, _device_index_ + i);
+               }
+            } else {
+               if (_type_ == DINT) {
+                  count = 2;
+               }
+               for (var i = 0; i < count; i++) {
+                  this._tag_check(_device_name_, _device_index_ + i);
+               }
+            }
+            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
+            this.csv += `"VAR_GLOBAL"	"${_name_}"	"${_type_}"	""	"${_device_name_}${_device_index_}"	""	""	""	""	""	""\n`;
+            return this.tags[_name_];
+         case ControllerType.Weintek:
+            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
+            this.csv += `${_name_},${_type_},${_device_name_},${_device_index_}\n`;
+            this._tag_check(_device_name_, _device_index_);
+            break;
+         case ControllerType.Delta:
+            var device_type = function (_device_name_) {
+               if (_device_name_ == D || _device_name_ == '$' || _device_name_ == '$M') {
+                  return 'WORD';
+               }
+               return 'BIT';
+            }
+            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
+            if (_type_ == Self) {
+               this.csv += `${_name_},${device_type(_device_name_)},${_device_name_}${_device_index_},\n`;
+            } else {
+               this.csv += `${_name_},${device_type(_device_name_)},{${_type_}}0@${_device_name_}${_device_index_},\n`;
+            }
+            this._tag_check(_device_name_, _device_index_);
+            break;
       }
-      this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
-      this.csv += `"VAR_GLOBAL"	"${_name_}"	"${_type_}"	""	"${_device_name_}${_device_index_}"	""	""	""	""	""	""\n`;
    }
 
    _tag_check(_device_name_, _device_index_) {
+      if (this.devices_used.hasOwnProperty(_device_name_) == false) {
+         this.devices_used[_device_name_] = [];
+      }
       if (this.devices_used[_device_name_].includes(_device_index_)) {
          this.error += `${this.type} overlap device ${_name_}${_device_index_}\n`;
       }
@@ -100,6 +132,9 @@ class Controller {
    }
 
    _auto_index(_device_name_) {
+      if (this.devices_used.hasOwnProperty(_device_name_) == false) {
+         this.devices_used[_device_name_] = [];
+      }
       for (var i = 0; i < 256; i++) {
          if (this.devices_used[_device_name_].includes(i)) {
             continue;
@@ -110,7 +145,7 @@ class Controller {
    }
 
    save() {
-      fs.writeFile(this.path, this.csv, {encoding: this.encoding}, err => {
+      fs.writeFile(this.path, this.csv, { encoding: this.encoding }, err => {
          if (err) {
             print(err);
          } else {

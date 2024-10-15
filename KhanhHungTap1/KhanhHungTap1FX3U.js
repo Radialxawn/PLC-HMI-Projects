@@ -4,7 +4,7 @@ function print(data) {
    console.log(data);
 }
 
-const PLC = 'PLC', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW';
+const PLC = 'PLC', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW', $M = '$M', $ = '$';
 const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y', TC = 'TC';
 const XAxis = 'XX', YAxis = 'YY', ZAxis = 'ZZ', AAxis = 'AA';
 const Auto = -1, NoUse = -2;
@@ -18,6 +18,12 @@ class ARRAY {
    }
    toString() { return `ARRAY [0..${this.length - 1}] OF ${this.type}`; }
 }
+
+const ControllerType = Object.freeze({
+   FX3U: 'FX3U',
+   Weintek: 'Weintek',
+   Delta: 'Delta'
+});
 
 class Controller {
    type = '';
@@ -33,25 +39,24 @@ class Controller {
       var is_plc = false;
       var project_name = __dirname.split('\\').pop();
       switch (_type_) {
-         case 'FX3U':
+         case ControllerType.FX3U:
             is_plc = true;
             this.csv += `${project_name}\n`;
 			   this.csv += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
             this.encoding = 'UTF16LE';
-            this.tags = {};
-            this.devices_used = {
-               [X]: [], [Y]: [], [M]: [], [D]: [], [TC]: []
-            };
+            this.devices_used[X] = [];
+            this.devices_used[Y] = [];
             for (var i = 0; i < 32; i++) {
                var to_ignore = [i * 10 + 8, i * 10 + 9];
                this.devices_used[X].push(...to_ignore);
                this.devices_used[Y].push(...to_ignore);
             }
             break;
-         case 'Weintek':
+         case ControllerType.Weintek:
             this.csv_data = '';
+            this.encoding = 'UTF16LE';
             break;
-         case 'Delta':
+         case ControllerType.Delta:
             this.csv += 'Define Name,Type,Address,Description\n';
             break;
       }
@@ -72,27 +77,54 @@ class Controller {
       if (this.tags.hasOwnProperty(_name_)) {
          this.error += `${this.type} already has ${_name_}\n`;
       }
-      let count = 1;
-      if (_type_ instanceof ARRAY) {
-         if (_type_.type == DINT) {
-            count = 2;
-         }
-         for (var i = 0; i < _type_.length * count; i++) {
-            this._tag_check(_device_name_, _device_index_ + i);
-         }
-      } else {
-         if (_type_ == DINT) {
-            count = 2;
-         }
-         for (var i = 0; i < count; i++) {
-            this._tag_check(_device_name_, _device_index_ + i);
-         }
+      switch (this.type) {
+         case ControllerType.FX3U:
+            let count = 1;
+            if (_type_ instanceof ARRAY) {
+               if (_type_.type == DINT) {
+                  count = 2;
+               }
+               for (var i = 0; i < _type_.length * count; i++) {
+                  this._tag_check(_device_name_, _device_index_ + i);
+               }
+            } else {
+               if (_type_ == DINT) {
+                  count = 2;
+               }
+               for (var i = 0; i < count; i++) {
+                  this._tag_check(_device_name_, _device_index_ + i);
+               }
+            }
+            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
+            this.csv += `"VAR_GLOBAL"	"${_name_}"	"${_type_}"	""	"${_device_name_}${_device_index_}"	""	""	""	""	""	""\n`;
+            return this.tags[_name_];
+         case ControllerType.Weintek:
+            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
+            this.csv += `${_name_},${_type_},${_device_name_},${_device_index_}\n`;
+            this._tag_check(_device_name_, _device_index_);
+            break;
+         case ControllerType.Delta:
+            var device_type = function (_device_name_) {
+               if (_device_name_ == D || _device_name_ == '$' || _device_name_ == '$M') {
+                  return 'WORD';
+               }
+               return 'BIT';
+            }
+            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
+            if (_type_ == Self) {
+               this.csv += `${_name_},${device_type(_device_name_)},${_device_name_}${_device_index_},\n`;
+            } else {
+               this.csv += `${_name_},${device_type(_device_name_)},{${_type_}}0@${_device_name_}${_device_index_},\n`;
+            }
+            this._tag_check(_device_name_, _device_index_);
+            break;
       }
-      this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
-      this.csv += `"VAR_GLOBAL"	"${_name_}"	"${_type_}"	""	"${_device_name_}${_device_index_}"	""	""	""	""	""	""\n`;
    }
 
    _tag_check(_device_name_, _device_index_) {
+      if (this.devices_used.hasOwnProperty(_device_name_) == false) {
+         this.devices_used[_device_name_] = [];
+      }
       if (this.devices_used[_device_name_].includes(_device_index_)) {
          this.error += `${this.type} overlap device ${_name_}${_device_index_}\n`;
       }
@@ -100,6 +132,9 @@ class Controller {
    }
 
    _auto_index(_device_name_) {
+      if (this.devices_used.hasOwnProperty(_device_name_) == false) {
+         this.devices_used[_device_name_] = [];
+      }
       for (var i = 0; i < 256; i++) {
          if (this.devices_used[_device_name_].includes(i)) {
             continue;
@@ -110,7 +145,7 @@ class Controller {
    }
 
    save() {
-      fs.writeFile(this.path, this.csv, {encoding: this.encoding}, err => {
+      fs.writeFile(this.path, this.csv, { encoding: this.encoding }, err => {
          if (err) {
             print(err);
          } else {
@@ -120,8 +155,9 @@ class Controller {
    }
 }
 
-const plc = new Controller('FX3U');
+const plc = new Controller(ControllerType.FX3U);
 
+/////GENERATE
 function plc_generate_axis(_name_) {
    let lb = function (n) { return `${_name_}${n}`; }
    let xyz = function (x, y, z) { return _name_ == XAxis ? x : _name_ == YAxis ? y : z; }
@@ -132,20 +168,20 @@ function plc_generate_axis(_name_) {
    plc.tag_add(lb('Pos'), DINT, D, xyz(8340, 8350, 8360));
    plc.tag_add(lb('AccelTime'), INT, D, xyz(8348, 8358, 8368));
    plc.tag_add(lb('DecelTime'), INT, D, xyz(8349, 8359, 8369));
-   plc.tag_add(lb('PosView'), DINT, D, Auto, true);
-   plc.tag_add(lb('TarPos'), DINT, D, Auto, true);
-   plc.tag_add(lb('Feed'), DINT, D, Auto, true);
-   plc.tag_add(lb('TarR'), BOOL, M, Auto, true);
-   plc.tag_add(lb('TarRSkip'), INT, D, Auto, false);
-   plc.tag_add(lb('On'), BOOL, M, Auto, true);
-   plc.tag_add(lb('Run'), BOOL, M, Auto, true);
+   plc.tag_add(lb('PosView'), DINT, D, Auto);
+   plc.tag_add(lb('TarPos'), DINT, D, Auto);
+   plc.tag_add(lb('Feed'), DINT, D, Auto);
+   plc.tag_add(lb('TarR'), BOOL, M, Auto);
+   plc.tag_add(lb('TarRSkip'), INT, D, Auto);
+   plc.tag_add(lb('On'), BOOL, M, Auto);
+   plc.tag_add(lb('Run'), BOOL, M, Auto);
    plc.tag_add(lb('Direction'), BOOL, M, Auto);
    plc.tag_add(lb('OverTorque'), BOOL, M, Auto);
    //Input
-   plc.tag_add(lb('MinI'), BOOL, X, xyz(0, 1, NoUse), true);
-   plc.tag_add(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse), true);
-   plc.tag_add(lb('ReadyI'), BOOL, X, xyz(4, 5, NoUse), true);
-   plc.tag_add(lb('InTorqueI'), BOOL, X, xyz(2, 3, NoUse), true);
+   plc.tag_add(lb('MinI'), BOOL, X, xyz(0, 1, NoUse));
+   plc.tag_add(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse));
+   plc.tag_add(lb('ReadyI'), BOOL, X, xyz(4, 5, NoUse));
+   plc.tag_add(lb('InTorqueI'), BOOL, X, xyz(2, 3, NoUse));
    plc.tag_add(lb('InTorqueIEdge'), BOOL, M, Auto);
    //Output
    plc.tag_add(lb('PulseO'), BOOL, Y, xyz(0, 1, NoUse));
@@ -153,16 +189,15 @@ function plc_generate_axis(_name_) {
    plc.tag_add(lb('OnO'), BOOL, Y, xyz(2, 3, NoUse));
 }
 
-/////GENERATE
 plc_generate_axis(XAxis);
 plc_generate_axis(YAxis);
 for (k of ['Run', 'RunStop']) {
-   plc.tag_add(`${k}`, BOOL, M, Auto);
-   plc.tag_add(`${k}I`, BOOL, X, Auto);
+   plc.tag_add(`${k}`, BOOL, M, Auto).sync = true;
+   plc.tag_add(`${k}I`, BOOL, X, Auto).sync = true;
 }
 for (k of ['Run', 'AxisSpin', 'AxisTap', 'FoilExtract', 'FoilClamp', 'FoilSupply']) {
-   plc.tag_add(`${k}State`, INT, D, Auto);
-   plc.tag_add(`${k}StateNext`, BOOL, M, Auto);
+   plc.tag_add(`${k}State`, INT, D, Auto).sync = true;
+   plc.tag_add(`${k}StateNext`, BOOL, M, Auto).sync = true;
 }
 for (k of ['FoilExtractPush', 'FoilClamp', 'FoilSupply']) {
    for (a of ['N', 'P']) {
