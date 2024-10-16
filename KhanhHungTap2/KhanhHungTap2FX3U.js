@@ -153,6 +153,16 @@ class Controller {
          }
       });
    }
+
+   get_table(_device_name_) {
+      let table = [];
+      for (const [k, v] of Object.entries(this.tags)) {
+         if (v.device_name == _device_name_) {
+            table.push({ name: v.name, device: `${v.device_name}${v.device_index}` });
+         }
+      }
+      return table;
+   }
 }
 
 const plc = new Controller('FX3U');
@@ -169,19 +179,19 @@ function plc_generate_axis(_name_) {
    plc.tag_add(lb('Pos'), DINT, D, xyz(8340, 8350, 8360));
    plc.tag_add(lb('AccelTime'), INT, D, xyz(8348, 8358, 8368));
    plc.tag_add(lb('DecelTime'), INT, D, xyz(8349, 8359, 8369));
-   plc.tag_add(lb('PosView'), DINT, D, Auto, true);
-   plc.tag_add(lb('TarPos'), DINT, D, Auto, true);
-   plc.tag_add(lb('Feed'), DINT, D, Auto, true);
-   plc.tag_add(lb(xyz_name('PPR', 'PPM', 'PPR')), DINT, D, Auto, true);
-   plc.tag_add(lb('TarR'), BOOL, M, Auto, true);
+   plc.tag_add(lb('PosView'), DINT, D, Auto);
+   plc.tag_add(lb('TarPos'), DINT, D, Auto);
+   plc.tag_add(lb('Feed'), DINT, D, Auto);
+   plc.tag_add(lb(xyz_name('PPR', 'PPM', 'PPR')), DINT, D, Auto);
+   plc.tag_add(lb('TarR'), BOOL, M, Auto);
    plc.tag_add(lb('TarRSkip'), INT, D, Auto, false);
-   plc.tag_add(lb('On'), BOOL, M, xyz(Auto, Auto, NoUse), true);
-   plc.tag_add(lb('Run'), BOOL, M, Auto, true);
+   plc.tag_add(lb('On'), BOOL, M, xyz(Auto, Auto, NoUse));
+   plc.tag_add(lb('Run'), BOOL, M, Auto);
    plc.tag_add(lb('Direction'), BOOL, M, Auto);
-   plc.tag_add(lb('MinI'), BOOL, X, xyz(0, 1, NoUse), true);
-   plc.tag_add(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse), true);
-   plc.tag_add(lb('Ready'), BOOL, M, xyz(Auto, Auto, NoUse), true);
-   plc.tag_add(lb('ReadyI'), BOOL, X, xyz(4, 5, 6), true);
+   plc.tag_add(lb('MinI'), BOOL, X, xyz(0, 1, NoUse));
+   plc.tag_add(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse));
+   plc.tag_add(lb('Ready'), BOOL, M, xyz(Auto, Auto, NoUse));
+   plc.tag_add(lb('ReadyI'), BOOL, X, xyz(4, 5, 6));
    plc.tag_add(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
    plc.tag_add(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
    plc.tag_add(lb('OnO'), BOOL, Y, xyz(3, 7, 10));
@@ -301,6 +311,8 @@ for (k of ['Alert']) {
 
 if (plc.error == '') {
    plc.save();
+   console.table(plc.get_table(X));
+   console.table(plc.get_table(Y));
 } else {
    print(plc.error);
 }

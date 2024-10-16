@@ -153,6 +153,16 @@ class Controller {
          }
       });
    }
+
+   get_table(_device_name_) {
+      let table = [];
+      for (const [k, v] of Object.entries(this.tags)) {
+         if (v.device_name == _device_name_) {
+            table.push({ name: v.name, device: `${v.device_name}${v.device_index}` });
+         }
+      }
+      return table;
+   }
 }
 
 const plc = new Controller(ControllerType.FX3U);
@@ -199,7 +209,7 @@ for (k of ['Run', 'AxisSpin', 'AxisTap', 'FoilExtract', 'FoilClamp', 'FoilSupply
    plc.tag_add(`${k}State`, INT, D, Auto).sync = true;
    plc.tag_add(`${k}StateNext`, BOOL, M, Auto).sync = true;
 }
-for (k of ['FoilExtractPush', 'FoilClamp', 'FoilSupply']) {
+for (k of ['FoilClamp', 'FoilSupply']) {
    for (a of ['N', 'P']) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
       plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
@@ -275,6 +285,8 @@ for (k of ['Alert']) {
 
 if (plc.error == '') {
    plc.save();
+   console.table(plc.get_table(X));
+   console.table(plc.get_table(Y));
 } else {
    print(plc.error);
 }
