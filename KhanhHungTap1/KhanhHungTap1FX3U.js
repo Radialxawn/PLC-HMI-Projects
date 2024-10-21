@@ -186,7 +186,7 @@ function plc_generate_axis(_name_) {
    plc.tag_add(lb('On'), BOOL, M, Auto);
    plc.tag_add(lb('Run'), BOOL, M, Auto);
    plc.tag_add(lb('Direction'), BOOL, M, Auto);
-   plc.tag_add(lb('OverTorque'), BOOL, M, Auto);
+   //plc.tag_add(lb('OverTorque'), BOOL, M, Auto);
    //Input
    plc.tag_add(lb('MinI'), BOOL, X, xyz(0, 1, NoUse));
    plc.tag_add(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse));
