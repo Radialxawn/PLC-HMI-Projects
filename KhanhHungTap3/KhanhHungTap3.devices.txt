@@ -1,48 +1,4 @@
-FX3U-32MT
-   X0 	xx min		   -> xinje SO2
-   X4 	xx ready	      -> xinje SO1
-   X21   xx in torque   -> xinje SO3
-   ---
-   X1		yy min		   -> external sensor
-   X5		yy ready	      -> xinje SO1
-   x22   yy in torque   -> xinje SO3
-   ---
-   X6		zz ready 	   -> yellow
-   X23   zz in torque   -> tbd
-   ---
-   X2 	run
-   X3 	run stop
-   ---
-   X7 	clamp n
-   X10	clamp p
-   X13	foil full
-   ---
-   X12	pitch (1.0/1.27)
-   X13	speed 1
-   X14	speed 2
-   X15	supply (on/off)
-   X16	travel 1
-   X17	travel 2
-   ---
-   X20	air ready
-   --------
-   Y0		xx pulse	-> p-
-   Y4		xx dir	-> d-
-   Y3		xx on		-> xinje SI1
-   ---
-   Y1		yy pulse	-> p-
-   Y5		yy dir	-> d-
-   Y7		yy on		-> xinje SI1
-   ---
-   Y2	yy pulse	-> blue
-   Y6	yy dir	-> white
-   Y10	yy on	-> green
-   ---
-   Y11	extract drop
-   Y12	extract push
-   Y13	clamp
-   Y14	supply
-   Y15   error reset
+FX3U-64MT
 
 Xinje DS5C-20P7-PTA
    P0-00 Set to 0 to disable Modbus
@@ -95,12 +51,12 @@ FATEK SD3-200-C812
    No.147.0 = torque limit value 1: 0.0 to 300.0
    No.148.0 = toruqe limit value 2: 0.0 to 300.0
    ----- Wire
-   24V -> 1, 3, 28, 29                    -> red
-   0V ->	2, 12, 20(srdy-)                 -> black
-   servo on -> 4                          -> green
-   servo ready ->	19                      -> yellow
-   pulse -> 27                            -> blue
-   direction -> 31                        -> white
-   alarm reset          -> 5  -> tbd
-   torque limit select  -> 11 -> tbd
-   in torque limit      -> 17 -> tbd
+   24V -> 1, 3, 28, 29
+   0V ->	2, 12, 20(srdy-)
+   servo on -> 4
+   servo ready ->	19
+   pulse -> 27
+   direction -> 31
+   alarm reset          -> 5
+   torque limit select  -> 11
+   in torque limit      -> 17

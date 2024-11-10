@@ -1,3 +1,4 @@
+const { match } = require('node:assert');
 const fs = require('node:fs');
 
 function print(data) {
@@ -158,7 +159,7 @@ class Controller {
       let table = [];
       for (const [k, v] of Object.entries(this.tags)) {
          if (v.device_name == _device_name_) {
-            table.push({ name: v.name, device: `${v.device_name}${v.device_index}` });
+            table[v.name] = { device: `${v.device_name}${v.device_index}` };
          }
       }
       return table;
@@ -210,8 +211,7 @@ for (k of ['Run', 'AxisSpin', 'AxisTap', 'FoilExtract', 'FoilClamp', 'FoilSupply
 }
 const iterable = new Map([
    ['FoilExtractDrop', []],
-   ['FoilExtractPush', []],
-   ['FoilClamp', ['N', 'P']],
+   ['FoilClamp', ['P']],
    ['FoilSupply', []],
    ]);
 for (const [k, v] of iterable) {
@@ -240,11 +240,11 @@ for (k of ['FoilFull']) {
 plc.tag_add(`SpinArray`, new ARRAY(DINT, 8), D, Auto);
 plc.tag_add(`SpinArrayIndex`, INT, D, Auto);
 for (k of ['Setting']) {
-   plc.tag_add(`${k}TapPitchI`, BOOL, X, Auto);
    plc.tag_add(`${k}TapPitch`, DINT, D, Auto);
+   plc.tag_add(`${k}TapPitchI`, BOOL, X, Auto);
+   plc.tag_add(`${k}FoilSupplyI`, BOOL, X, Auto);
    plc.tag_add(`${k}TapSpinSpeed1I`, BOOL, X, Auto);
    plc.tag_add(`${k}TapSpinSpeed2I`, BOOL, X, Auto);
-   plc.tag_add(`${k}FoilSupplyI`, BOOL, X, Auto);
    plc.tag_add(`${k}TapTravelLength1I`, BOOL, X, Auto);
    plc.tag_add(`${k}TapTravelLength2I`, BOOL, X, Auto);
    plc.tag_add(`${k}TapTravelBegin`, DINT, D, Auto);
@@ -274,10 +274,6 @@ for (k of ['XXOff']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
 }
-for (k of ['FoilExtractPush']) {
-   plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
-   plc.tag_add(`${k}TimerDelay`, INT, D, Auto);
-}
 for (k of ['Test']) {
    for (a of ['Spin']) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
@@ -286,12 +282,18 @@ for (k of ['Test']) {
    }
    for (a of ['IgnoreZZ']) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
+      plc.tag_add(`${k}${a}I`, BOOL, X, Auto);
    }
 }
 for (k of ['XX', 'YY', 'ZZ']) {
    plc.tag_add(`${k}InTorqueI`, BOOL, X, Auto);
    plc.tag_add(`${k}InTorqueIEdge`, BOOL, M, Auto);
    plc.tag_add(`${k}OverTorque`, BOOL, M, Auto);
+}
+for (k of ['Alert']) {
+   plc.tag_add(`${k}`, BOOL, M, Auto);
+   plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
+   plc.tag_add(`${k}O`, BOOL, Y, Auto);
 }
 for (k of ['ErrorReset']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
@@ -302,17 +304,60 @@ for (k of ['Overload']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}I`, BOOL, X, Auto);
 }
-for (k of ['Alert']) {
-   plc.tag_add(`${k}`, BOOL, M, Auto);
-   plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
-   plc.tag_add(`${k}O`, BOOL, Y, Auto);
-}
 /////GENERATE
 
 if (plc.error == '') {
    plc.save();
-   console.table(plc.get_table(X));
-   console.table(plc.get_table(Y));
+   //
+   var input = plc.get_table(X);
+   input.XXReadyI.xinje1 = 'SO1';
+   input.XXMinI.xinje1 = 'SO2';
+   input.XXInTorqueI.xinje1 = 'SO3';
+   //
+   input.YYReadyI.xinje2 = 'SO1';
+   input.YYInTorqueI.xinje2 = 'SO3';
+   //
+   input.YYMinI.sensor = 'NPN';
+   input.FoilClampPI.sensor = 'NPN';
+   input.FoilFullI.sensor = 'NPN';
+   input.OverloadI.sensor = 'N/A';
+   input.AirReadyI.sensor = 'NPN';
+   input.TestIgnoreZZI.sensor = 'N/A';
+   //
+   input.ZZReadyI.fatek = 'CN1-19';
+   input.ZZInTorqueI.fatek = 'CN1-17';
+   //
+   input.RunI.panel = 'NO';
+   input.RunStopI.panel = 'NC';
+   input.SettingTapPitchI.panel = "NO";
+   input.SettingTapSpinSpeed1I.panel = "NO";
+   input.SettingTapSpinSpeed2I.panel = "NO";
+   input.SettingFoilSupplyI.panel = "NO";
+   input.SettingTapTravelLength1I.panel = "NO";
+   input.SettingTapTravelLength2I.panel = "NO";
+   var output = plc.get_table(Y);
+   output.XXPulseO.xinje1 = 'P-';
+   output.XXDirectionO.xinje1 = 'D-';
+   output.XXOnO.xinje1 = 'SI1';
+   output.ErrorResetO.xinje1 = 'SI2';
+   //
+   output.YYPulseO.xinje2 = 'P-';
+   output.YYDirectionO.xinje2 = 'D-';
+   output.YYOnO.xinje2 = 'SI1';
+   output.ErrorResetO.xinje2 = 'SI2';
+   //
+   output.ZZPulseO.fatek = 'CN1-27';
+   output.ZZDirectionO.fatek = 'CN1-31,11';
+   output.ZZOnO.fatek = 'CN1-4';
+   output.ErrorResetO.fatek = 'CN1-5';
+   //
+   output.FoilExtractDropO.relay = 'NO';
+   output.FoilClampO.relay = 'NO';
+   output.FoilSupplyO.relay = 'NO';
+   output.AlertO.relay = 'NO';
+   //
+   console.table(input);
+   console.table(output);
 } else {
    print(plc.error);
 }
