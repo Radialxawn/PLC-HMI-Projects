@@ -61,9 +61,9 @@ class Controller {
             break;
       }
       if (is_plc) {
-         this.path = `${__dirname}\\${project_name}.tags.PLC.csv`;
+         this.path = `${__dirname}\\${project_name}.tag.PLC.csv`;
       } else {
-         this.path = `${__dirname}\\${project_name}.tags.HMI.csv`;
+         this.path = `${__dirname}\\${project_name}.tag.HMI.csv`;
       }
    }
 
@@ -165,13 +165,12 @@ class Controller {
    }
 }
 
-const plc = new Controller('FX3U');
+const plc = new Controller(ControllerType.FX3U);
 
 /////GENERATE
 function plc_generate_axis(_name_) {
    let lb = function (n) { return `${_name_}${n}`; }
    let xyz = function (x, y, z) { return _name_ == XAxis ? x : _name_ == YAxis ? y : z; }
-   let xyz_name = function (x, y, z) { return _name_ == XAxis ? x : _name_ == YAxis ? y : z; }
    plc.tag_add(lb('LimitN'), BOOL, M, xyz(8344, 8354, 8364));
    plc.tag_add(lb('LimitP'), BOOL, M, xyz(8343, 8353, 8363));
    plc.tag_add(lb('Busy'), BOOL, M, xyz(8340, 8350, 8360));
@@ -182,81 +181,79 @@ function plc_generate_axis(_name_) {
    plc.tag_add(lb('PosView'), DINT, D, Auto);
    plc.tag_add(lb('TarPos'), DINT, D, Auto);
    plc.tag_add(lb('Feed'), DINT, D, Auto);
-   plc.tag_add(lb(xyz_name('PPR', 'PPM', 'PPR')), DINT, D, Auto);
    plc.tag_add(lb('TarR'), BOOL, M, Auto);
-   plc.tag_add(lb('TarRSkip'), INT, D, Auto, false);
-   plc.tag_add(lb('On'), BOOL, M, xyz(Auto, Auto, NoUse));
+   plc.tag_add(lb('TarRSkip'), INT, D, Auto);
+   plc.tag_add(lb('On'), BOOL, M, Auto);
    plc.tag_add(lb('Run'), BOOL, M, Auto);
    plc.tag_add(lb('Direction'), BOOL, M, Auto);
+   //plc.tag_add(lb('OverTorque'), BOOL, M, Auto);
+   //Input
    plc.tag_add(lb('MinI'), BOOL, X, xyz(0, 1, NoUse));
    plc.tag_add(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse));
-   plc.tag_add(lb('Ready'), BOOL, M, xyz(Auto, Auto, NoUse));
-   plc.tag_add(lb('ReadyI'), BOOL, X, xyz(4, 5, 6));
-   plc.tag_add(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
-   plc.tag_add(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
-   plc.tag_add(lb('OnO'), BOOL, Y, xyz(3, 7, 10));
+   plc.tag_add(lb('ReadyI'), BOOL, X, xyz(4, 5, NoUse));
+   plc.tag_add(lb('InTorqueI'), BOOL, X, xyz(2, 3, NoUse));
+   plc.tag_add(lb('InTorqueIEdge'), BOOL, M, Auto);
+   //Output
+   plc.tag_add(lb('PulseO'), BOOL, Y, xyz(0, 1, NoUse));
+   plc.tag_add(lb('DirectionO'), BOOL, Y, xyz(4, 5, NoUse));
+   plc.tag_add(lb('OnO'), BOOL, Y, xyz(2, 3, NoUse));
 }
 
 plc_generate_axis(XAxis);
 plc_generate_axis(YAxis);
-plc_generate_axis(ZAxis);
 for (k of ['Run', 'RunStop']) {
-   plc.tag_add(`${k}`, BOOL, M, Auto);
-   plc.tag_add(`${k}I`, BOOL, X, Auto);
+   plc.tag_add(`${k}`, BOOL, M, Auto).sync = true;
+   plc.tag_add(`${k}I`, BOOL, X, Auto).sync = true;
 }
 for (k of ['Run', 'AxisSpin', 'AxisTap', 'FoilExtract', 'FoilClamp', 'FoilSupply']) {
-   plc.tag_add(`${k}State`, INT, D, Auto);
-   plc.tag_add(`${k}StateNext`, BOOL, M, Auto);
+   plc.tag_add(`${k}State`, INT, D, Auto).sync = true;
+   plc.tag_add(`${k}StateNext`, BOOL, M, Auto).sync = true;
 }
-const iterable = new Map([
-   ['FoilExtractDrop', []],
-   ['FoilExtractPush', []],
-   ['FoilClamp', ['N', 'P']],
-   ['FoilSupply', []],
-   ]);
-for (const [k, v] of iterable) {
+for (k of ['FoilClamp', 'FoilSupply']) {
    for (a of ['N', 'P']) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
       plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
       plc.tag_add(`${k}${a}TimerDelay`, INT, D, Auto);
    }
-   for (a of v) {
-      plc.tag_add(`${k}${a}I`, BOOL, X, Auto);
+   for (a of ['P']) {
+      if (k == 'FoilClamp') {
+         plc.tag_add(`${k}${a}I`, BOOL, X, Auto);
+      }
    }
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}O`, BOOL, Y, Auto);
 }
+for (k of ['Overload']) {
+   plc.tag_add(`${k}`, BOOL, M, Auto);
+   plc.tag_add(`${k}I`, BOOL, X, Auto);
+}
 for (k of ['WorkFeed']) {
    plc.tag_add(`${k}Spin`, DINT, D, Auto);
-   plc.tag_add(`${k}TapTravelFast`, DINT, D, Auto);
-   plc.tag_add(`${k}TapSpinDown`, DINT, D, Auto);
-   plc.tag_add(`${k}TapSpinUp`, DINT, D, Auto);
+   plc.tag_add(`${k}TapDown`, DINT, D, Auto);
+   plc.tag_add(`${k}TapUp`, DINT, D, Auto);
 }
 for (k of ['FoilFull']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}I`, BOOL, X, Auto);
    plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
 }
-plc.tag_add(`SpinArray`, new ARRAY(DINT, 8), D, Auto);
+plc.tag_add(`SpinArray`, new ARRAY(DINT, 6), D, Auto);
 plc.tag_add(`SpinArrayIndex`, INT, D, Auto);
+for (k of ['SpinTest']) {
+   plc.tag_add(`${k}`, BOOL, M, Auto);
+   plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
+   plc.tag_add(`${k}TimerDelay`, INT, D, Auto);
+}
 for (k of ['Setting']) {
-   plc.tag_add(`${k}TapPitchI`, BOOL, X, Auto);
-   plc.tag_add(`${k}TapPitch`, DINT, D, Auto);
-   plc.tag_add(`${k}TapSpinSpeed1I`, BOOL, X, Auto);
-   plc.tag_add(`${k}TapSpinSpeed2I`, BOOL, X, Auto);
+   plc.tag_add(`${k}TapBegin`, DINT, D, Auto);
    plc.tag_add(`${k}FoilSupplyI`, BOOL, X, Auto);
-   plc.tag_add(`${k}TapTravelLength1I`, BOOL, X, Auto);
-   plc.tag_add(`${k}TapTravelLength2I`, BOOL, X, Auto);
-   plc.tag_add(`${k}TapTravelBegin`, DINT, D, Auto);
-   plc.tag_add(`${k}TapTravelBeginOffset`, DINT, D, Auto);
-   plc.tag_add(`${k}TapTravelFast`, DINT, D, Auto);
-   plc.tag_add(`${k}TapTravelEnd`, DINT, D, Auto);
+   plc.tag_add(`${k}TapSpeed1I`, BOOL, X, Auto);
+   plc.tag_add(`${k}TapSpeed2I`, BOOL, X, Auto);
 }
 for (k of ['Air']) {
    plc.tag_add(`${k}Ready`, BOOL, M, Auto);
    plc.tag_add(`${k}ReadyI`, BOOL, X, Auto);
 }
-plc.tag_add(`TapMoveToTravelBegin`, BOOL, M, Auto);
 plc.tag_add(`TapCount`, DINT, D, Auto);
 plc.tag_add(`TapCountAtSupplyEnd`, DINT, D, Auto);
 for (k of ['Stop']) {
@@ -274,33 +271,10 @@ for (k of ['XXOff']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
 }
-for (k of ['FoilExtractPush']) {
-   plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
-   plc.tag_add(`${k}TimerDelay`, INT, D, Auto);
-}
-for (k of ['Test']) {
-   for (a of ['Spin']) {
-      plc.tag_add(`${k}${a}`, BOOL, M, Auto);
-      plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
-      plc.tag_add(`${k}${a}TimerDelay`, INT, D, Auto);
-   }
-   for (a of ['IgnoreZZ']) {
-      plc.tag_add(`${k}${a}`, BOOL, M, Auto);
-   }
-}
-for (k of ['XX', 'YY', 'ZZ']) {
-   plc.tag_add(`${k}InTorqueI`, BOOL, X, Auto);
-   plc.tag_add(`${k}InTorqueIEdge`, BOOL, M, Auto);
-   plc.tag_add(`${k}OverTorque`, BOOL, M, Auto);
-}
 for (k of ['ErrorReset']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
    plc.tag_add(`${k}O`, BOOL, Y, Auto);
-}
-for (k of ['Overload']) {
-   plc.tag_add(`${k}`, BOOL, M, Auto);
-   plc.tag_add(`${k}I`, BOOL, X, Auto);
 }
 for (k of ['Alert']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);

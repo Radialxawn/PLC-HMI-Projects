@@ -62,9 +62,9 @@ class Controller {
             break;
       }
       if (is_plc) {
-         this.path = `${__dirname}\\${project_name}.tags.PLC.csv`;
+         this.path = `${__dirname}\\${project_name}.tag.PLC.csv`;
       } else {
-         this.path = `${__dirname}\\${project_name}.tags.HMI.csv`;
+         this.path = `${__dirname}\\${project_name}.tag.HMI.csv`;
       }
    }
 
