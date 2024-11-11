@@ -274,6 +274,11 @@ for (k of ['XXOff']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
 }
+for (k of ['XX', 'YY', 'ZZ']) {
+   plc.tag_add(`${k}InTorqueI`, BOOL, X, Auto);
+   plc.tag_add(`${k}InTorqueIEdge`, BOOL, M, Auto);
+   plc.tag_add(`${k}OverTorque`, BOOL, M, Auto);
+}
 for (k of ['Test']) {
    for (a of ['Spin']) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
@@ -284,11 +289,6 @@ for (k of ['Test']) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
       plc.tag_add(`${k}${a}I`, BOOL, X, Auto);
    }
-}
-for (k of ['XX', 'YY', 'ZZ']) {
-   plc.tag_add(`${k}InTorqueI`, BOOL, X, Auto);
-   plc.tag_add(`${k}InTorqueIEdge`, BOOL, M, Auto);
-   plc.tag_add(`${k}OverTorque`, BOOL, M, Auto);
 }
 for (k of ['Alert']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
