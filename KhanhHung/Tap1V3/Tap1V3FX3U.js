@@ -267,8 +267,7 @@ for (k of ['Stop']) {
    plc.tag_add(`${k}ClampTimer`, BOOL, TC, Auto);
 }
 for (k of ['FoilSupply']) {
-   plc.tag_add(`${k}PTimeoutTimer`, BOOL, TC, Auto);
-   plc.tag_add(`${k}PTimeoutTimerDelay`, INT, D, Auto);
+   plc.tag_add(`${k}Type`, INT, D, Auto);
 }
 for (k of ['XXOff']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
