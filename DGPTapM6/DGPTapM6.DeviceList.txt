@@ -1,26 +1,6 @@
 FX3G-32MT
-	X0 	xx min
-	X2	xx max
-	X4 	xx ready	-> servo SO3
-	X1	yy min
-	X3	yy max
-	X5	yy ready	-> servo SO3
-	X6 	run
-	X7 	run stop
-	X10 	top p
-	X11	bot p
-	X12	overload
-	--------
-	Y0	xx pulse
-	Y4	xx dir
-	Y2	xx on		-> servo SI1
-	Y1	yy pulse
-	Y5	yy dir
-	Y3	yy on		-> servo SI1
-	Y6	top
-	Y7	bot
-	Y10	air burst
-DS5C-20P7-PTA
+	
+Xinje DS5C
 	P0-00 Set to 0 to disable Modbus
 	P0-01 Control mode (6: Position external)
 	P0-03 Enable mode (0: Not enable, 1: I/O enable, 2: Software enable, F1-05 or software, 3: Fieldbus enable)
@@ -31,8 +11,8 @@ DS5C-20P7-PTA
 	P5-20 ~ P5-36 -> n.0ABC -> B (0: NO, 1: NC), C (Input terminal no.)
 		P5-20 = n.0001 -> SI1 terminal NO control servo enable
 	P5-37 ~ P5-53 -> n.0ABC ->  B (0: NO, 1: NC), C (Ouput terminal no.)
-		P5-70 Ready type (0: valid if no alarm, 1: valid if enable and no alarm)
-		P5-41 = n.0003 -> SO3 terminal NO signal servo ready
+		P5-41 = n.0001 -> SO1 terminal NO signal servo ready
+			P5-70 Ready type (0: valid if no alarm, 1: valid if enable and no alarm)
 		
 
 
