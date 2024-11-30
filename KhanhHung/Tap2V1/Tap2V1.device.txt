@@ -1,34 +1,4 @@
 FX3U-32MT
-	X0 	xx min			-> xinje SO2
-	X4 	xx ready			-> xinje SO1
-	X2		xx in torque	-> xinje SO3
-	X1		yy min
-	X5		yy ready			-> hcfa Ready
-	X3		yy in torque	-> hfca In torque limit
-	X2 	run
-	X3 	run stop
-
-	X6		clamp p
-	X7		overload
-	X10	foil full
-
-	X11	foil supply
-	X12	speed 1
-	X13	speed 2
-
-	X14	air ready
-	--------
-	Y0	xx pulse
-	Y4	xx dir
-	Y2	xx on		-> xinje SI1
-	Y1	yy pulse
-	Y5	yy dir
-	Y3	yy on		-> hcfa Enable
-
-	Y6	push
-	Y7	clamp
-	Y10 supply
-	Y11 error reset
 
 Xinje DS5C-20P7-PTA
 	P0-00 Set to 0 to disable Modbus
@@ -57,6 +27,9 @@ Xinje DS5C-20P7-PTA
 	P3-29	Internal reverse torque limit 0% to 300%
 
 HCFA SV-X3EA150A-A2
+	P00-00 direction = 0
+	P00-07 pulse form = dir pulse positive
+	P00-08 ppr = 1000
 	3, 28, 29 -> COM+, Pulse+, Direction+ <- red
 	12 -> COM- <- black
 	27 -> Pulse- <- yellow
