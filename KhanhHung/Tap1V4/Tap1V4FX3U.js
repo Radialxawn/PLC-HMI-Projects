@@ -260,6 +260,7 @@ for (k of ['Setting']) {
 plc.tag_add(`TapMoveToTravelBegin`, BOOL, M, Auto);
 plc.tag_add(`TapCount`, DINT, D, Auto);
 plc.tag_add(`TapCountAtSupplyEnd`, DINT, D, Auto);
+plc.tag_add(`TapCountResetOrigin`, DINT, D, Auto);
 for (k of ['Stop']) {
    plc.tag_add(`${k}Tap`, BOOL, M, Auto);
    plc.tag_add(`${k}TapTimer`, BOOL, TC, Auto);

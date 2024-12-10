@@ -60,3 +60,16 @@ FATEK SD3-200-C812
    alarm reset          -> 5
    torque limit select  -> 11
    in torque limit      -> 17
+
+Wire length:
+   Axis X: power 2.4m, signal 0.6m (10 cores)
+   Axis Y: power 1.2m, signal 0.6m (10 cores)
+   Axis Z: power 1.2m, signal 0.6m (10 cores)
+   Input panel: 0.9m (10 cores)
+   Input sensor: 1.8m (6 cores)
+   Output pneumatic: 0.9m (4 cores)
+
+SDVC20-S CUH
+   GND -> 12
+   Switch 1 -> 10
+   Switch 2 -> 14

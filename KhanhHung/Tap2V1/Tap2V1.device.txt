@@ -43,3 +43,9 @@ HCFA SV-X3EA150A-A2
 	P03.09 internal forward torque limit (value * 0.1%)
 	P03.10 internal reverse torque limit (value * 0.1%)
 
+Wire length:
+   Axis Y: power 1.2m, signal 0.6m (10 cores)
+   Axis Z: power 1.2m, signal 0.6m (10 cores)
+   Input panel: 0.9m (10 cores)
+   Input sensor: 1.8m (6 cores)
+   Output pneumatic: 0.9m (4 cores)
