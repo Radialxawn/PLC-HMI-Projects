@@ -189,7 +189,7 @@ function plc_generate_axis(_name_) {
    plc.tag_add(lb('On'), BOOL, M, xyz(Auto, Auto, NoUse));
    plc.tag_add(lb('Run'), BOOL, M, Auto);
    plc.tag_add(lb('Direction'), BOOL, M, Auto);
-   plc.tag_add(lb('MinI'), BOOL, X, xyz(NoUse, NoUse, NoUse));
+   plc.tag_add(lb('MinI'), BOOL, X, xyz(0, NoUse, NoUse));
    plc.tag_add(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse));
    plc.tag_add(lb('Ready'), BOOL, M, xyz(Auto, Auto, NoUse));
    plc.tag_add(lb('ReadyI'), BOOL, X, xyz(4, 5, 6));
@@ -201,17 +201,18 @@ function plc_generate_axis(_name_) {
    plc.tag_add(lb('OverTorque'), BOOL, M, Auto);
 }
 
+plc_generate_axis(XAxis);
 plc_generate_axis(YAxis);
 plc_generate_axis(ZAxis);
-for (k of ['Run', 'AxisTap', 'FoilExtract', 'FoilClamp', 'FoilSupply']) {
+for (k of ['Run', 'AxisSpin', 'AxisTap', 'FoilExtract', 'FoilClamp', 'FoilSupply']) {
    plc.tag_add(`${k}State`, INT, D, Auto);
    plc.tag_add(`${k}StateNext`, BOOL, M, Auto);
 }
 const blocks = [
-      ['FoilExtractDrop', ['N', 'P'], []],
-      ['FoilClamp', ['N', 'P'], ['P']],
-      ['FoilSupply', [], []],
-   ];
+   ['FoilExtractDrop', ['N', 'P'], []],
+   ['FoilClamp', ['N', 'P'], ['P']],
+   ['FoilSupply', [], []],
+];
 for (const block of blocks) {
    var k = block[0];
    var s = block[1];
@@ -230,14 +231,16 @@ for (const block of blocks) {
 for (k of ['WorkFeed']) {
    plc.tag_add(`${k}Spin`, DINT, D, Auto);
    plc.tag_add(`${k}TapTravelFast`, DINT, D, Auto);
-   plc.tag_add(`${k}TapSpinForward`, DINT, D, Auto);
-   plc.tag_add(`${k}TapSpinBack`, DINT, D, Auto);
+   plc.tag_add(`${k}TapSpinDown`, DINT, D, Auto);
+   plc.tag_add(`${k}TapSpinUp`, DINT, D, Auto);
 }
 for (k of ['FoilFull']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}I`, BOOL, X, Auto);
    plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
 }
+plc.tag_add(`SpinArray`, new ARRAY(DINT, 8), D, Auto);
+plc.tag_add(`SpinArrayIndex`, INT, D, Auto);
 for (k of ['AirReady', 'Run', 'RunStop']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}I`, BOOL, X, Auto);
@@ -247,19 +250,27 @@ for (k of ['Setting']) {
    plc.tag_add(`${k}TapPitchI`, BOOL, X, Auto);
    plc.tag_add(`${k}FoilSupplyI`, BOOL, X, Auto);
    plc.tag_add(`${k}TapSpinSpeedI`, BOOL, X, Auto);
+   plc.tag_add(`${k}TapTravelLengthIObsolete`, BOOL, X, Auto);
    plc.tag_add(`${k}TapTravelBegin`, DINT, D, Auto);
+   plc.tag_add(`${k}TapTravelBeginOffset`, DINT, D, Auto);
+   plc.tag_add(`${k}TapTravelFast`, DINT, D, Auto);
    plc.tag_add(`${k}TapTravelEnd`, DINT, D, Auto);
 }
 
 plc.tag_add(`TapMoveToTravelBegin`, BOOL, M, Auto);
 plc.tag_add(`TapCount`, DINT, D, Auto);
 plc.tag_add(`TapCountAtSupplyEnd`, DINT, D, Auto);
+plc.tag_add(`TapCountResetOrigin`, DINT, D, Auto);
 for (k of ['Stop']) {
    plc.tag_add(`${k}Tap`, BOOL, M, Auto);
    plc.tag_add(`${k}TapTimer`, BOOL, TC, Auto);
    plc.tag_add(`${k}Clamp`, BOOL, M, Auto);
    plc.tag_add(`${k}ClampPLS`, BOOL, M, Auto);
    plc.tag_add(`${k}ClampTimer`, BOOL, TC, Auto);
+}
+for (k of ['XXOff']) {
+   plc.tag_add(`${k}`, BOOL, M, Auto);
+   plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
 }
 for (k of ['Alert']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
@@ -280,6 +291,10 @@ if (plc.error == '') {
    plc.save();
    //
    var input = plc.get_table(X);
+   input.XXReadyI.xinje1 = 'SO1';
+   input.XXMinI.xinje1 = 'SO2';
+   input.XXInTorqueI.xinje1 = 'SO3';
+   //
    input.YYReadyI.xinje2 = 'SO1';
    input.YYInTorqueI.xinje2 = 'SO3';
    //
@@ -288,41 +303,35 @@ if (plc.error == '') {
    input.FoilFullI.sensor = 'NPN';
    //
    input.ZZReadyI.fatek = 'CN1-19';
-   input.ZZReadyI.hcfa = 'CN1-14';
    input.ZZInTorqueI.fatek = 'CN1-17';
-   input.ZZInTorqueI.hcfa = 'CN1-17';
    //
    input.RunI.panel = 'NO';
    input.RunStopI.panel = 'NC';
    input.SettingTapPitchI.panel = "NO";
    input.SettingTapSpinSpeedI.panel = "NO";
    input.SettingFoilSupplyI.panel = "NO";
+   input.SettingTapTravelLengthIObsolete.panel = "NO";
    var output = plc.get_table(Y);
+   output.XXPulseO.xinje1 = 'P-';
+   output.XXDirectionO.xinje1 = 'D-';
+   output.XXOnO.xinje1 = 'SI1';
+   output.ErrorResetO.xinje1 = 'SI2';
+   //
    output.YYPulseO.xinje2 = 'P-';
    output.YYDirectionO.xinje2 = 'D-';
    output.YYOnO.xinje2 = 'SI1';
    output.ErrorResetO.xinje2 = 'SI2';
    //
    output.ZZPulseO.fatek = 'CN1-27';
-   output.ZZPulseO.hcfa = 'CN1-27';
    output.ZZDirectionO.fatek = 'CN1-31,11';
-   output.ZZDirectionO.hcfa = 'CN1-31';
    output.ZZOnO.fatek = 'CN1-4';
-   output.ZZOnO.hcfa = 'CN1-4';
    output.ErrorResetO.fatek = 'CN1-5';
-   output.ErrorResetO.hcfa = 'CN1-8';
    //
    output.FoilExtractDropO.relay = 'NO';
    output.FoilClampO.relay = 'NO';
    output.FoilSupplyO.relay = 'NO';
    output.AlertO.relay = 'NO';
    //
-   for (const [k, v] of Object.entries(input)) {
-      delete v.fatek;
-   }
-   for (const [k, v] of Object.entries(output)) {
-      delete v.fatek;
-   }
    console.table(input);
    console.table(output);
 } else {
