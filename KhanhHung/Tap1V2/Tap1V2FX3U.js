@@ -308,6 +308,11 @@ for (k of ['Alert']) {
    plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
    plc.tag_add(`${k}O`, BOOL, Y, Auto);
 }
+for (k of ['AirBurst']) {
+   plc.tag_add(`${k}`, BOOL, M, Auto);
+   plc.tag_add(`${k}Timer`, BOOL, TC, Auto);
+   plc.tag_add(`${k}O`, BOOL, Y, Auto);
+}
 /////GENERATE
 
 if (plc.error == '') {

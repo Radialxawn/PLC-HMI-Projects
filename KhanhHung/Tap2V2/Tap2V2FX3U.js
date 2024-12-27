@@ -285,6 +285,9 @@ for (k of ['ErrorReset']) {
 for (k of ['Overload']) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
 }
+for (k of ['Setting']) {
+   plc.tag_add(`${k}TapPitchO`, BOOL, Y, Auto);
+}
 /////GENERATE
 
 if (plc.error == '') {
@@ -332,8 +335,11 @@ if (plc.error == '') {
    output.FoilSupplyO.relay = 'NO';
    output.AlertO.relay = 'NO';
    //
+   output.SettingTapPitchO.panel = 'NO';
+   //
    console.table(input);
    console.table(output);
+   print(`Input used: ${Object.keys(input).length}, Output used: ${Object.keys(output).length}`);
 } else {
    print(plc.error);
 }

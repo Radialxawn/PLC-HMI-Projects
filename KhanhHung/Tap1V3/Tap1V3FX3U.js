@@ -301,8 +301,13 @@ for (k of ['ErrorReset']) {
    plc.tag_add(`${k}O`, BOOL, Y, Auto);
 }
 for (k of ['Overload']) {
+   plc.tag_add(`${k}Timer`, BOOL, TC, 256);
+   plc.tag_add(`${k}TimerEN`, BOOL, M, Auto);
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}I`, BOOL, X, Auto);
+}
+for (k of ['Setting']) {
+   plc.tag_add(`${k}TapPitchO`, BOOL, Y, Auto);
 }
 /////GENERATE
 
@@ -355,6 +360,8 @@ if (plc.error == '') {
    output.FoilClampO.relay = 'NO';
    output.FoilSupplyO.relay = 'NO';
    output.AlertO.relay = 'NO';
+   //
+   output.SettingTapPitchO.panel = 'NO';
    //
    console.table(input);
    console.table(output);

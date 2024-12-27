@@ -192,7 +192,7 @@ function plc_generate_axis(_name_) {
    plc.tag_add(lb('MinI'), BOOL, X, xyz(NoUse, NoUse, NoUse));
    plc.tag_add(lb('MaxI'), BOOL, X, xyz(NoUse, NoUse, NoUse));
    plc.tag_add(lb('Ready'), BOOL, M, xyz(Auto, Auto, Auto));
-   plc.tag_add(lb('ReadyI'), BOOL, X, xyz(10, 11, 12));
+   plc.tag_add(lb('ReadyI'), BOOL, X, xyz(4, 5, 6));
    plc.tag_add(lb('PulseO'), BOOL, Y, xyz(0, 1, 2));
    plc.tag_add(lb('DirectionO'), BOOL, Y, xyz(4, 5, 6));
    plc.tag_add(lb('OnO'), BOOL, Y, xyz(10, 11, 12));
