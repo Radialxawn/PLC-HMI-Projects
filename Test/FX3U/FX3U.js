@@ -205,6 +205,7 @@ for (k of ['AxisX', 'AxisY', 'AxisZ']) {
    plc.tag_add(`${k}State`, INT, D, Auto);
    plc.tag_add(`${k}StateNext`, BOOL, M, Auto);
 }
+plc.tag_add('AutoI', BOOL, X, 17);
 /////GENERATE
 
 if (plc.error == '') {

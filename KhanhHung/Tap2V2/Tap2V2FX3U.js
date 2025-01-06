@@ -283,10 +283,16 @@ for (k of ['ErrorReset']) {
    plc.tag_add(`${k}O`, BOOL, Y, Auto);
 }
 for (k of ['Overload']) {
+   plc.tag_add(`${k}Timer`, BOOL, TC, 256);
+   plc.tag_add(`${k}TimerEN`, BOOL, M, Auto);
    plc.tag_add(`${k}`, BOOL, M, Auto);
 }
 for (k of ['Setting']) {
-   plc.tag_add(`${k}TapPitchO`, BOOL, Y, Auto);
+   plc.tag_add(`${k}TapPitchBoolCounter1000`, INT, D, Auto);
+   plc.tag_add(`${k}TapPitchBoolCounter1270`, INT, D, Auto);
+   plc.tag_add(`${k}TapPitchBool`, BOOL, M, Auto);
+   plc.tag_add(`${k}TapPitchBoolO`, BOOL, Y, Auto);
+   plc.tag_add(`${k}TapPitchDone`, BOOL, M, Auto);
 }
 /////GENERATE
 
@@ -335,7 +341,7 @@ if (plc.error == '') {
    output.FoilSupplyO.relay = 'NO';
    output.AlertO.relay = 'NO';
    //
-   output.SettingTapPitchO.panel = 'NO';
+   output.SettingTapPitchBoolO.panel = 'NO';
    //
    console.table(input);
    console.table(output);
