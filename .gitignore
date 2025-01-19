@@ -1,4 +1,5 @@
 **/*.bak[0-9]*
+**/*.backup
 **/*.xob*
 **/[Bb]ackup*
 __pycache__/
@@ -6,3 +7,5 @@ __pycache__/
 **/*.bak
 **/*.opt
 **/*.xml
+**/*.bootinfo**
+**/*.compileinfo
