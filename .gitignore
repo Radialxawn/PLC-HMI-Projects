@@ -1,6 +1,7 @@
 **/*.bak[0-9]*
 **/*.backup
 **/*.xob*
+**/*.exob*
 **/[Bb]ackup*
 __pycache__/
 **/*autosave.kra
