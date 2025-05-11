@@ -11,13 +11,13 @@
 *GUI(1)*Usb1Dir:D:\Github\PLC-HMI-Projects\VietTrungTapM8\LT2070E\temp\disk\usb1\
 *GUI(1)*Usb2Dir:C:\Program Files (x86)\LS\LT Studio 1.2 2.x\Bin\
 *GUI(1)*MemFs:D:\Github\PLC-HMI-Projects\VietTrungTapM8\LT2070E\temp\ramdisk\
-*GUI(1)*RunMode:TruePlc
+*GUI(1)*RunMode:SimPlc
 *GUI(1)*Debug:N
 *GUI(1)*SysFontDir:C:\Program Files (x86)\LS\LT Studio 1.2 2.x\Lib\Fonts\
 *GUI(1)*MapPort:1234
 *GUI(1)*SimRamSize:128
 *GUI(1)*SimExitTime:14400
-*GUI(1)*ProjectCheckSum(0x276deb2, 0x276c7d7)
+*GUI(1)*ProjectCheckSum(0x276c7d7, 0x276de9a)
 *GUI(1)*ClientMonit::Pid(0)
 *GUI(1)*LightSave 0 BackLight 10 LightPercent 3
 *GUI(1)*DoLoadTtfFile::Pid(0)

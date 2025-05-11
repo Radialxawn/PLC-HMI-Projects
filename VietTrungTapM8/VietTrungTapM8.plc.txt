@@ -31,4 +31,5 @@
 	_ViewAirBurst AT %MX1.2: BOOL;
 	_ViewCycleTime AT %MD16: UDINT;
 	_ViewOverload AT %MX1.3: BOOL;
-	_ViewWorkReady AT %MX1.4: BOOL;
+	_ViewReady AT %MX1.4: BOOL;
+	_ViewCanChangeMode AT %MX1.5: BOOL;

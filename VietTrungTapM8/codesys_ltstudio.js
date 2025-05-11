@@ -217,7 +217,8 @@ for (var k of ['View']) {
    tag_add(`${k}AirBurst`, M, BOOL, Auto);
    tag_add(`${k}CycleTime`, M, UDINT, Auto);
    tag_add(`${k}Overload`, M, BOOL, Auto);
-   tag_add(`${k}WorkReady`, M, BOOL, Auto);
+   tag_add(`${k}Ready`, M, BOOL, Auto);
+   tag_add(`${k}CanChangeMode`, M, BOOL, Auto);
 }
 /////GENERATE
 
