@@ -181,6 +181,11 @@ tag_add('Off', M, BOOL, Auto);
 tag_add('Home', M, BOOL, Auto);
 tag_add('SettingApply', M, BOOL, Auto);
 tag_add('OverloadResolved', M, BOOL, Auto);
+for (var k of ['Jog']) {
+   tag_add(`${k}N`, M, BOOL, Auto);
+   tag_add(`${k}P`, M, BOOL, Auto);
+   tag_add(`${k}MicronPerSec`, M, UINT, Auto);
+}
 //setting
 tag_add(`HomeTorque`, M, UDINT, Auto);
 tag_add(`AccelRpm`, M, UINT, Auto);
@@ -219,6 +224,10 @@ for (var k of ['View']) {
    tag_add(`${k}Overload`, M, BOOL, Auto);
    tag_add(`${k}Ready`, M, BOOL, Auto);
    tag_add(`${k}CanChangeMode`, M, BOOL, Auto);
+   tag_add(`${k}LinearPositionMax`, M, UDINT, Auto);
+   tag_add(`${k}Auto`, M, BOOL, Auto);
+   tag_add(`${k}RotaryTorqueMaxN`, M, DINT, Auto);
+   tag_add(`${k}RotaryTorqueMaxP`, M, DINT, Auto);
 }
 /////GENERATE
 
