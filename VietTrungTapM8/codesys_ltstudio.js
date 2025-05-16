@@ -206,6 +206,12 @@ for (var k of ['FoilExtract']) {
       }
    }
 }
+for (var k of ['FoilClamp']) {
+   tag_add(`${k}`, M, BOOL, Auto);
+   for (var a of ['N', 'P']) {
+      tag_add(`${k}${a}Delay`, M, UINT, Auto);
+   }
+}
 for (var k of ['AirBurst']) {
    tag_add(`${k}`, M, BOOL, Auto);
    tag_add(`${k}Delay`, M, UINT, Auto);
@@ -226,8 +232,13 @@ for (var k of ['View']) {
    tag_add(`${k}CanChangeMode`, M, BOOL, Auto);
    tag_add(`${k}LinearPositionMax`, M, UDINT, Auto);
    tag_add(`${k}Auto`, M, BOOL, Auto);
+   tag_add(`${k}AutoActive`, M, BOOL, Auto);
    tag_add(`${k}RotaryTorqueMaxN`, M, DINT, Auto);
    tag_add(`${k}RotaryTorqueMaxP`, M, DINT, Auto);
+   tag_add(`${k}Air`, M, BOOL, Auto);
+   tag_add(`${k}StateMain`, M, UINT, Auto);
+   tag_add(`${k}StateWork`, M, UINT, Auto);
+   tag_add(`${k}StateGear`, M, UINT, Auto);
 }
 /////GENERATE
 
