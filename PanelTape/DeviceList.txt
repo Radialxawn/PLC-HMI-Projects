@@ -1,7 +1,17 @@
 Leadshine MC508
 HMI Weinview MT8071iP
 /////
-Servo
+Servo Delta ASDA-B2
+1500W
+-Parameter:
+	P1.00 = 2 (pulse + direction)
+	P1.01 = 1_00 (ccw direction_position mode)
+	P1.44 = 160, P1.45 = 1 -> 160000 ppr / (160 / 1) = 1000 ppr
+400W
+-Parameter:
+	P1.00 = 2 (pulse + direction)
+	P1.01 = 1_00 (ccw direction_position mode)
+	P1.44 = 160, P1.45 = 1 -> 160000 ppr / (160 / 1) = 1000 ppr
 /////
 VFD INVT GD20
 -Wire:
@@ -14,7 +24,7 @@ VFD INVT GD20
 	P14.03 = 5 (retry count)
 	P14.04 = 0.0
 	~
-	P00.00 = 1 (speed control mode: 0 = SVC0 small power, 1 = SVC1 high performance, [2] = SVPWM)
+	P00.00 = 2 (speed control mode: 0 = SVC0 small power, 1 = SVC1 high performance, [2] = SVPWM)
 		SVC mode require:
 			P02.01 = rated power (0.1 to 3000.0 kW)
 			P02.02 = rated frequency (0.01 to P00.03)
@@ -28,7 +38,20 @@ VFD INVT GD20
 	~
 	P00.11 = ? (accel time)
 	P00.12 = ? (decel time)
-
-
-
-	
+/////
+-Input
+	X4 -> tape roll tension high (NO)
+	X5 -> tape roll tension low (NO)
+	X6 -> foil in (NC)
+	X7 -> cut home (NC)
+	X10 -> foil out (NO)
+	X11 -> foil out conveyer stop (NO)
+-Output
+	Y0 -> tape servo pulse
+	Y1 -> N/A
+	Y2 -> cut servo pulse
+	Y3 -> cut servo direction
+	Y12 -> cut servo on
+	Y14 -> cylinder press 1
+	Y15 -> cylinder press 2
+	Y16 -> cut cylinder
