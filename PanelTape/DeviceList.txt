@@ -40,12 +40,14 @@ VFD INVT GD20
 	P00.12 = ? (decel time)
 /////
 -Input
+	X1 -> cut ready
 	X4 -> tape roll tension high (NO)
 	X5 -> tape roll tension low (NO)
-	X6 -> foil in (NC)
+	X6 -> foil cut in (NC)
 	X7 -> cut home (NC)
-	X10 -> foil out (NO)
+	X10 -> foil out (NC)
 	X11 -> foil out conveyer stop (NO)
+	X12 -> foil in (NO)
 -Output
 	Y0 -> tape servo pulse
 	Y1 -> N/A
