@@ -1,3 +1,0 @@
-PLC Mitsubishi FX1N-60MT
-HMI Weintek MT6070iH
-Servo Amplifier Mitsubishi MR-J3-20A
