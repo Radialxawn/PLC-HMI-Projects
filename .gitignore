@@ -11,3 +11,4 @@ __pycache__/
 **/*.bootinfo**
 **/*.compileinfo
 **/*.~u
+**/*.projectbackup
