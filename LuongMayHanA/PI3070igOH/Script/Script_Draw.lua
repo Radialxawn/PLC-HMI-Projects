@@ -1,6 +1,6 @@
 Script_Draw_limits = 11
 
-function curve_test()
+function draw_curve_test()
     local style = {
         color = 0x000000,
         linetype = 0,
