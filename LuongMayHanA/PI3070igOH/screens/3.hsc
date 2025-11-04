@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrInfo ScreenNo="3" ScreenType="" ScreenSize="0">
+<ScrInfo ScreenNo="5" ScreenType="" ScreenSize="0">
 	<PartInfo PartType="FunctionSwitch" PartName="FS_0" PartClassifyType="Switch" PartID="3_FS_0">
-		<General Desc="FS_0" Area="1 1 121 61" ScrSwitch="0" FuncFunc="3" ScreenNo="0" ScreenNo2="-1" PointPos="0 0" PopupScreenType="0" PopupCloseWithParent="0" OperateDataType="0" FigureFile="" BorderColor="0xf7e7ad 0" Pattern="0" FrnColor="0x0 0" BgColor="0x0 0" BmpIndex="102" LaStartPt="27 16" DelayTime="0" FunAllTerminal="0" EnableTryAddr="0" TextAlign="0" TextArea="65 28" Locking="0" />
+		<General Desc="FS_0" Area="1 1 121 61" ScrSwitch="0" FuncFunc="3" ScreenNo="1" ScreenNo2="-1" PointPos="0 0" PopupScreenType="0" PopupCloseWithParent="0" OperateDataType="0" FigureFile="" BorderColor="0xf7e7ad 0" Pattern="0" FrnColor="0x0 0" BgColor="0x0 0" BmpIndex="102" Align="3" LaStartPt="27 13" DelayTime="0" FunAllTerminal="0" EnableTryAddr="0" TextAlign="0" TextArea="65 28" Locking="0" />
 		<Extension TouchState="1" Buzzer="0" />
 		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
 		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
