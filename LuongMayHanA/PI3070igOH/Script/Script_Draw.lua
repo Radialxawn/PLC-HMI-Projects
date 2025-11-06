@@ -5,7 +5,8 @@ local draw_id = {
     size_y = "@W_1#Application.M.hmi.sv.max_micro[1]",
     p_count = "@W_1#Application.M.hmi.pf.p_count",
     p_x = "@W_1#Application.M.hmi.view_axis_micro[0]",
-    p_y = "@W_1#Application.M.hmi.view_axis_micro[1]"
+    p_y = "@W_1#Application.M.hmi.view_axis_micro[1]",
+    p_index = "@W_1#Application.M.hmi.pf_p_index"
 }
 
 local draw_id_px = {
@@ -1051,10 +1052,16 @@ function draw_pf()
         width = 1,
         visible = 1,
     }
-    local lineStyle = {
+    local pathStyle = {
         color = 0x00868b,
         linetype = 0,
         width = 1,
+        visible = 1,
+    }
+    local indexStyle = {
+        color = 0x0000ff,
+        linetype = 0,
+        width = 2,
         visible = 1,
     }
     local cursorStyle = {
@@ -1077,51 +1084,86 @@ function draw_pf()
     cus_curve.init(part, 1, 1)
     cus_curve.set_range(part, "x", 0, size.x)
     cus_curve.set_range(part, "y", 0, size.y)
-    cus_curve.set_line(part, 1, 10, axisStyle)
-    cus_curve.set_line(part, 2, 512, lineStyle)
-    cus_curve.set_line(part, 3, 10, cursorStyle)
+    cus_curve.set_line(part, 1, 5, axisStyle)
+    cus_curve.set_line(part, 2, 512, pathStyle)
+    cus_curve.set_line(part, 3, 9, indexStyle)
+    cus_curve.set_line(part, 5, 5, cursorStyle)
     cus_curve.draw_line(part, 1, axis)
     --
-    local line = {}
-    local line_valid_count = 0
-    local p_count = we_bas_getint(draw_id.p_count)
-    if p_count ~= nil and p_count >= 2 then
-        for i = 1, p_count do
-            local x = we_bas_getint(draw_id_px[i])
-            local y = we_bas_getint(draw_id_py[i])
-            if x ~= nil and y ~= nil then
-                table.insert(line, x * 1e-3)
-                table.insert(line, y * 1e-3)
-                line_valid_count = line_valid_count + 1
-            end
-        end
-        if line_valid_count >= 2 then
-            cus_curve.draw_line(part, 2, line)
-        end
-    end
-    --
-    local cursor = {0, 0, 0, 1, 1, 1, 1, 0, 0, 0}
-    local p_x = we_bas_getint(draw_id.p_x)
-    local p_y = we_bas_getint(draw_id.p_y)
-    if p_x ~= nil and p_y ~= nil then
-        local xo = size.x * 2
-        local yo = size.y * 2
-        p_x = p_x * 1e-3
-        p_y = p_y * 1e-3
-        cursor[1] = p_x
-        cursor[2] = p_y + yo
-        cursor[3] = p_x
-        cursor[4] = p_y - yo
-        cursor[5] = p_x - xo
-        cursor[6] = p_y - yo
-        cursor[7] = p_x - xo
-        cursor[8] = p_y
-        cursor[9] = p_x + xo
-        cursor[10] = p_y
-        cus_curve.draw_line(part, 3, cursor)
-    end
+    draw_pf_path(part)
+    draw_pf_index(part, size)
+    draw_pf_cursor(part, size)
     --
     cus_curve.refresh(part)
     draw_pf_in_progress = 0
     return true
+end
+
+function draw_pf_path(part)
+    local p_count = we_bas_getint(draw_id.p_count)
+    if p_count == nil or p_count < 2 then
+        return
+    end
+    local path = {}
+    local valid_count = 0
+    for i = 1, p_count do
+        local x = we_bas_getint(draw_id_px[i])
+        local y = we_bas_getint(draw_id_py[i])
+        if x ~= nil and y ~= nil then
+            table.insert(path, x * 1e-3)
+            table.insert(path, y * 1e-3)
+            valid_count = valid_count + 1
+        end
+    end
+    if valid_count >= 2 then
+        cus_curve.draw_line(part, 2, path)
+    end
+end
+
+function draw_pf_index(part, size)
+    local p_index = we_bas_getint(draw_id.p_index)
+    if p_index == nil then
+        return
+    end
+    local x = we_bas_getint(draw_id_px[p_index + 1])
+    local y = we_bas_getint(draw_id_py[p_index + 1])
+    if x == nil or y == nil then
+        return
+    end
+    x = x * 1e-3
+    y = y * 1e-3
+    local sx = size.x / 600
+    local sy = size.y / 400
+    local r = 4
+    local index = {}
+    for i = 0, 8 do
+        local rad = (math.pi * 2 * i) / 8
+        index[i * 2 + 1] = x + math.cos(rad) * r * sx
+        index[i * 2 + 2] = y + math.sin(rad) * r * sy
+    end
+    cus_curve.draw_line(part, 3, index)
+end
+
+function draw_pf_cursor(part, size)
+    local x = we_bas_getint(draw_id.p_x)
+    local y = we_bas_getint(draw_id.p_y)
+    if x == nil or y == nil then
+        return
+    end
+    x = x * 1e-3
+    y = y * 1e-3
+    local xo = size.x * 2
+    local yo = size.y * 2
+    local cursor = {}
+    cursor[1] = x
+    cursor[2] = y + yo
+    cursor[3] = x
+    cursor[4] = y - yo
+    cursor[5] = x - xo
+    cursor[6] = y - yo
+    cursor[7] = x - xo
+    cursor[8] = y
+    cursor[9] = x + xo
+    cursor[10] = y
+    cus_curve.draw_line(part, 5, cursor)
 end

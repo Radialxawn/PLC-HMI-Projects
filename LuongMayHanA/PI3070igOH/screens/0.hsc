@@ -138,7 +138,7 @@
 	</PartInfo>
 	<PartInfo PartType="String" PartName="STR_0" PartClassifyType="InputAndShow" PartID="1_STR_0">
 		<General Desc="STR_0" Area="592 90 822 120" WordAddr="0#HDW0" Fast="0" stCount="20" HighLowChange="0" HighLowByteChange="0" IsInput="1" WriteAddr="0#HDW0" KbdScreen="1001" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" BorderColor="0xf7e7ad 0" LaFrnColor="0x0 0" BgColor="0xfdf0c4 0" BmpIndex="-1" CharSize="2114141414141414" Align="2" IsHideNum="0" IsShowPwd="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" IsInputDefault="0" IsDWord="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" Locking="0" EncodFormat="0" Systemkeyboard="0" VTextAlign="0" Multiline="0" />
-		<SVGColor svgfile="" dark="" light="0xffffff 0" hlight="" shadow="0x0 0" shape="" gstartcolor="" gmidcolor="" gendcolor="" />
+		<SVGColor svgfile="" dark="0x0 0" light="0xffffff 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
 		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
 		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
 		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" CtrlType="0" DataFormat="105" />
