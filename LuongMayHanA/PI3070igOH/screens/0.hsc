@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrInfo ScreenNo="1" ScreenType="" ScreenSize="0">
-	<PartInfo PartType="Custom_Part" PartName="CST_0" PartClassifyType="CustomType" PartID="0_CST_0" DllName="Custom_LuaCurve">
+	<PartInfo PartType="Rect" PartName="REC_4" PartClassifyType="OtherClassType" PartID="1_REC_4">
+		<General Area="0 360 200 435" Rx="0" BorderColor="0xb07928 0" Pattern="-1" BgColor="0x0 0" PatternNew="1" BgColorNew="0xc0c0c0 -1" ChangeColor="0xffffff 0" IsCirleAngle="0" IsCorlorAddr="0" LineTranValue="5" IsTranValue="0" LineWidth="1" CirleAngle="1" IsMoveControl="0" Locking="0" />
+	</PartInfo>
+	<PartInfo PartType="Rect" PartName="REC_3" PartClassifyType="OtherClassType" PartID="1_REC_3">
+		<General Area="0 280 200 355" Rx="0" BorderColor="0xb07928 0" Pattern="-1" BgColor="0x0 0" PatternNew="1" BgColorNew="0xc0c0c0 -1" ChangeColor="0xffffff 0" IsCirleAngle="0" IsCorlorAddr="0" LineTranValue="5" IsTranValue="0" LineWidth="1" CirleAngle="1" IsMoveControl="0" Locking="0" />
+	</PartInfo>
+	<PartInfo PartType="Rect" PartName="REC_0" PartClassifyType="OtherClassType" PartID="1_REC_0">
+		<General Area="0 120 200 195" Rx="0" LineType="5" BorderColor="0xb07928 0" Pattern="-1" BgColor="0x0 0" PatternNew="1" BgColorNew="0xc0c0c0 -1" ChangeColor="0xffffff 0" IsCirleAngle="0" IsCorlorAddr="0" LineTranValue="5" IsTranValue="0" LineWidth="1" CirleAngle="1" IsMoveControl="0" Locking="0" />
+	</PartInfo>
+	<PartInfo PartType="Rect" PartName="REC_2" PartClassifyType="OtherClassType" PartID="1_REC_2">
+		<General Area="0 200 200 275" Rx="0" BorderColor="0xb07928 0" Pattern="-1" BgColor="0x0 0" PatternNew="1" BgColorNew="0xc0c0c0 -1" ChangeColor="0xffffff 0" IsCirleAngle="0" IsCorlorAddr="0" LineTranValue="5" IsTranValue="0" LineWidth="1" CirleAngle="1" IsMoveControl="0" Locking="0" />
+	</PartInfo>
+	<PartInfo PartType="Custom_Part" PartName="CST_0" PartClassifyType="CustomType" PartID="1_CST_0" DllName="Custom_LuaCurve">
 		<General Desc="CST_0" Area="212 120 832 520" DllName="Custom_LuaCurve" CustomAddr="5 " Locking="0" />
 	</PartInfo>
-	<PartInfo PartType="FunctionSwitch" PartName="FS_0" PartClassifyType="Switch" PartID="0_FS_0">
+	<PartInfo PartType="FunctionSwitch" PartName="FS_0" PartClassifyType="Switch" PartID="1_FS_0">
 		<General Desc="FS_0" Area="873 539 1023 599" ScrSwitch="0" FuncFunc="3" ScreenNo="2" ScreenNo2="-1" PointPos="0 0" PopupScreenType="0" PopupCloseWithParent="0" OperateDataType="0" FigureFile="" BorderColor="0xf7e7ad 0" Pattern="0" FrnColor="0x0 0" BgColor="0x0 0" BmpIndex="102" Align="3" LaStartPt="29 12" DelayTime="0" FunAllTerminal="0" EnableTryAddr="0" TextAlign="0" TextArea="91 28" Locking="0" />
 		<Extension TouchState="1" Buzzer="0" />
 		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
@@ -16,7 +28,7 @@
 		<SVGColor Status="1" svgfile="3D Style\3D Style44-2.svg" dark="0x0 0" light="0x0 0" hlight="0x6aa4cc 0" shadow="0xc6c7c7 0" shape="0xfefefe 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
 		<Label Status="0" Bold="0" LaIndexID="Cài đặt" CharSize="2317171717171717" LaFrnColor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
-	<PartInfo PartType="Numeric" PartName="NUM_0" PartClassifyType="InputAndShow" PartID="0_NUM_0">
+	<PartInfo PartType="Numeric" PartName="NUM_0" PartClassifyType="InputAndShow" PartID="1_NUM_0">
 		<General Desc="NUM_0" Area="22 2 142 32" CharSize="2314141414141414" WordAddr="1#Application.M.hmi.view_axis_micro[0]" Fast="1" nuCount="1" HighLowChange="0" IsInput="0" KbdScreen="1000" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" LaStartPt="0 0" BorderColor="0xf7e7ad 0" LaFrnColor="0x808080 -1" BgColor="0xfdf0c4 0" BmpIndex="-1" IsHideNum="0" HighZeroPad="0" IsShowPwd="0" ZeroNoDisplay="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" IsShowNaturalDecimals="0" Locking="0" Systemkeyboard="0" Displaylimits="0" />
 		<SVGColor svgfile="Rectangle\Rectangle0001.svg" dark="0x0 0" light="0xffffff 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
 		<DispFormat DispType="204" DigitCount="4 3" DataLimit="0204 04 03 -9999999 9999999" IsVar="0" Zoom="0" Mutiple="1.000000000000000" Round="0" IsInputLabelL="0" IsInputLabelR="0" IsInputDefault="0" bShowRange="0" IsVar1="0" ColorHText="0x0 0" ColorHBag="0x0 0" ColorLText="0x0 0" ColorLBag="0x0 0" UseOutRangeText="0" />
@@ -28,7 +40,7 @@
 		<ClickPopTrig />
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
-	<PartInfo PartType="Numeric" PartName="NUM_1" PartClassifyType="InputAndShow" PartID="0_NUM_1">
+	<PartInfo PartType="Numeric" PartName="NUM_1" PartClassifyType="InputAndShow" PartID="1_NUM_1">
 		<General Desc="NUM_0" Area="22 32 142 62" CharSize="2314141414141414" WordAddr="1#Application.M.hmi.view_axis_micro[1]" Fast="1" nuCount="1" HighLowChange="0" IsInput="0" KbdScreen="1000" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" LaStartPt="0 0" BorderColor="0xf7e7ad 0" LaFrnColor="0x808080 -1" BgColor="0xfdf0c4 0" BmpIndex="-1" IsHideNum="0" HighZeroPad="0" IsShowPwd="0" ZeroNoDisplay="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" IsShowNaturalDecimals="0" Locking="0" Systemkeyboard="0" Displaylimits="0" />
 		<SVGColor svgfile="Rectangle\Rectangle0001.svg" dark="0x0 0" light="0xffffff 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
 		<DispFormat DispType="204" DigitCount="4 3" DataLimit="0204 04 03 -9999999 9999999" IsVar="0" Zoom="0" Mutiple="1.000000000000000" Round="0" IsInputLabelL="0" IsInputLabelR="0" IsInputDefault="0" bShowRange="0" IsVar1="0" ColorHText="0x0 0" ColorHBag="0x0 0" ColorLText="0x0 0" ColorLBag="0x0 0" UseOutRangeText="0" />
@@ -40,7 +52,7 @@
 		<ClickPopTrig />
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
-	<PartInfo PartType="Numeric" PartName="NUM_2" PartClassifyType="InputAndShow" PartID="0_NUM_2">
+	<PartInfo PartType="Numeric" PartName="NUM_2" PartClassifyType="InputAndShow" PartID="1_NUM_2">
 		<General Desc="NUM_0" Area="143 2 233 32" CharSize="2314141414141414" WordAddr="1#Application.M.hmi.view_axis_mNm[0]" Fast="1" nuCount="1" HighLowChange="0" IsInput="0" KbdScreen="1000" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" LaStartPt="0 0" BorderColor="0xf7e7ad 0" LaFrnColor="0x808080 -1" BgColor="0xfdf0c4 0" BmpIndex="-1" IsHideNum="0" HighZeroPad="0" IsShowPwd="0" ZeroNoDisplay="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" IsShowNaturalDecimals="0" Locking="0" Systemkeyboard="0" Displaylimits="0" />
 		<SVGColor svgfile="Rectangle\Rectangle0001.svg" dark="0x0 0" light="0xffffff 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
 		<DispFormat DispType="204" DigitCount="2 3" DataLimit="0204 02 03 -99999 99999" IsVar="0" Zoom="0" Mutiple="1.000000000000000" Round="0" IsInputLabelL="0" IsInputLabelR="0" IsInputDefault="0" bShowRange="0" IsVar1="0" ColorHText="0x0 0" ColorHBag="0x0 0" ColorLText="0x0 0" ColorLBag="0x0 0" UseOutRangeText="0" />
@@ -52,7 +64,7 @@
 		<ClickPopTrig />
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
-	<PartInfo PartType="Numeric" PartName="NUM_3" PartClassifyType="InputAndShow" PartID="0_NUM_3">
+	<PartInfo PartType="Numeric" PartName="NUM_3" PartClassifyType="InputAndShow" PartID="1_NUM_3">
 		<General Desc="NUM_0" Area="143 32 233 62" CharSize="2314141414141414" WordAddr="1#Application.M.hmi.view_axis_mNm[1]" Fast="1" nuCount="1" HighLowChange="0" IsInput="0" KbdScreen="1000" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" LaStartPt="0 0" BorderColor="0xf7e7ad 0" LaFrnColor="0x808080 -1" BgColor="0xfdf0c4 0" BmpIndex="-1" IsHideNum="0" HighZeroPad="0" IsShowPwd="0" ZeroNoDisplay="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" IsShowNaturalDecimals="0" Locking="0" Systemkeyboard="0" Displaylimits="0" />
 		<SVGColor svgfile="Rectangle\Rectangle0001.svg" dark="0x0 0" light="0xffffff 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
 		<DispFormat DispType="204" DigitCount="2 3" DataLimit="0204 02 03 -99999 99999" IsVar="0" Zoom="0" Mutiple="1.000000000000000" Round="0" IsInputLabelL="0" IsInputLabelR="0" IsInputDefault="0" bShowRange="0" IsVar1="0" ColorHText="0x0 0" ColorHBag="0x0 0" ColorLText="0x0 0" ColorLBag="0x0 0" UseOutRangeText="0" />
@@ -64,7 +76,7 @@
 		<ClickPopTrig />
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
-	<PartInfo PartType="FunctionSwitch" PartName="FS_1" PartClassifyType="Switch" PartID="0_FS_1">
+	<PartInfo PartType="FunctionSwitch" PartName="FS_1" PartClassifyType="Switch" PartID="1_FS_1">
 		<General Desc="FS_0" Area="717 539 867 599" ScrSwitch="0" FuncFunc="3" ScreenNo="4" ScreenNo2="-1" PointPos="0 0" PopupScreenType="0" PopupCloseWithParent="0" OperateDataType="0" FigureFile="" BorderColor="0xf7e7ad 0" Pattern="0" FrnColor="0x0 0" BgColor="0x0 0" BmpIndex="102" Align="3" LaStartPt="36 12" DelayTime="0" FunAllTerminal="0" EnableTryAddr="0" TextAlign="0" TextArea="78 28" Locking="0" />
 		<Extension TouchState="1" Buzzer="0" />
 		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
@@ -77,7 +89,7 @@
 		<SVGColor Status="1" svgfile="3D Style\3D Style44-2.svg" dark="0x0 0" light="0x0 0" hlight="0x6aa4cc 0" shadow="0xc6c7c7 0" shape="0xfefefe 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
 		<Label Status="0" Bold="0" LaIndexID="Vào/Ra" CharSize="2317171717171717" LaFrnColor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
-	<PartInfo PartType="FunctionSwitch" PartName="FS_2" PartClassifyType="Switch" PartID="0_FS_2">
+	<PartInfo PartType="FunctionSwitch" PartName="FS_2" PartClassifyType="Switch" PartID="1_FS_2">
 		<General Desc="FS_0" Area="1 539 151 599" ScrSwitch="0" FuncFunc="3" ScreenNo="5" ScreenNo2="-1" PointPos="0 0" PopupScreenType="0" PopupCloseWithParent="0" OperateDataType="0" FigureFile="" BorderColor="0xf7e7ad 0" Pattern="0" FrnColor="0x0 0" BgColor="0x0 0" BmpIndex="102" Align="3" LaStartPt="29 13" DelayTime="0" FunAllTerminal="0" EnableTryAddr="0" TextAlign="0" TextArea="91 28" Locking="0" />
 		<Extension TouchState="1" Buzzer="0" />
 		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
@@ -90,16 +102,16 @@
 		<SVGColor Status="1" svgfile="3D Style\3D Style44-2.svg" dark="0x0 0" light="0x0 0" hlight="0x6aa4cc 0" shadow="0xc6c7c7 0" shape="0xfefefe 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
 		<Label Status="0" Bold="0" LaIndexID="Hàn thử" CharSize="2317171717171717" LaFrnColor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
-	<PartInfo PartType="Text" PartName="TXT_0" PartClassifyType="OtherClassType" PartID="0_TXT_0">
+	<PartInfo PartType="Text" PartName="TXT_0" PartClassifyType="OtherClassType" PartID="1_TXT_0">
 		<General TextContent="X" LaFrnColor="0x0 0" IsBackColor="0" BgColor="0xfdf0c4 0" CharSize="2314141414141414" Bold="0" StartPt="5 7" Width="0" Height="0" Area="5 7 18 35" InAlign="1" Locking="0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
-	<PartInfo PartType="Text" PartName="TXT_1" PartClassifyType="OtherClassType" PartID="0_TXT_1">
+	<PartInfo PartType="Text" PartName="TXT_1" PartClassifyType="OtherClassType" PartID="1_TXT_1">
 		<General TextContent="Y" LaFrnColor="0x0 0" IsBackColor="0" BgColor="0xfdf0c4 0" CharSize="2314141414141414" Bold="0" StartPt="5 37" Width="0" Height="0" Area="5 37 18 65" InAlign="1" Locking="0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
-	<PartInfo PartType="Text" PartName="TXT_2" PartClassifyType="OtherClassType" PartID="0_TXT_2">
+	<PartInfo PartType="Text" PartName="TXT_2" PartClassifyType="OtherClassType" PartID="1_TXT_2">
 		<General TextContent="Tốc độ" LaFrnColor="0x0 0" IsBackColor="0" BgColor="0xffff80 -1" CharSize="2314141414141414" Bold="0" StartPt="316 7" Width="0" Height="0" Area="316 7 394 35" InAlign="1" Locking="0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
-	<PartInfo PartType="BitSwitch" PartName="BS_0" PartClassifyType="Switch" PartID="0_BS_0">
+	<PartInfo PartType="BitSwitch" PartName="BS_0" PartClassifyType="Switch" PartID="1_BS_0">
 		<General Desc="BS_2" Area="452 539 572 599" OperateAddr="1#Application.M.hmi.sv_trigger" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.sv_trigger" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="102" Align="3" LaStartPt="40 13" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="39 28" Locking="0" />
 		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" />
 		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
@@ -112,7 +124,7 @@
 		<Label Status="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" LaIndexID="Lưu" CharSize="2320202020202020" LaFrnColor="0x0 0" svgfile="3D Style\3D Style44-1.svg" dark="0xc6c7c7 0" light="0x5086b4 0" hlight="0x6aa4cc 0" shadow="0xfefefe 0" shape="0x406797 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
 		<Label Status="1" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" CharSize="2020202020202020" LaFrnColor="0x0 0" svgfile="3D Style\3D Style44-2.svg" dark="0x0 0" light="0x0 0" hlight="0x6aa4cc 0" shadow="0xc6c7c7 0" shape="0xfefefe 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
-	<PartInfo PartType="Numeric" PartName="NUM_4" PartClassifyType="InputAndShow" PartID="0_NUM_4">
+	<PartInfo PartType="Numeric" PartName="NUM_4" PartClassifyType="InputAndShow" PartID="1_NUM_4">
 		<General Desc="NUM_0" Area="311 32 401 62" CharSize="2314141414141414" WordAddr="1#Application.M.hmi.speed_factor_micro" Fast="1" HighLowChange="0" IsInput="1" WriteAddr="1#Application.M.hmi.speed_factor_micro" KbdScreen="1000" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" LaStartPt="0 0" BorderColor="0xf7e7ad 0" LaFrnColor="0x0 0" BgColor="0xfdf0c4 0" BmpIndex="-1" IsHideNum="0" HighZeroPad="0" IsShowPwd="0" ZeroNoDisplay="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" IsShowNaturalDecimals="0" Locking="0" Systemkeyboard="0" Displaylimits="0" />
 		<SVGColor svgfile="Rectangle\Rectangle0001.svg" dark="0x0 0" light="0xffffff 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
 		<DispFormat DispType="105" DigitCount="3 1" DataLimit="0105 03 01 1 1000" IsVar="0" Zoom="0" Mutiple="1.000000000000000" Round="0" IsInputLabelL="0" IsInputLabelR="0" IsInputDefault="0" bShowRange="0" IsVar1="0" ColorHText="0x0 0" ColorHBag="0x0 0" ColorLText="0x0 0" ColorLBag="0x0 0" UseOutRangeText="0" />
@@ -125,14 +137,14 @@
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
 	<PartInfo PartType="String" PartName="STR_0" PartClassifyType="InputAndShow" PartID="1_STR_0">
-		<General Desc="STR_0" Area="602 90 832 120" WordAddr="0#HDW0" Fast="0" stCount="20" HighLowChange="0" HighLowByteChange="0" IsInput="1" WriteAddr="0#HDW0" KbdScreen="1001" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" BorderColor="0xf7e7ad 0" LaFrnColor="0x0 0" BgColor="0xfdf0c4 0" BmpIndex="-1" CharSize="2114141414141414" Align="2" IsHideNum="0" IsShowPwd="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" IsInputDefault="0" IsDWord="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" Locking="0" EncodFormat="0" Systemkeyboard="0" VTextAlign="0" Multiline="0" />
-		<SVGColor svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x66ff 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
+		<General Desc="STR_0" Area="592 90 822 120" WordAddr="0#HDW0" Fast="0" stCount="20" HighLowChange="0" HighLowByteChange="0" IsInput="1" WriteAddr="0#HDW0" KbdScreen="1001" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" BorderColor="0xf7e7ad 0" LaFrnColor="0x0 0" BgColor="0xfdf0c4 0" BmpIndex="-1" CharSize="2114141414141414" Align="2" IsHideNum="0" IsShowPwd="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" IsInputDefault="0" IsDWord="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" Locking="0" EncodFormat="0" Systemkeyboard="0" VTextAlign="0" Multiline="0" />
+		<SVGColor svgfile="" dark="" light="0xffffff 0" hlight="" shadow="0x0 0" shape="" gstartcolor="" gmidcolor="" gendcolor="" />
 		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
 		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
-		<Extension TouchState="1" Buzzer="1" IsCheck="1" AckTime="20" CtrlType="0" DataFormat="105" />
+		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" CtrlType="0" DataFormat="105" />
 		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" IsShowGrayScale="0" />
 		<PartPwd IsUesPartPassword="0" IsSetLowerLev="0" PartPasswordLev="0" />
-		<ClickPopTrig PopTriggMode="2" />
+		<ClickPopTrig />
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
 	<PartInfo PartType="WordSwitch" PartName="WS_0" PartClassifyType="Switch" PartID="1_WS_0">
@@ -278,10 +290,40 @@
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
 	<PartInfo PartType="Text" PartName="TXT_4" PartClassifyType="OtherClassType" PartID="1_TXT_4">
-		<General TextContent="Dòng hàn" LaFrnColor="0x0 0" IsBackColor="0" BgColor="0xfdf0c4 0" CharSize="2314141414141414" Bold="0" StartPt="10 135" Width="0" Height="0" Area="10 135 114 163" InAlign="1" Locking="0" IsEnableStringTable="0" IsDynamic="0" />
+		<General TextContent="Số điểm hàn" LaFrnColor="0x0 0" IsBackColor="0" BgColor="0xfdf0c4 0" CharSize="2314141414141414" Bold="0" StartPt="10 130" Width="0" Height="0" Area="10 130 153 158" InAlign="1" Locking="0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
 	<PartInfo PartType="Numeric" PartName="NUM_6" PartClassifyType="InputAndShow" PartID="1_NUM_6">
-		<General Desc="NUM_0" Area="132 130 192 160" CharSize="2314141414141414" WordAddr="1#Application.M.hmi.pf_p_weld_mode" Fast="1" HighLowChange="0" IsInput="1" WriteAddr="1#Application.M.hmi.pf_p_weld_mode" KbdScreen="1000" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" LaStartPt="0 0" BorderColor="0xf7e7ad 0" LaFrnColor="0x0 -1" BgColor="0xfdf0c4 0" BmpIndex="-1" IsHideNum="0" HighZeroPad="0" IsShowPwd="0" ZeroNoDisplay="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" IsShowNaturalDecimals="0" Locking="0" Systemkeyboard="0" Displaylimits="0" />
+		<General Desc="NUM_0" Area="10 160 70 190" CharSize="2314141414141414" WordAddr="1#Application.M.hmi.pf.p_count" Fast="1" HighLowChange="0" IsInput="1" WriteAddr="1#Application.M.hmi.pf.p_count" KbdScreen="1000" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" LaStartPt="0 0" BorderColor="0xf7e7ad 0" LaFrnColor="0x0 -1" BgColor="0xfdf0c4 0" BmpIndex="-1" IsHideNum="0" HighZeroPad="0" IsShowPwd="0" ZeroNoDisplay="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" IsShowNaturalDecimals="0" Locking="0" Systemkeyboard="0" Displaylimits="0" />
+		<SVGColor svgfile="Rectangle\Rectangle0001.svg" dark="0x0 0" light="0xffffff 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
+		<DispFormat DispType="105" DigitCount="3 0" DataLimit="0105 03 00 0 512" IsVar="0" Zoom="0" Mutiple="1.000000000000000" Round="0" IsInputLabelL="0" IsInputLabelR="0" IsInputDefault="0" bShowRange="0" IsVar1="0" ColorHText="0x0 0" ColorHBag="0x0 0" ColorLText="0x0 0" ColorLBag="0x0 0" UseOutRangeText="0" />
+		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
+		<Extension TouchState="1" Buzzer="1" IsCheck="1" AckTime="20" CtrlType="0" DataFormat="105" />
+		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" IsShowGrayScale="0" />
+		<PartPwd IsUesPartPassword="0" IsSetLowerLev="0" PartPasswordLev="0" />
+		<ClickPopTrig PopTriggMode="2" />
+		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
+	</PartInfo>
+	<PartInfo PartType="Rect" PartName="REC_1" PartClassifyType="OtherClassType" PartID="1_REC_1">
+		<General Area="212 120 832 520" Rx="0" LineType="1" BorderColor="0xb07928 0" Pattern="-1" BgColor="0x0 0" PatternNew="0" BgColorNew="0xfefab8 -1" ChangeColor="0xffffff 0" IsCirleAngle="0" IsCorlorAddr="0" LineTranValue="0" IsTranValue="0" LineWidth="1" CirleAngle="1" IsMoveControl="0" Locking="0" />
+	</PartInfo>
+	<PartInfo PartType="Numeric" PartName="NUM_7" PartClassifyType="InputAndShow" PartID="1_NUM_7">
+		<General Desc="NUM_0" Area="10 240 70 270" CharSize="2314141414141414" WordAddr="1#Application.M.hmi.pf_p_index" Fast="1" HighLowChange="0" IsInput="1" WriteAddr="1#Application.M.hmi.pf_p_index" KbdScreen="1000" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" LaStartPt="0 0" BorderColor="0xf7e7ad 0" LaFrnColor="0x0 -1" BgColor="0xfdf0c4 0" BmpIndex="-1" IsHideNum="0" HighZeroPad="0" IsShowPwd="0" ZeroNoDisplay="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" IsShowNaturalDecimals="0" Locking="0" Systemkeyboard="0" Displaylimits="0" />
+		<SVGColor svgfile="Rectangle\Rectangle0001.svg" dark="0x0 0" light="0xffffff 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
+		<DispFormat DispType="105" DigitCount="3 0" DataLimit="0105 03 00 0 511" IsVar="0" Zoom="0" Mutiple="1.000000000000000" Round="0" IsInputLabelL="0" IsInputLabelR="0" IsInputDefault="0" bShowRange="0" IsVar1="0" ColorHText="0x0 0" ColorHBag="0x0 0" ColorLText="0x0 0" ColorLBag="0x0 0" UseOutRangeText="0" />
+		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
+		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" CtrlType="0" DataFormat="105" />
+		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" IsShowGrayScale="0" />
+		<PartPwd IsUesPartPassword="0" IsSetLowerLev="0" PartPasswordLev="0" />
+		<ClickPopTrig />
+		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
+	</PartInfo>
+	<PartInfo PartType="Text" PartName="TXT_5" PartClassifyType="OtherClassType" PartID="1_TXT_5">
+		<General TextContent="Dòng hàn" LaFrnColor="0x0 0" IsBackColor="0" BgColor="0xfdf0c4 0" CharSize="2314141414141414" Bold="0" StartPt="10 290" Width="0" Height="0" Area="10 290 114 318" InAlign="1" Locking="0" IsEnableStringTable="0" IsDynamic="0" />
+	</PartInfo>
+	<PartInfo PartType="Numeric" PartName="NUM_8" PartClassifyType="InputAndShow" PartID="1_NUM_8">
+		<General Desc="NUM_0" Area="10 320 70 350" CharSize="2314141414141414" WordAddr="1#Application.M.hmi.pf_p_weld_mode" Fast="1" HighLowChange="0" IsInput="1" WriteAddr="1#Application.M.hmi.pf_p_weld_mode" KbdScreen="1000" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" LaStartPt="0 0" BorderColor="0xf7e7ad 0" LaFrnColor="0x0 -1" BgColor="0xfdf0c4 0" BmpIndex="-1" IsHideNum="0" HighZeroPad="0" IsShowPwd="0" ZeroNoDisplay="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" IsShowNaturalDecimals="0" Locking="0" Systemkeyboard="0" Displaylimits="0" />
 		<SVGColor svgfile="Rectangle\Rectangle0001.svg" dark="0x0 0" light="0xffffff 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
 		<DispFormat DispType="105" DigitCount="2 0" DataLimit="0105 02 00 0 15" IsVar="0" Zoom="0" Mutiple="1.000000000000000" Round="0" IsInputLabelL="0" IsInputLabelR="0" IsInputDefault="0" bShowRange="0" IsVar1="0" ColorHText="0x0 0" ColorHBag="0x0 0" ColorLText="0x0 0" ColorLBag="0x0 0" UseOutRangeText="0" />
 		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
@@ -292,10 +334,75 @@
 		<ClickPopTrig />
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
-	<PartInfo PartType="Rect" PartName="REC_0" PartClassifyType="OtherClassType" PartID="1_REC_0">
-		<General Area="0 120 200 520" Rx="0" BorderColor="0xb07928 0" Pattern="-1" BgColor="0x0 0" PatternNew="1" BgColorNew="0xfefab8 0" ChangeColor="0xffffff 0" IsCirleAngle="0" IsCorlorAddr="0" LineTranValue="8" IsTranValue="0" LineWidth="1" CirleAngle="1" IsMoveControl="0" Locking="0" />
+	<PartInfo PartType="Text" PartName="TXT_6" PartClassifyType="OtherClassType" PartID="1_TXT_6">
+		<General TextContent="Thời gian hàn" LaFrnColor="0x0 0" IsBackColor="0" BgColor="0xfdf0c4 0" CharSize="2314141414141414" Bold="0" StartPt="10 370" Width="0" Height="0" Area="10 370 179 398" InAlign="1" Locking="0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
-	<PartInfo PartType="Rect" PartName="REC_1" PartClassifyType="OtherClassType" PartID="1_REC_1">
-		<General Area="212 120 832 520" Rx="0" LineType="1" BorderColor="0xb07928 0" Pattern="-1" BgColor="0x0 0" PatternNew="0" BgColorNew="0xfefab8 -1" ChangeColor="0xffffff 0" IsCirleAngle="0" IsCorlorAddr="0" LineTranValue="0" IsTranValue="0" LineWidth="1" CirleAngle="1" IsMoveControl="0" Locking="0" />
+	<PartInfo PartType="Numeric" PartName="NUM_9" PartClassifyType="InputAndShow" PartID="1_NUM_9">
+		<General Desc="NUM_0" Area="10 400 90 430" CharSize="2314141414141414" WordAddr="1#Application.M.hmi.pf.weld_delay_msec" Fast="1" HighLowChange="0" IsInput="1" WriteAddr="1#Application.M.hmi.pf.weld_delay_msec" KbdScreen="1000" IsPopKeyBrod="0" FigureFile="" IsKeyBoardRemark="0" LaStartPt="0 0" BorderColor="0xf7e7ad 0" LaFrnColor="0x0 -1" BgColor="0xfdf0c4 0" BmpIndex="-1" IsHideNum="0" HighZeroPad="0" IsShowPwd="0" ZeroNoDisplay="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" KbdContinue="0" KbdContinueNum="0" KbdContinueGroup="0" KbdContinueEnd="0" IsShowNaturalDecimals="0" Locking="0" Systemkeyboard="0" Displaylimits="0" />
+		<SVGColor svgfile="Rectangle\Rectangle0001.svg" dark="0x0 0" light="0xffffff 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
+		<DispFormat DispType="105" DigitCount="1 3" DataLimit="0105 01 03 0 999" IsVar="0" Zoom="0" Mutiple="1.000000000000000" Round="0" IsInputLabelL="0" IsInputLabelR="0" IsInputDefault="0" bShowRange="0" IsVar1="0" ColorHText="0x0 0" ColorHBag="0x0 0" ColorLText="0x0 0" ColorLBag="0x0 0" UseOutRangeText="0" />
+		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
+		<Extension TouchState="1" Buzzer="1" IsCheck="1" AckTime="20" CtrlType="0" DataFormat="105" />
+		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" IsShowGrayScale="0" />
+		<PartPwd IsUesPartPassword="0" IsSetLowerLev="0" PartPasswordLev="0" />
+		<ClickPopTrig PopTriggMode="2" />
+		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
+	</PartInfo>
+	<PartInfo PartType="BitSwitch" PartName="BS_1" PartClassifyType="Switch" PartID="1_BS_1">
+		<General Desc="BS_2" Area="130 240 190 270" OperateAddr="1#Application.M.hmi.pf_p_remove_trigger" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.pf_p_remove_trigger" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="109" LaStartPt="10 1" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="39 28" Locking="0" />
+		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" />
+		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
+		<Glint UseGlint="0" Glintfrq="0" />
+		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" IsShowGrayScale="0" />
+		<PartPwd IsUesPartPassword="0" IsSetLowerLev="0" PartPasswordLev="0" />
+		<ClickPopTrig />
+		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
+		<Label Status="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" LaIndexID="Xoá" CharSize="2320202020202020" LaFrnColor="0xffffff -1" svgfile="Button\Button0004.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x66ff 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
+		<Label Status="1" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" CharSize="2020202020202020" LaFrnColor="0x0 0" svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
+	</PartInfo>
+	<PartInfo PartType="BitSwitch" PartName="BS_2" PartClassifyType="Switch" PartID="1_BS_2">
+		<General Desc="BS_2" Area="10 205 190 235" OperateAddr="1#Application.M.hmi.pf_p_move_trigger" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.pf_p_move_trigger" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="109" LaStartPt="5 1" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="169 28" Locking="0" />
+		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" />
+		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
+		<Glint UseGlint="0" Glintfrq="0" />
+		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" IsShowGrayScale="0" />
+		<PartPwd IsUesPartPassword="0" IsSetLowerLev="0" PartPasswordLev="0" />
+		<ClickPopTrig />
+		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
+		<Label Status="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" LaIndexID="Điểm hiện tại" CharSize="2320202020202020" LaFrnColor="0xffffff -1" svgfile="Button\Button0004.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x66ff 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
+		<Label Status="1" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" CharSize="2020202020202020" LaFrnColor="0x0 0" svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
+	</PartInfo>
+	<PartInfo PartType="IndicatorLamp" PartName="BL_0" PartClassifyType="Switch" PartID="1_BL_0">
+		<General Desc="BL_0" Area="272 90 282 120" MonitorAddr="0#HDX200.0" Fast="0" BmpIndex="109" LaStartPt="5 15" BitShowReverse="0" FigureFile="" BorderColor="0xf7e7ad 0" TextAlign="0" TextArea="0 0" Locking="0" />
+		<Extension TouchState="1" Buzzer="1" />
+		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
+		<Glint UseGlint="0" Glintfrq="0" />
+		<Label Status="0" Bold="0" CharSize="1414141414141414" LaFrnColor="0x0 0" svgfile="Button\Button0004.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x66ff 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" />
+		<Label Status="1" Bold="0" CharSize="1414141414141414" LaFrnColor="0x0 0" svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" />
+	</PartInfo>
+	<PartInfo PartType="IndicatorLamp" PartName="BL_1" PartClassifyType="Switch" PartID="1_BL_1">
+		<General Desc="BL_0" Area="822 90 832 120" MonitorAddr="0#HDX200.1" Fast="0" BmpIndex="109" LaStartPt="5 15" BitShowReverse="0" FigureFile="" BorderColor="0xf7e7ad 0" TextAlign="0" TextArea="0 0" Locking="0" />
+		<Extension TouchState="1" Buzzer="1" />
+		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
+		<Glint UseGlint="0" Glintfrq="0" />
+		<Label Status="0" Bold="0" CharSize="1414141414141414" LaFrnColor="0x0 0" svgfile="Button\Button0004.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x66ff 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" />
+		<Label Status="1" Bold="0" CharSize="1414141414141414" LaFrnColor="0x0 0" svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" />
+	</PartInfo>
+	<PartInfo PartType="LuaPart" PartName="Lua_0" PartClassifyType="CustomType" PartID="1_Lua_0">
+		<General Area="472 90 592 120" DataFormat="105" Const="" BmpIndex="109" LaStartPt="14 1" IsIndirectR="0" IndirectLabelIndexR="0" IsManyTypeShow="1" Fast="0" StatusCovType="0" StatusFreq="10" AnimaReturn="0" ByAddr="0" Trigger="0" isNautomatic="0" UseClickTime="0" ClickTime="2000" isReturn="0" IsControl="1" ControlNum="1" FigureFile="" BorderColor="0xf7e7ad 0" WSShowErrorState="0" WSErrorState="0" TextAlign="0" TextArea="91 28" Locking="0" />
+		<LuaScript LuaClickUp="bg_pf_name_save()" />
+		<Extension TouchState="1" Buzzer="1" />
+		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" />
+		<SVGColor svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" />
+		<MoveZoom DataFormatMZ="0" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
+		<ClickPopTrig />
+		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
+		<Label Status="0" Bold="0" LaIndexID="Đổi tên" CharSize="2323232323232323" LaFrnColor="0xffffff -1" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" svgfile="Button\Button0004.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x66ff 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" keyValue="0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
 </ScrInfo>

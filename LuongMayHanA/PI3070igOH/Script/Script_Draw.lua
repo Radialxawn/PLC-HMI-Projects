@@ -1,6 +1,14 @@
 Script_Draw_limits = 11
 
-local draw_px_id = {
+local draw_id = {
+    size_x = "@W_1#Application.M.hmi.sv.max_micro[0]",
+    size_y = "@W_1#Application.M.hmi.sv.max_micro[1]",
+    p_count = "@W_1#Application.M.hmi.pf.p_count",
+    p_x = "@W_1#Application.M.hmi.view_axis_micro[0]",
+    p_y = "@W_1#Application.M.hmi.view_axis_micro[1]"
+}
+
+local draw_id_px = {
 	"@W_1#Application.M.hmi.pf.px[0]",
 	"@W_1#Application.M.hmi.pf.px[1]",
 	"@W_1#Application.M.hmi.pf.px[2]",
@@ -515,7 +523,7 @@ local draw_px_id = {
 	"@W_1#Application.M.hmi.pf.px[511]"
 }
 
-local draw_py_id = {
+local draw_id_py = {
 	"@W_1#Application.M.hmi.pf.py[0]",
 	"@W_1#Application.M.hmi.pf.py[1]",
 	"@W_1#Application.M.hmi.pf.py[2]",
@@ -1030,7 +1038,13 @@ local draw_py_id = {
 	"@W_1#Application.M.hmi.pf.py[511]",
 }
 
-function draw_profile()
+local draw_pf_in_progress = 0
+function draw_pf()
+    if draw_pf_in_progress == 1 then
+        return false
+    end
+    draw_pf_in_progress = 1
+    local part = "1_CST_0"
     local axisStyle = {
         color = 0x000000,
         linetype = 3,
@@ -1049,19 +1063,65 @@ function draw_profile()
         width = 1,
         visible = 1,
     }
-    local size = {x = 2400, y = 1600}
+    local size = {x = 600, y = 400}
+    local size_x = we_bas_getint(draw_id.size_x)
+    local size_y = we_bas_getint(draw_id.size_y)
+    if size_x ~= nil and size_y ~= nil and size_x > 1000 and size_y > 1000 then
+        size.x = math.ceil(size_x * 1e-3)
+        size.y = math.ceil(size_y * 1e-3)
+    else
+        draw_pf_in_progress = 0
+        return false
+    end
     local axis = {0, 0, 0, size.y, size.x, size.y, size.x, 0, 0, 0}
-    local part = "1_CST_0"
     cus_curve.init(part, 1, 1)
     cus_curve.set_range(part, "x", 0, size.x)
     cus_curve.set_range(part, "y", 0, size.y)
-    cus_curve.set_line(part, 1, 5, axisStyle)
-    cus_curve.draw_line(part, 1, axis)
-    cus_curve.set_cursor(part, 0, cursorStyle)
-    --
-    local line = {0, 0, 100, 150, 200, 350, 600, 120}
+    cus_curve.set_line(part, 1, 10, axisStyle)
     cus_curve.set_line(part, 2, 512, lineStyle)
-    cus_curve.draw_line(part, 2, line)
+    cus_curve.set_line(part, 3, 10, cursorStyle)
+    cus_curve.draw_line(part, 1, axis)
+    --
+    local line = {}
+    local line_valid_count = 0
+    local p_count = we_bas_getint(draw_id.p_count)
+    if p_count ~= nil and p_count >= 2 then
+        for i = 1, p_count do
+            local x = we_bas_getint(draw_id_px[i])
+            local y = we_bas_getint(draw_id_py[i])
+            if x ~= nil and y ~= nil then
+                table.insert(line, x * 1e-3)
+                table.insert(line, y * 1e-3)
+                line_valid_count = line_valid_count + 1
+            end
+        end
+        if line_valid_count >= 2 then
+            cus_curve.draw_line(part, 2, line)
+        end
+    end
+    --
+    local cursor = {0, 0, 0, 1, 1, 1, 1, 0, 0, 0}
+    local p_x = we_bas_getint(draw_id.p_x)
+    local p_y = we_bas_getint(draw_id.p_y)
+    if p_x ~= nil and p_y ~= nil then
+        local xo = size.x * 2
+        local yo = size.y * 2
+        p_x = p_x * 1e-3
+        p_y = p_y * 1e-3
+        cursor[1] = p_x
+        cursor[2] = p_y + yo
+        cursor[3] = p_x
+        cursor[4] = p_y - yo
+        cursor[5] = p_x - xo
+        cursor[6] = p_y - yo
+        cursor[7] = p_x - xo
+        cursor[8] = p_y
+        cursor[9] = p_x + xo
+        cursor[10] = p_y
+        cus_curve.draw_line(part, 3, cursor)
+    end
     --
     cus_curve.refresh(part)
+    draw_pf_in_progress = 0
+    return true
 end
