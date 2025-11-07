@@ -11,7 +11,7 @@ local draw_id = {
 
 local draw_spec = {
     index_edge_count = 4,
-    rect_w = 500,
+    rect_w = 520,
     rect_h = 300
 }
 
@@ -1064,6 +1064,12 @@ function draw_pf()
         width = 1,
         visible = 1,
     }
+    local pathDirStyle = {
+        color = 0xff6600,
+        linetype = 1,
+        width = 1,
+        visible = 1,
+    }
     local indexStyle = {
         color = 0x0000ff,
         linetype = 0,
@@ -1076,7 +1082,7 @@ function draw_pf()
         width = 1,
         visible = 1,
     }
-    local size = {x = 600, y = 400}
+    local size = {x = draw_spec.rect_w, y = draw_spec.rect_h}
     local size_x = we_bas_getint(draw_id.size_x)
     local size_y = we_bas_getint(draw_id.size_y)
     if size_x ~= nil and size_y ~= nil and size_x > 1000 and size_y > 1000 then
@@ -1092,11 +1098,13 @@ function draw_pf()
     cus_curve.set_range(part, "y", 0, size.y)
     cus_curve.set_line(part, 1, 5, axisStyle)
     cus_curve.set_line(part, 2, 512, pathStyle)
-    cus_curve.set_line(part, 3, draw_spec.index_edge_count + 1, indexStyle)
+    cus_curve.set_line(part, 3, 6, pathDirStyle)
+    cus_curve.set_line(part, 4, draw_spec.index_edge_count + 1, indexStyle)
     cus_curve.set_line(part, 5, 5, cursorStyle)
     cus_curve.draw_line(part, 1, axis)
     --
     draw_pf_path(part, size)
+    draw_pf_path_dir(part, size)
     draw_pf_index(part, size)
     draw_pf_cursor(part, size)
     --
@@ -1131,6 +1139,61 @@ function draw_pf_path(part, size)
     cus_curve.draw_line(part, 2, path)
 end
 
+function draw_pf_path_dir(part, size)
+    local p_count = we_bas_getint(draw_id.p_count)
+    if p_count == nil then
+        p_count = 0
+    end
+    local sx = size.x / draw_spec.rect_w
+    local sy = size.y / draw_spec.rect_h
+    local path_dir = {}
+    local valid = false
+    if p_count >= 2 then
+        local a = {x = 0, y = 0}
+        local b = {x = 0, y = 0}
+        a.x = we_bas_getint(draw_id_px[p_count])
+        a.y = we_bas_getint(draw_id_py[p_count])
+        b.x = we_bas_getint(draw_id_px[1])
+        b.y = we_bas_getint(draw_id_py[1])
+        if a.x ~= nil and a.y ~= nil and b.x ~= nil and b.y ~= nil then
+            a.x = a.x * 1e-3
+            a.y = a.y * 1e-3
+            b.x = b.x * 1e-3
+            b.y = b.y * 1e-3
+            local dx = b.x - a.x
+            local dy = b.y - a.y
+            local d = math.sqrt(dx * dx + dy * dy)
+            local ux = 0
+            local uy = 0
+            local nx = 0
+            local ny = 0
+            if d > 0 then
+                ux = dx / d
+                uy = dy / d
+                nx = uy
+                ny = -ux
+            end
+            path_dir[1] = a.x
+            path_dir[2] = a.y
+            path_dir[3] = b.x - ux * 9 * sx
+            path_dir[4] = b.y - uy * 9 * sy
+            path_dir[5] = b.x - (ux * 12 - nx * 5) * sx
+            path_dir[6] = b.y - (uy * 12 - ny * 5) * sy
+            path_dir[7] = b.x
+            path_dir[8] = b.y
+            path_dir[9] = b.x - (ux * 12 + nx * 5) * sx
+            path_dir[10] = b.y - (uy * 12 + ny * 5) * sy
+            path_dir[11] = path_dir[3]
+            path_dir[12] = path_dir[4]
+            valid = true
+        end
+    end
+    if valid == false then
+        path_dir = draw_circle(0, 0, sx, sy, 7, math.pi / 4, 4)
+    end
+    cus_curve.draw_line(part, 3, path_dir)
+end
+
 function draw_pf_index(part, size)
     local p_index = we_bas_getint(draw_id.p_index)
     local p_count = we_bas_getint(draw_id.p_count)
@@ -1150,7 +1213,7 @@ function draw_pf_index(part, size)
     y = y * 1e-3
     local sx = size.x / draw_spec.rect_w
     local sy = size.y / draw_spec.rect_h
-    cus_curve.draw_line(part, 3, draw_circle(x, y, sx, sy, 6, 0, draw_spec.index_edge_count))
+    cus_curve.draw_line(part, 4, draw_circle(x, y, sx, sy, 6, 0, draw_spec.index_edge_count))
 end
 
 function draw_pf_cursor(part, size)
