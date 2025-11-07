@@ -28,7 +28,7 @@ function we_bg_init()
     timer.create(-1, 1, 1000, bg_ready_check)
     timer.create(-1, 2, 200, bg_set_save_need_repeat)
     timer.create(1, 3, 200, bg_pf_name_update_check)
-    timer.create(1, 4, 300, bg_pf_name_update)
+    timer.create(1, 4, 200, bg_pf_name_update_repeat)
     timer.create(1, 5, 200, bg_pf_draw_repeat)
 end
 
@@ -78,17 +78,29 @@ local bg_id_pf_name = {
     "@W_1#Application.M.hmi.pf_name_as_array[9]",
 }
 
+local bg_pf_name_update_in_progress = 0
 function bg_pf_name_update()
-    we_bas_setbit(bg_id_bit.pf_name_process_debug, 1)
+    if bg_pf_name_update_in_progress == 1 then
+        return false
+    end
+    bg_pf_name_update_in_progress = 1
     for i, v in ipairs(bg_id_pf_name) do
         local w = we_bas_getword(v)
         if w ~= nil then
             we_bas_setword(bg_id_name_show(i - 1), w)
         end
     end
-    if bg_repeat_end(2, 3) == true then
-        we_bas_setbit(bg_id_bit.pf_name_process_debug, 0)
-        timer.set_status(1, 4, 0)
+    bg_pf_name_update_in_progress = 0
+    return true
+end
+
+function bg_pf_name_update_repeat()
+    we_bas_setbit(bg_id_bit.pf_name_process_debug, 1)
+    if bg_pf_name_update() == true then
+        if bg_repeat_end(2, 3) == true then
+            we_bas_setbit(bg_id_bit.pf_name_process_debug, 0)
+            timer.set_status(1, 4, 0)
+        end
     end
 end
 
@@ -102,9 +114,6 @@ function bg_pf_name_save()
         we_bas_setword(v, w)
     end
     we_bas_setbit(bg_id_bit.pf_name_save_trigger, 1)
-    we_bas_setbit(bg_id_bit.pf_name_process_debug, 1)
-    we_bas_sleep(500)
-    we_bas_setbit(bg_id_bit.pf_name_process_debug, 0)
 end
 
 function bg_pf_draw_repeat()

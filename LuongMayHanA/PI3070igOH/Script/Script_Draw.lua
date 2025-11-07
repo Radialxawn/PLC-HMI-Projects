@@ -9,6 +9,12 @@ local draw_id = {
     p_index = "@W_1#Application.M.hmi.pf_p_index"
 }
 
+local draw_spec = {
+    index_edge_count = 4,
+    rect_w = 500,
+    rect_h = 300
+}
+
 local draw_id_px = {
 	"@W_1#Application.M.hmi.pf.px[0]",
 	"@W_1#Application.M.hmi.pf.px[1]",
@@ -1086,11 +1092,11 @@ function draw_pf()
     cus_curve.set_range(part, "y", 0, size.y)
     cus_curve.set_line(part, 1, 5, axisStyle)
     cus_curve.set_line(part, 2, 512, pathStyle)
-    cus_curve.set_line(part, 3, 9, indexStyle)
+    cus_curve.set_line(part, 3, draw_spec.index_edge_count + 1, indexStyle)
     cus_curve.set_line(part, 5, 5, cursorStyle)
     cus_curve.draw_line(part, 1, axis)
     --
-    draw_pf_path(part)
+    draw_pf_path(part, size)
     draw_pf_index(part, size)
     draw_pf_cursor(part, size)
     --
@@ -1099,49 +1105,52 @@ function draw_pf()
     return true
 end
 
-function draw_pf_path(part)
+function draw_pf_path(part, size)
     local p_count = we_bas_getint(draw_id.p_count)
-    if p_count == nil or p_count < 2 then
-        return
+    if p_count == nil then
+        p_count = 0
     end
     local path = {}
-    local valid_count = 0
+    local valid = 0
     for i = 1, p_count do
         local x = we_bas_getint(draw_id_px[i])
         local y = we_bas_getint(draw_id_py[i])
         if x ~= nil and y ~= nil then
             table.insert(path, x * 1e-3)
             table.insert(path, y * 1e-3)
-            valid_count = valid_count + 1
+            valid = valid + 1
         end
     end
-    if valid_count >= 2 then
-        cus_curve.draw_line(part, 2, path)
+    local sx = size.x / draw_spec.rect_w
+    local sy = size.y / draw_spec.rect_h
+    if valid == 0 then
+        path = draw_circle(0, 0, sx, sy, 7, math.pi / 4, 4)
+    elseif valid == 1 then
+        path = draw_circle(path[1], path[2], sx, sy, 7, math.pi / 4, 4)
     end
+    cus_curve.draw_line(part, 2, path)
 end
 
 function draw_pf_index(part, size)
     local p_index = we_bas_getint(draw_id.p_index)
-    if p_index == nil then
+    local p_count = we_bas_getint(draw_id.p_count)
+    if p_index == nil or p_count == nil then
         return
     end
     local x = we_bas_getint(draw_id_px[p_index + 1])
     local y = we_bas_getint(draw_id_py[p_index + 1])
+    if p_index >= p_count then
+        x = we_bas_getint(draw_id.p_x)
+        y = we_bas_getint(draw_id.p_y)
+    end
     if x == nil or y == nil then
         return
     end
     x = x * 1e-3
     y = y * 1e-3
-    local sx = size.x / 600
-    local sy = size.y / 400
-    local r = 4
-    local index = {}
-    for i = 0, 8 do
-        local rad = (math.pi * 2 * i) / 8
-        index[i * 2 + 1] = x + math.cos(rad) * r * sx
-        index[i * 2 + 2] = y + math.sin(rad) * r * sy
-    end
-    cus_curve.draw_line(part, 3, index)
+    local sx = size.x / draw_spec.rect_w
+    local sy = size.y / draw_spec.rect_h
+    cus_curve.draw_line(part, 3, draw_circle(x, y, sx, sy, 6, 0, draw_spec.index_edge_count))
 end
 
 function draw_pf_cursor(part, size)
@@ -1166,4 +1175,14 @@ function draw_pf_cursor(part, size)
     cursor[9] = x + xo
     cursor[10] = y
     cus_curve.draw_line(part, 5, cursor)
+end
+
+function draw_circle(x, y, sx, sy, r, rad, edge_count)
+    vts = {}
+    for i = 0, edge_count do
+        local irad = rad + (math.pi * 2 * i) / edge_count
+        vts[i * 2 + 1] = x + math.cos(irad) * r * sx
+        vts[i * 2 + 2] = y + math.sin(irad) * r * sy
+    end
+    return vts
 end
