@@ -1054,19 +1054,19 @@ function draw_pf()
     local part = "1_CST_0"
     local axisStyle = {
         color = 0x000000,
-        linetype = 3,
+        linetype = 1,
         width = 1,
         visible = 1,
     }
     local pathStyle = {
-        color = 0x00868b,
+        color = 0x7532a8,
         linetype = 0,
         width = 1,
         visible = 1,
     }
     local pathDirStyle = {
         color = 0xff6600,
-        linetype = 1,
+        linetype = 0,
         width = 1,
         visible = 1,
     }

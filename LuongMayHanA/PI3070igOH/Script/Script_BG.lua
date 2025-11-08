@@ -10,10 +10,6 @@ local bg_id_bit = {
     pf_name_save_trigger = "@B_1#Application.M.hmi.pf_name_save_trigger",
 }
 
-local bg_id_name_show = function (index)
-    return "@W_0#HDW"..index
-end
-
 local bg_repeat_count = {0, 0, 0, 0, 0}
 local bg_repeat_end = function (id, max)
     bg_repeat_count[id] = bg_repeat_count[id] + 1
@@ -77,6 +73,10 @@ local bg_id_pf_name = {
     "@W_1#Application.M.hmi.pf_name_as_array[8]",
     "@W_1#Application.M.hmi.pf_name_as_array[9]",
 }
+
+local bg_id_name_show = function (index)
+    return "@W_0#HDW"..index
+end
 
 local bg_pf_name_update_in_progress = 0
 function bg_pf_name_update()
