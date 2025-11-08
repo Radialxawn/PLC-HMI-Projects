@@ -1085,7 +1085,7 @@ function draw_pf()
     local size = {x = draw_spec.rect_w, y = draw_spec.rect_h}
     local size_x = we_bas_getint(draw_id.size_x)
     local size_y = we_bas_getint(draw_id.size_y)
-    if size_x ~= nil and size_y ~= nil and size_x > 1000 and size_y > 1000 then
+    if size_x ~= nil and size_y ~= nil and size_x > 10000 and size_y > 10000 then
         size.x = math.ceil(size_x * 1e-3)
         size.y = math.ceil(size_y * 1e-3)
     else
@@ -1163,28 +1163,30 @@ function draw_pf_path_dir(part, size)
             local dx = b.x - a.x
             local dy = b.y - a.y
             local d = math.sqrt(dx * dx + dy * dy)
-            local ux = 0
-            local uy = 0
-            local nx = 0
-            local ny = 0
-            if d > 0 then
-                ux = dx / d
-                uy = dy / d
-                nx = uy
-                ny = -ux
+            if d > 1 then
+                local u = {
+                    x = dx / d,
+                    y = dy / d
+                }
+                local n = {x = u.y, y = -u.x}
+                path_dir[1] = a.x
+                path_dir[2] = a.y
+                path_dir[3] = b.x - u.x * 9 * sx
+                path_dir[4] = b.y - u.y * 9 * sy
+                path_dir[5] = b.x - (u.x * 12 - n.x * 5) * sx
+                path_dir[6] = b.y - (u.y * 12 - n.y * 5) * sy
+                path_dir[7] = b.x
+                path_dir[8] = b.y
+                path_dir[9] = b.x - (u.x * 12 + n.x * 5) * sx
+                path_dir[10] = b.y - (u.y * 12 + n.y * 5) * sy
+                path_dir[11] = path_dir[3]
+                path_dir[12] = path_dir[4]
+            else
+                path_dir[1] = a.x
+                path_dir[2] = a.y
+                path_dir[3] = b.x
+                path_dir[4] = b.y
             end
-            path_dir[1] = a.x
-            path_dir[2] = a.y
-            path_dir[3] = b.x - ux * 9 * sx
-            path_dir[4] = b.y - uy * 9 * sy
-            path_dir[5] = b.x - (ux * 12 - nx * 5) * sx
-            path_dir[6] = b.y - (uy * 12 - ny * 5) * sy
-            path_dir[7] = b.x
-            path_dir[8] = b.y
-            path_dir[9] = b.x - (ux * 12 + nx * 5) * sx
-            path_dir[10] = b.y - (uy * 12 + ny * 5) * sy
-            path_dir[11] = path_dir[3]
-            path_dir[12] = path_dir[4]
             valid = true
         end
     end
