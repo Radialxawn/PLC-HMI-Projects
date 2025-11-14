@@ -484,20 +484,6 @@
 		<Label Status="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" LaIndexID="Thêm" CharSize="2320202020202020" LaFrnColor="0xffffff -1" svgfile="Button\Button0007.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x339900 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
 		<Label Status="1" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" CharSize="2020202020202020" LaFrnColor="0x0 0" svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
-	<PartInfo PartType="BitSwitch" PartName="BS_8" PartClassifyType="Switch" PartID="1_BS_8">
-		<General Desc="BS_2" Area="400 270 624 370" OperateAddr="1#Application.M.hmi.overload_fix" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.overload_fix" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="109" LaStartPt="21 22" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="182 56" Locking="0" />
-		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" />
-		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
-		<TrigHide UseShowHide="1" TrigHideAddr="1#Application.M.hmi.view_overload" HideType="0" IsHideAllTime="0" />
-		<Glint UseGlint="0" Glintfrq="0" />
-		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" IsShowGrayScale="0" />
-		<PartPwd IsUesPartPassword="0" IsSetLowerLev="0" PartPasswordLev="0" />
-		<ClickPopTrig />
-		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
-		<Label Status="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" LaIndexID="Quá tải
-(Ấn vào để ấn)" CharSize="2320202020202020" LaFrnColor="0xffffff -1" svgfile="Button\Button0004.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x66ff 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
-		<Label Status="1" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" CharSize="2020202020202020" LaFrnColor="0x0 0" svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
-	</PartInfo>
 	<PartInfo PartType="IndicatorLamp" PartName="BL_3" PartClassifyType="Switch" PartID="1_BL_3">
 		<General Desc="BL_0" Area="555 485 585 515" MonitorAddr="1#Application.M.hmi.view_auto" Fast="1" BmpIndex="-1" LaStartPt="15 15" BitShowReverse="0" FigureFile="" BorderColor="0xf7e7ad 0" TextAlign="0" TextArea="0 0" Locking="0" />
 		<Extension TouchState="1" Buzzer="1" />
@@ -602,6 +588,34 @@
 		<ClickPopTrig />
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 		<Label Status="0" Bold="0" LaIndexID="Tự động" CharSize="2323232323232323" LaFrnColor="0xffffff -1" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" svgfile="Button\Button0002.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x7f7f7f 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" keyValue="0" IsEnableStringTable="0" IsDynamic="0" />
+	</PartInfo>
+	<PartInfo PartType="BitSwitch" PartName="BS_9" PartClassifyType="Switch" PartID="1_BS_9">
+		<General Desc="BS_2" Area="400 320 624 420" OperateAddr="1#Application.M.hmi.problem_fix[1]" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.problem_fix[1]" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="126" LaStartPt="21 22" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="182 56" Locking="0" />
+		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" />
+		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="1" TrigHideAddr="1#Application.M.hmi.view_problem[1]" HideType="0" IsHideAllTime="0" />
+		<Glint UseGlint="0" Glintfrq="0" />
+		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" IsShowGrayScale="0" />
+		<PartPwd IsUesPartPassword="0" IsSetLowerLev="0" PartPasswordLev="0" />
+		<ClickPopTrig />
+		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
+		<Label Status="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" LaIndexID="Quá tải
+(Ấn vào để ấn)" CharSize="2320202020202020" LaFrnColor="0xffffff -1" svgfile="Button\Button0005.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x404c4 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
+		<Label Status="1" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" CharSize="2020202020202020" LaFrnColor="0x0 0" svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
+	</PartInfo>
+	<PartInfo PartType="BitSwitch" PartName="BS_8" PartClassifyType="Switch" PartID="1_BS_8">
+		<General Desc="BS_2" Area="400 220 624 320" OperateAddr="1#Application.M.hmi.problem_fix[0]" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.problem_fix[0]" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="126" Align="3" LaStartPt="21 22" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="182 56" Locking="0" />
+		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" />
+		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="1" TrigHideAddr="1#Application.M.hmi.view_problem[0]" HideType="0" IsHideAllTime="0" />
+		<Glint UseGlint="0" Glintfrq="0" />
+		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" IsShowGrayScale="0" />
+		<PartPwd IsUesPartPassword="0" IsSetLowerLev="0" PartPasswordLev="0" />
+		<ClickPopTrig />
+		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
+		<Label Status="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" LaIndexID="Mất khí
+(Ấn vào để ấn)" CharSize="2320202020202020" LaFrnColor="0xffffff -1" svgfile="Button\Button0005.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x404c4 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
+		<Label Status="1" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" CharSize="2020202020202020" LaFrnColor="0x0 0" svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
 	<PartInfo PartType="Rect" PartName="REC_1" PartClassifyType="OtherClassType" PartID="1_REC_1">
 		<General Area="195 120 815 520" Rx="0" LineType="1" BorderColor="0xb07928 0" Pattern="-1" BgColor="0x0 0" PatternNew="0" BgColorNew="0xfefab8 -1" ChangeColor="0xffffff 0" IsCirleAngle="0" IsCorlorAddr="0" LineTranValue="0" IsTranValue="0" LineWidth="1" CirleAngle="1" IsMoveControl="0" Locking="0" />

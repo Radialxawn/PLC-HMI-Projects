@@ -2024,6 +2024,24 @@ local draw_spec = {
     p_scale = 2e-1, -- get from plc
 }
 
+local draw_size = {
+    x = draw_spec.rect_w,
+    y = draw_spec.rect_h,
+    sx = 1,
+    sy = 1,
+}
+
+local draw_id_cursor = {
+    ax1 = "@W_0#HDW100",
+    ay1 = "@W_0#HDW101",
+    ax2 = "@W_0#HDW102",
+    ay2 = "@W_0#HDW103",
+    bx1 = "@W_0#HDW104",
+    by1 = "@W_0#HDW105",
+    bx2 = "@W_0#HDW106",
+    by2 = "@W_0#HDW107",
+}
+
 local draw_pf_in_progress = 0
 function draw_pf()
     if draw_pf_in_progress == 1 then
@@ -2032,12 +2050,13 @@ function draw_pf()
     draw_pf_in_progress = 1
     local part = "1_CST_0"
     --
-    local size = {x = draw_spec.rect_w, y = draw_spec.rect_h}
     local size_x = we_bas_getint(draw_id.size_x)
     local size_y = we_bas_getint(draw_id.size_y)
     if size_x ~= nil and size_y ~= nil and size_x > 10000 and size_y > 10000 then
-        size.x = math.ceil(size_x * draw_spec.s_scale)
-        size.y = math.ceil(size_y * draw_spec.s_scale)
+        draw_size.x = math.ceil(size_x * draw_spec.s_scale)
+        draw_size.y = math.ceil(size_y * draw_spec.s_scale)
+        draw_size.sx = draw_size.x / draw_spec.rect_w
+        draw_size.sy = draw_size.y / draw_spec.rect_h
     else
         draw_pf_in_progress = 0
         return false
@@ -2050,21 +2069,21 @@ function draw_pf()
         return false
     end
     cus_curve.init(part, 1, 1)
-    cus_curve.set_range(part, "x", 0, size.x)
-    cus_curve.set_range(part, "y", 0, size.y)
+    cus_curve.set_range(part, "x", 0, draw_size.x)
+    cus_curve.set_range(part, "y", 0, draw_size.y)
     --
-    draw_pf_axis(part, 1, size)
-    draw_pf_path(part, 2, size)
-    draw_pf_visual_path_dir(part, 3, size)
-    draw_pf_visual_index(part, 4, size)
-    draw_pf_visual_cursor(part, 5, size)
+    draw_pf_axis(part, 1)
+    draw_pf_path(part, 2)
+    draw_pf_visual_path_dir(part, 3)
+    draw_pf_visual_index(part, 4)
+    draw_pf_visual_cursor(part, 5)
     --
     cus_curve.refresh(part)
     draw_pf_in_progress = 0
     return true
 end
 
-function draw_pf_axis(part, id, size)
+function draw_pf_axis(part, id)
     local axisStyle = {
         color = 0x000000,
         linetype = 1,
@@ -2072,11 +2091,11 @@ function draw_pf_axis(part, id, size)
         visible = 1,
     }
     cus_curve.set_line(part, id, 5, axisStyle)
-    local axis = {0, 0, 0, size.y, size.x, size.y, size.x, 0, 0, 0}
+    local axis = {0, 0, 0, draw_size.y, draw_size.x, draw_size.y, draw_size.x, 0, 0, 0}
     cus_curve.draw_line(part, id, axis)
 end
 
-function draw_pf_path(part, id, size)
+function draw_pf_path(part, id)
     local pathStyle = {
         color = 0x7532a8,
         linetype = 0,
@@ -2099,17 +2118,15 @@ function draw_pf_path(part, id, size)
             valid = valid + 1
         end
     end
-    local sx = size.x / draw_spec.rect_w
-    local sy = size.y / draw_spec.rect_h
     if valid == 0 then
-        path = draw_circle(0, 0, sx, sy, 7, math.pi / 4, 4)
+        path = draw_circle(0, 0, draw_size.sx, draw_size.sy, 7, math.pi / 4, 4)
     elseif valid == 1 then
-        path = draw_circle(path[1], path[2], sx, sy, 7, math.pi / 4, 4)
+        path = draw_circle(path[1], path[2], draw_size.sx, draw_size.sy, 7, math.pi / 4, 4)
     end
     cus_curve.draw_line(part, id, path)
 end
 
-function draw_pf_visual_path_dir(part, id, size)
+function draw_pf_visual_path_dir(part, id)
     local pathDirStyle = {
         color = 0xff6600,
         linetype = 0,
@@ -2121,8 +2138,6 @@ function draw_pf_visual_path_dir(part, id, size)
     if p_count == nil then
         p_count = 0
     end
-    local sx = size.x / draw_spec.rect_w
-    local sy = size.y / draw_spec.rect_h
     local path_dir = {}
     local valid = false
     if p_count >= 2 then
@@ -2148,14 +2163,14 @@ function draw_pf_visual_path_dir(part, id, size)
                 local n = {x = u.y, y = -u.x}
                 path_dir[1] = a.x
                 path_dir[2] = a.y
-                path_dir[3] = b.x - u.x * 9 * sx
-                path_dir[4] = b.y - u.y * 9 * sy
-                path_dir[5] = b.x - (u.x * 12 - n.x * 5) * sx
-                path_dir[6] = b.y - (u.y * 12 - n.y * 5) * sy
+                path_dir[3] = b.x - u.x * 9 * draw_size.sx
+                path_dir[4] = b.y - u.y * 9 * draw_size.sy
+                path_dir[5] = b.x - (u.x * 12 - n.x * 5) * draw_size.sx
+                path_dir[6] = b.y - (u.y * 12 - n.y * 5) * draw_size.sy
                 path_dir[7] = b.x
                 path_dir[8] = b.y
-                path_dir[9] = b.x - (u.x * 12 + n.x * 5) * sx
-                path_dir[10] = b.y - (u.y * 12 + n.y * 5) * sy
+                path_dir[9] = b.x - (u.x * 12 + n.x * 5) * draw_size.sx
+                path_dir[10] = b.y - (u.y * 12 + n.y * 5) * draw_size.sy
                 path_dir[11] = path_dir[3]
                 path_dir[12] = path_dir[4]
             else
@@ -2168,12 +2183,12 @@ function draw_pf_visual_path_dir(part, id, size)
         end
     end
     if valid == false then
-        path_dir = draw_circle(0, 0, sx, sy, 7, math.pi / 4, 4)
+        path_dir = draw_circle(0, 0, draw_size.sx, draw_size.sy, 7, math.pi / 4, 4)
     end
     cus_curve.draw_line(part, id, path_dir)
 end
 
-function draw_pf_visual_index(part, id, size)
+function draw_pf_visual_index(part, id)
     local indexStyle = {
         color = 0x0000ff,
         linetype = 0,
@@ -2199,12 +2214,10 @@ function draw_pf_visual_index(part, id, size)
     end
     x = x * scale
     y = y * scale
-    local sx = size.x / draw_spec.rect_w
-    local sy = size.y / draw_spec.rect_h
-    cus_curve.draw_line(part, id, draw_circle(x, y, sx, sy, 6, 0, draw_spec.index_edge_count))
+    cus_curve.draw_line(part, id, draw_circle(x, y, draw_size.sx, draw_size.sy, 6, 0, draw_spec.index_edge_count))
 end
 
-function draw_pf_visual_cursor(part, id, size)
+function draw_pf_visual_cursor(part, id)
     local cursorStyle = {
         color = 0xff0000,
         linetype = 2,
@@ -2219,8 +2232,8 @@ function draw_pf_visual_cursor(part, id, size)
     end
     x = x * draw_spec.s_scale
     y = y * draw_spec.s_scale
-    local xo = size.x * 2
-    local yo = size.y * 2
+    local xo = draw_size.x * 2
+    local yo = draw_size.y * 2
     local cursor = {}
     cursor[1] = x
     cursor[2] = y + yo
