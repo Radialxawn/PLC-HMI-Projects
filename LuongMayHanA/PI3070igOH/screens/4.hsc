@@ -107,7 +107,7 @@
 		<General TextContent="Chiều xoay thuận" LaFrnColor="0x0 0" IsBackColor="0" BgColor="0xfdf0c4 0" CharSize="2314141414141414" Bold="0" StartPt="209 145" Width="0" Height="0" Area="209 145 417 173" InAlign="1" Locking="0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
 	<PartInfo PartType="BitSwitch" PartName="BS_0" PartClassifyType="Switch" PartID="3_BS_0">
-		<General Desc="BS_0" Area="430 140 510 170" OperateAddr="1#Application.M.hmi.sv.gear_dir[0]" Fast="1" BitFunc="1" Monitor="1" MonitorAddr="1#Application.M.hmi.sv.gear_dir[0]" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="116" LaStartPt="40 15" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="0 0" Locking="0" />
+		<General Desc="BS_0" Area="430 140 510 170" OperateAddr="1#Application.M.hmi.sv.gear_dir[0]" Fast="1" BitFunc="3" Monitor="1" MonitorAddr="1#Application.M.hmi.sv.gear_dir[0]" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="116" LaStartPt="40 15" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="0 0" Locking="0" />
 		<Extension TouchState="1" Buzzer="1" IsCheck="1" AckTime="20" />
 		<MoveZoom DataFormatMZ="0" MutipleMZ="1.000000000000000" />
 		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
@@ -160,7 +160,7 @@
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
 	<PartInfo PartType="BitSwitch" PartName="BS_2" PartClassifyType="Switch" PartID="3_BS_2">
-		<General Desc="BS_2" Area="903 539 1023 599" OperateAddr="1#Application.M.hmi.home" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.home" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="109" Align="3" LaStartPt="14 16" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="0 0" Locking="0" />
+		<General Desc="BS_2" Area="903 539 1023 599" OperateAddr="1#Application.M.hmi.home" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.home" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="109" Align="3" LaStartPt="14 16" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="91 28" Locking="0" />
 		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" />
 		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
 		<TrigHide UseShowHide="1" TrigHideAddr="1#Application.M.hmi.view_can_home" HideType="0" IsHideAllTime="0" />
@@ -340,7 +340,7 @@
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
 	<PartInfo PartType="BitSwitch" PartName="BS_5" PartClassifyType="Switch" PartID="3_BS_5">
-		<General Desc="BS_2" Area="452 539 572 599" OperateAddr="1#Application.M.hmi.sv_trigger" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.sv_trigger" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="109" Align="3" LaStartPt="40 16" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="0 0" Locking="0" />
+		<General Desc="BS_2" Area="452 539 572 599" OperateAddr="1#Application.M.hmi.sv_trigger" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.sv_trigger" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="109" Align="3" LaStartPt="40 16" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="39 28" Locking="0" />
 		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" />
 		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
 		<TrigHide UseShowHide="1" TrigHideAddr="1#Application.M.hmi.sv_need" HideType="0" IsHideAllTime="0" />
