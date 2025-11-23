@@ -5,7 +5,7 @@
 	<StringLib Language="0" />
 	<SysSet>
 		<SecSet Design="" />
-		<NETSet NET2IPaddr="192.168.1.67" NET2MASKaddr="255.255.255.0" NET2Wayaddr="192.168.1.1" NETIPaddr="192.168.1.100" NETMASKaddr="255.255.255.0" NETWayaddr="192.168.1.1" DNS1="8.8.8.8" DNS2="0.0.0.0" UseNet="0" UseNet2="0" />
+		<NETSet NET2IPaddr="192.168.1.67" NET2MASKaddr="255.255.255.0" NET2Wayaddr="192.168.1.1" UseNet="1" NETIPaddr="192.168.1.100" NETMASKaddr="255.255.255.0" NETWayaddr="192.168.1.1" DNS1="8.8.8.8" DNS2="0.0.0.0" UseNet2="0" />
 		<UpnpPortSet UsePortMapping="0" />
 		<RemoteSet RemotePwd="888888" />
 		<ServerSet ServerAddr="hmi.weconcloud.com" />
@@ -36,7 +36,7 @@
 	<PlcSet Count="1">
 		<Connection>
 			<PLC TypeAlias="CODESYS V3" Type="CODESYS V3" Driver="libCodesysV3.so" HmiStatNo="0" PlcStatNo="1" />
-			<CommSet Port="Ethernet" UseUserInfo="0" UserName="" UserPwd="" ComType="0" BaudRate="" StopBit="" DataLength="" CheckBit="" RetryTimes="2" WaitTimeout="1500" RevTimeout="50" RetryTimeOut="3" ComIoDelayTime="0" SingleReadLen="0" ComStepInterval="5" CustomName="PLC" NETIPaddr="192.168.1.3" NETPort="11740" NETBroadcastAddr="0" NETIsBroadcast="0" NETIsUDP="2" EthType="0" />
+			<CommSet Port="Ethernet" UseUserInfo="0" UserName="" UserPwd="" ComType="0" BaudRate="" StopBit="" DataLength="" CheckBit="" RetryTimes="2" WaitTimeout="1500" RevTimeout="50" RetryTimeOut="3" ComIoDelayTime="0" SingleReadLen="0" ComStepInterval="5" CustomName="PLC" NETIPaddr="192.168.1.3" NETPort="502" NETBroadcastAddr="0" NETIsBroadcast="0" NETIsUDP="2" EthType="0" />
 		</Connection>
 	</PlcSet>
 </project>
