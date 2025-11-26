@@ -405,4 +405,17 @@
 	<PartInfo PartType="Text" PartName="TXT_24" PartClassifyType="OtherClassType" PartID="2_TXT_24">
 		<General TextContent="15" LaFrnColor="0x0 0" IsBackColor="0" BgColor="0xfdf0c4 0" CharSize="2314141414141414" Bold="0" StartPt="875 195" Width="0" Height="0" Area="875 195 901 223" InAlign="1" Locking="0" IsEnableStringTable="0" IsDynamic="0" />
 	</PartInfo>
+	<PartInfo PartType="BitSwitch" PartName="BS_1" PartClassifyType="Switch" PartID="2_BS_1">
+		<General Desc="BS_2" Area="903 539 1023 599" OperateAddr="1#Application.M.hmi.home" Fast="1" BitFunc="2" Monitor="1" MonitorAddr="1#Application.M.hmi.home" FigureFile="" BorderColor="0xf7e7ad 0" BmpIndex="109" Align="3" LaStartPt="14 16" BitShowReverse="0" IsIndirectR="0" IndirectLabelIndexR="0" IsIndirectW="0" IndirectLabelIndexW="0" MinClickTime="0" TextAlign="0" TextArea="91 28" Locking="0" />
+		<Extension TouchState="1" Buzzer="1" IsCheck="0" AckTime="0" />
+		<MoveZoom DataFormatMZ="4" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="1" TrigHideAddr="1#Application.M.hmi.view_can_home" HideType="0" IsHideAllTime="0" />
+		<Glint UseGlint="0" Glintfrq="0" />
+		<Lock Lockmate="0" UnDrawLock="0" LockMode="0" IsShowGrayScale="0" />
+		<PartPwd IsUesPartPassword="0" IsSetLowerLev="0" PartPasswordLev="0" />
+		<ClickPopTrig />
+		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
+		<Label Status="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" LaIndexID="Lấy gốc" CharSize="2320202020202020" LaFrnColor="0xffffff -1" svgfile="Button\Button0004.svg" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x66ff 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
+		<Label Status="1" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" Bold="0" CharSize="2020202020202020" LaFrnColor="0x0 0" svgfile="" dark="0x0 0" light="0x0 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0x0 0" gmidcolor="0x0 0" gendcolor="0x0 0" IsEnableStringTable="0" IsDynamic="0" />
+	</PartInfo>
 </ScrInfo>
