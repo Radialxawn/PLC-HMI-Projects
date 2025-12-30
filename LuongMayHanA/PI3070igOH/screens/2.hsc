@@ -325,4 +325,16 @@
 		<ClickPopTrig />
 		<UserAuthority IsUseUserAuthority="0" IsPopUserLoginWin="0" PopType="0" IsHidePart="0" />
 	</PartInfo>
+	<PartInfo PartType="Text" PartName="TXT_20" PartClassifyType="OtherClassType" PartID="4_TXT_20">
+		<General TextContent="Nút chạy tự động" LaFrnColor="0x0 0" IsBackColor="0" BgColor="0xfdf0c4 0" CharSize="2314141414141414" Bold="0" StartPt="607 40" Width="0" Height="0" Area="607 40 815 68" InAlign="1" Locking="0" IsEnableStringTable="0" IsDynamic="0" />
+	</PartInfo>
+	<PartInfo PartType="IndicatorLamp" PartName="BL_22" PartClassifyType="Switch" PartID="4_BL_22">
+		<General Desc="BL_0" Area="552 30 592 70" MonitorAddr="1#Application.M.hmi.view_input[6]" Fast="1" BmpIndex="-1" LaStartPt="8 8" BitShowReverse="0" FigureFile="" BorderColor="0xf7e7ad 0" TextAlign="0" TextArea="24 24" Locking="0" />
+		<Extension TouchState="1" Buzzer="1" />
+		<MoveZoom DataFormatMZ="0" MutipleMZ="1.000000000000000" />
+		<TrigHide UseShowHide="0" HideType="0" IsHideAllTime="0" />
+		<Glint UseGlint="0" Glintfrq="0" />
+		<Label Status="0" Bold="0" LaIndexID="06" CharSize="2814141414141414" LaFrnColor="0x0 0" svgfile="Circle\Circle1453.svg" dark="0x0 0" light="0xffccaa 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0xffffff 0" gmidcolor="0x0 0" gendcolor="0xfa6508 0" IsEnableStringTable="0" IsDynamic="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" />
+		<Label Status="1" Bold="0" LaIndexID="06" CharSize="2814141414141414" LaFrnColor="0x0 0" svgfile="Circle\Circle1455.svg" dark="0x0 0" light="0xaaffaa 0" hlight="0x0 0" shadow="0x0 0" shape="0x0 0" gstartcolor="0xffffff 0" gmidcolor="0x0 0" gendcolor="0xff00 0" IsEnableStringTable="0" IsDynamic="0" Pattern="1" FrnColor="0xfdf0c4 0" BgColor="0xfdf0c4 0" />
+	</PartInfo>
 </ScrInfo>
