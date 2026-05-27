@@ -1,0 +1,41 @@
+UAC command execution result : succeeds,Self,LW_Bit,895100,,Undesignated
+UAC command execution result : invalid command,Self,LW_Bit,895101,,Undesignated
+UAC command execution result : account exists,Self,LW_Bit,895102,,Undesignated
+UAC command execution result : account not exists,Self,LW_Bit,895103,,Undesignated
+UAC command execution result : password error,Self,LW_Bit,895104,,Undesignated
+UAC command execution result : deny command,Self,LW_Bit,895105,,Undesignated
+UAC command execution result : invalid name,Self,LW_Bit,895106,,Undesignated
+UAC command execution result : invalid password character exists,Self,LW_Bit,895107,,Undesignated
+UAC command execution result : invalid import data,Self,LW_Bit,895108,,Undesignated
+UAC command execution result : out of validity range,Self,LW_Bit,895109,,Undesignated
+UAC privilege (Class A ),Self,LW_Bit,895300,,Undesignated
+UAC privilege (Class B ),Self,LW_Bit,895301,,Undesignated
+UAC privilege (Class C ),Self,LW_Bit,895302,,Undesignated
+UAC privilege (Class D ),Self,LW_Bit,895303,,Undesignated
+UAC privilege (Class E ),Self,LW_Bit,895304,,Undesignated
+UAC privilege (Class F ),Self,LW_Bit,895305,,Undesignated
+UAC privilege (Class G ),Self,LW_Bit,895306,,Undesignated
+UAC privilege (Class H ),Self,LW_Bit,895307,,Undesignated
+UAC privilege (Class I ),Self,LW_Bit,895308,,Undesignated
+UAC privilege (Class J ),Self,LW_Bit,895309,,Undesignated
+UAC privilege (Class K ),Self,LW_Bit,895310,,Undesignated
+UAC privilege (Class L ),Self,LW_Bit,895311,,Undesignated
+UAC command,Self,LW,8950,,Undesignated
+UAC command execution result,Self,LW,8951,,Undesignated
+UAC user index,Self,LW,8952,,Undesignated
+UAC user privilege,Self,LW,8953,,Undesignated
+UAC user name,Self,LW,8954,,Undesignated
+UAC password,Self,LW,8962,,Undesignated
+logout_need,Self,LB,0,,Undesignated
+login_window_trigger,Self,LW,10,,Undesignated
+login_window_id,Self,LW,12,,16-bit Unsigned
+set_index,Self,LW,14,,16-bit Unsigned
+jog_dummy,Self,LW,1000,,Undesignated
+set_active,Self,LB,1,,Undesignated
+jog_index_show,Self,LB,2,,Undesignated
+shape_0,Self,LW,100,,Undesignated
+shape_1,Self,LW,102,,Undesignated
+shape_2,Self,LW,104,,Undesignated
+shape_3,Self,LW,106,,Undesignated
+shape_4,Self,LW,108,,Undesignated
+shape_changed,Self,LB,3,,Undesignated
