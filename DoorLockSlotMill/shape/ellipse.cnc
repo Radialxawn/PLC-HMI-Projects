@@ -1,0 +1,10 @@
+LET #a : LREAL := 0
+LET #k : LREAL := 0.01745329252
+
+N0 F60
+N1 G0 X0 Y0 Z0
+N2 G1 Z$VI$
+
+N20 G1 X100*cos{#a} Y100*sin{#a}
+N21 G37 O#a D1*#k
+N30 G20 L20
