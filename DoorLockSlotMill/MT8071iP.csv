@@ -32,10 +32,8 @@ login_window_id,Self,LW,12,,16-bit Unsigned
 set_index,Self,LW,14,,16-bit Unsigned
 jog_dummy,Self,LW,1000,,Undesignated
 set_active,Self,LB,1,,Undesignated
-jog_index_show,Self,LB,2,,Undesignated
 shape_0,Self,LW,100,,Undesignated
 shape_1,Self,LW,102,,Undesignated
 shape_2,Self,LW,104,,Undesignated
 shape_3,Self,LW,106,,Undesignated
 shape_4,Self,LW,108,,Undesignated
-shape_changed,Self,LB,3,,Undesignated
