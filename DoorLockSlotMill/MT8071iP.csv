@@ -37,3 +37,10 @@ shape_1,Self,LW,102,,Undesignated
 shape_2,Self,LW,104,,Undesignated
 shape_3,Self,LW,106,,Undesignated
 shape_4,Self,LW,108,,Undesignated
+list_update,Self,LW,130,,Undesignated
+list_count,Self,LW,131,,Undesignated
+list_index,Self,LW,132,,Undesignated
+list_progress,Self,LW,140,,Undesignated
+name_temp,Self,LW,150,,Undesignated
+list_begin,Self,LW,200,,Undesignated
+list_update_ing,Self,LB,2,,Undesignated
