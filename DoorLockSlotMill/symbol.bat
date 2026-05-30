@@ -1,0 +1,1 @@
+magick -size 64x64 -background none symbol_cog.svg symbol_cog.png
