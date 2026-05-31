@@ -1,19 +1,16 @@
-N0 F$VF$
-N1 G0 X0 Y0 Z0
-N2 G1 Z$VZ$
-
-N10 G42 D$VT$*0.5
-N11 G1 Y-$VB$*0.5
-N12 G1 X-$VA$*0.5+$VC$
-N13 G2 X-$VA$*0.5 Y-$VB$*0.5+$VC$ R$VC$
-N14 G1 Y$VB$*0.5-$VC$
-N15 G2 X-$VA$*0.5+$VC$ Y$VB$*0.5 R$VC$
-N16 G1 X$VA$*0.5-$VC$
-N17 G2 X$VA$*0.5 Y$VB$*0.5-$VC$ R$VC$
-N18 G1 Y-$VB$*0.5+$VC$
-N19 G2 X$VA$*0.5-$VC$ Y-$VB$*0.5 R$VC$
-N20 G1 X-$VA$*0.5+$VC$
-N29 G40
-
-N30 G1 X0 Y0
-N31 G1 Z0
+LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}
+LET #b : LREAL := MAX{0.001, {$VB$-$VT$}*0.5}
+LET #r : LREAL := MAX{0.001, $VC$-$VT$*0.5}
+N3 G0 X-#a
+N4 G1 Z$VZ$
+N5 G1 Y#b-#r
+N6 G2 X-#a+#r Y#b R#r
+N7 G1 X#a-#r
+N8 G2 X#a Y#b-#r R#r
+N9 G1 Y-#b+#r
+N10 G2 X#a-#r Y-#b R#r
+N11 G1 X-#a+#r
+N12 G2 X-#a Y-#b+#r R#r
+N13 G1 Y0
+N14 G0 X0 Y0
+N15 G0 Z0
