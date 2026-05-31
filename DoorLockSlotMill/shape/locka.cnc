@@ -12,4 +12,3 @@ N10 G1 X#a-#rc*2 Y0
 N11 G2 X#a R#rc
 N12 G2 X#a-#rc*2 R#rc
 N13 G0 X0 Y0
-N14 G0 Z0

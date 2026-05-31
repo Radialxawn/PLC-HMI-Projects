@@ -14,4 +14,3 @@ N12 G1 Z$VZ$
 N13 G2 X#r R#r
 N14 G2 X-#r R#r
 N15 G0 X0 Y0
-N16 G0 Z0

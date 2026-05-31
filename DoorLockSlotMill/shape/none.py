@@ -8,7 +8,6 @@ shape = {
 		'G2 X-#r R#r',
 		#
 		'G0 X0 Y0',
-		'G0 Z0',
 	],
 	'rect' : [
 		'LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',
@@ -23,7 +22,6 @@ shape = {
 		'G1 Y0',
 		#
 		'G0 X0 Y0',
-		'G0 Z0',
 	],
 	'capsule' : [
 		'LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',
@@ -38,7 +36,6 @@ shape = {
 		'G2 X-#a Y0 R#r',
 		#
 		'G0 X0 Y0',
-		'G0 Z0',
 	],
 	'rectr' : [
 		'LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',
@@ -58,7 +55,6 @@ shape = {
 		'G1 Y0',
 		#
 		'G0 X0 Y0',
-		'G0 Z0',
 	],
 	'ellipse' : [
 		'LET #x : LREAL := {$VA$+$VB$}*0.5',
@@ -79,7 +75,6 @@ shape = {
 		'G2 X-#r R#r',
 		#
 		'G0 X0 Y0',
-		'G0 Z0',
 	],
 	'locka' : [
 		'LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',
@@ -99,7 +94,6 @@ shape = {
 		'G2 X#a-#rc*2 R#rc',
 		#
 		'G0 X0 Y0',
-		'G0 Z0',
 	],
 	'lockb' : [
 		'LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',
@@ -121,7 +115,6 @@ shape = {
 		'G1 Y0',
 		#
 		'G0 X0 Y0',
-		'G0 Z0',
 	]
 }
 

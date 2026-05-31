@@ -8,4 +8,3 @@ N6 G1 Y-#b
 N7 G1 X-#a
 N8 G1 Y0
 N9 G0 X0 Y0
-N10 G0 Z0
