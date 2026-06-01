@@ -125,13 +125,13 @@ shape = {
 		'LET #h : LREAL := MAX{0.001, $VC$-$VB$*0.5-$VT$*0.5}',
 		'LET #w : LREAL := MAX{0.001, {$VD$-$VT$}*0.5}',
 		# capsule
-		'G0 X-#a',
+		'G0 X#a',
 		'G1 Z$VZ$',
-		'G2 X-#a+#r Y#r R#r',
-		'G1 X#a-#r',
-		'G2 Y-#r R#r',
+		'G2 X#a-#r Y-#r R#r',
 		'G1 X-#a+#r',
-		'G2 X-#a Y0 R#r',
+		'G2 Y#r R#r',
+		'G1 X#a-#r',
+		'G2 X#a Y0 R#r',
 		#
 		'G1 X#w Y0',
 		'G1 Y-#h',
@@ -140,9 +140,30 @@ shape = {
 		#
 		'G0 Z0',
 		'G0 X0 Y0',
+	],
+	'lockbf' : [
+		'LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',
+		'LET #r : LREAL := MAX{0.001, {$VB$-$VT$}*0.5}',
+		'LET #h : LREAL := MAX{0.001, $VC$-$VB$*0.5-$VT$*0.5}',
+		'LET #w : LREAL := MAX{0.001, {$VD$-$VT$}*0.5}',
+		# capsule
+		'G0 X-#a',
+		'G1 Z$VZ$',
+		'G2 X-#a+#r Y#r R#r',
+		'G1 X#a-#r',
+		'G2 Y-#r R#r',
+		'G1 X-#a+#r',
+		'G2 X-#a Y0 R#r',
+		#
+		'G1 X-#w Y0',
+		'G1 Y#h',
+		'G1 X#w',
+		'G1 Y0',
+		#
+		'G0 Z0',
+		'G0 X0 Y0',
 	]
 }
-
 
 for k, v in shape.items():
 	for i, j in enumerate(v):
