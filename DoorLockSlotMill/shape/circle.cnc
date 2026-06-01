@@ -3,4 +3,5 @@ N1 G0 X-#r
 N2 G1 Z$VZ$
 N3 G2 X#r R#r
 N4 G2 X-#r R#r
-N5 G0 X0 Y0
+N5 G0 Z0
+N6 G0 X0 Y0

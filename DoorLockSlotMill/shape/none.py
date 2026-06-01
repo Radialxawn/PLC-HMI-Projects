@@ -7,6 +7,7 @@ shape = {
 		'G2 X#r R#r',
 		'G2 X-#r R#r',
 		#
+		'G0 Z0',
 		'G0 X0 Y0',
 	],
 	'rect' : [
@@ -21,6 +22,7 @@ shape = {
 		'G1 X-#a',
 		'G1 Y0',
 		#
+		'G0 Z0',
 		'G0 X0 Y0',
 	],
 	'capsule' : [
@@ -35,6 +37,7 @@ shape = {
 		'G1 X-#a+#r',
 		'G2 X-#a Y0 R#r',
 		#
+		'G0 Z0',
 		'G0 X0 Y0',
 	],
 	'rectr' : [
@@ -54,6 +57,7 @@ shape = {
 		'G2 X-#a Y-#b+#r R#r',
 		'G1 Y0',
 		#
+		'G0 Z0',
 		'G0 X0 Y0',
 	],
 	'ellipse' : [
@@ -74,6 +78,7 @@ shape = {
 		'G2 X#r R#r',
 		'G2 X-#r R#r',
 		#
+		'G0 Z0',
 		'G0 X0 Y0',
 	],
 	'locka' : [
@@ -93,6 +98,7 @@ shape = {
 		'G2 X#a R#rc',
 		'G2 X#a-#rc*2 R#rc',
 		#
+		'G0 Z0',
 		'G0 X0 Y0',
 	],
 	'lockb' : [
@@ -114,6 +120,7 @@ shape = {
 		'G1 X-#w',
 		'G1 Y0',
 		#
+		'G0 Z0',
 		'G0 X0 Y0',
 	]
 }
