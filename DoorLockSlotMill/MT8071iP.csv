@@ -27,11 +27,14 @@ UAC user privilege,Self,LW,8953,,Undesignated
 UAC user name,Self,LW,8954,,Undesignated
 UAC password,Self,LW,8962,,Undesignated
 logout_need,Self,LB,0,,Undesignated
+set_active,Self,LB,1,,Undesignated
+list_update_ing,Self,LB,2,,Undesignated
+loading,Self,LB,3,,Undesignated
+loading_ignore,Self,LW,0,,Undesignated
+jog_dummy,Self,LW,2,,Undesignated
 login_window_trigger,Self,LW,10,,Undesignated
 login_window_id,Self,LW,12,,16-bit Unsigned
 set_index,Self,LW,14,,16-bit Unsigned
-jog_dummy,Self,LW,1000,,Undesignated
-set_active,Self,LB,1,,Undesignated
 shape_0,Self,LW,100,,Undesignated
 shape_1,Self,LW,102,,Undesignated
 shape_2,Self,LW,104,,Undesignated
@@ -43,4 +46,3 @@ list_index,Self,LW,132,,Undesignated
 list_progress,Self,LW,140,,Undesignated
 name_temp,Self,LW,150,,Undesignated
 list_begin,Self,LW,200,,Undesignated
-list_update_ing,Self,LB,2,,Undesignated
