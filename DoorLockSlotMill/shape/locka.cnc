@@ -10,5 +10,5 @@ N8 G1 X#a-#r
 N9 G2 X#a Y0 R#r
 N10 G2 X#a-#rc*2 Y0 R#rc
 N11 G2 X#a R#rc
-N12 G0 Z0
-N13 G0 X0 Y0
+N12 G1 X0 Y0
+N13 G0 Z0
