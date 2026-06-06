@@ -39,10 +39,10 @@ class UaClient(object):
             print('No connection')
         return self._connected
 
-    def get_id__node(self, _ids_):
-        nodes = [self.client.get_node(i) for i in _ids_]
+    def id__node(self, _ids_):
+        nodes = [self.client.get_node(id) for id in _ids_]
         return dict(zip(_ids_, nodes))
     
-    def get_node__value(self, _nodes_):
+    def node__value(self, _nodes_):
         values = self.client.read_values(_nodes_)
         return dict(zip(_nodes_, values))
