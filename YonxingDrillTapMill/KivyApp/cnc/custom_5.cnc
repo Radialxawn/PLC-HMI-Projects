@@ -9,4 +9,4 @@ N7 G1 X0 Y0
 N8 G1 X0 Y150
 N9 G1 X150 Y150
 N10 G0 X0 Y0
-(end file 0)
+(crazy)

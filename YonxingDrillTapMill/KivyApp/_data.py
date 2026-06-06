@@ -12,16 +12,14 @@ class DataBlock(object):
 
 class Data(object):
     def __init__(self, _uac_, _address_):
+        self.uac = _uac_
         self.address = _address_
         self.id__block = {}
         self.name__block = {}
-        self._uac = _uac_
-        self._get_done = False
 
     def create(self, _xml_path_, _head_):
         tree = ET.parse(_xml_path_)
         root = tree.getroot()
-
         stype__uatype = {
             'T_BOOL': ua.VariantType.Boolean,
             'T_INT': ua.VariantType.Int16,
@@ -30,7 +28,6 @@ class Data(object):
             'T_UDINT': ua.VariantType.UInt32,
             'T_STRING': ua.VariantType.String,
         }
-
         # user type process
         utype_last = ''
         utype__elms = {}
@@ -55,7 +52,6 @@ class Data(object):
                         utype_last = d['name']
                         if utype_last not in utype__elms:
                             utype__elms[utype_last] = []
-
         # node process
         head_part = [_head_] + [''] * 5
         node__utype = {}
@@ -79,16 +75,13 @@ class Data(object):
                         node__utype[head] = d['type']
                     else:
                         head_part[level] = d['name']
-
         # generate process
-        self.count = 0
-        self.count_max = 10
         ids = []
         types = []
         for node, utype in node__utype.items():
             elms = utype__elms[utype]
             self._create_generate(node, elms, stype__uatype, utype__elms, ids, types)
-        
+        # apply process
         self.ids = ids
         head = '.'.join(item for item in head_part if item)
         for id, type in zip(ids, types):
@@ -101,9 +94,6 @@ class Data(object):
             sname = e['iecname']
             stype = e['type']
             if stype in _stype__uatype_: # simple type
-                self.count += 1
-                if self.count > self.count_max:
-                    break
                 if sname[0] == '[': # array element
                     name = '%s%s' % (_node_, sname)
                 else:
@@ -126,8 +116,10 @@ class Data(object):
                     elms.append(e)
                 self._create_generate('%s.%s' % (_node_, sname), elms, _stype__uatype_, _utype__elms_, _ids_, _types_)
     
-    def start(self, _dt_):
-        self._get_done = True
+    def start(self, _dt_, _step_):
+        self._get_all_done = True
+        self._get_all_index = 0
+        self._get_all_step = _step_
         self._get_all_clock = Clock.schedule_interval(self._get_all, _dt_)
     
     def stop(self):
@@ -136,11 +128,19 @@ class Data(object):
             delattr(self, '_get_all_clock')
 
     def _get_all(self, _dt_):
-        if not self._get_done:
+        if not self._get_all_done:
             return
-        self._get_done = False
-        id__node = self._uac.id__node(self.ids)
-        node__value = self._uac.node__value(id__node.values())
+        self._get_all_done = False
+        si = self._get_all_index
+        se = si + self._get_all_step
+        count = len(self.ids)
+        if se > count:
+            self._get_all_index = 0
+        else:
+            self._get_all_index += self._get_all_step
+        ids = self.ids[si:se]
+        id__node = self.uac.id__node(ids)
+        node__value = self.uac.node__value(id__node.values())
         for id in id__node:
             node = id__node[id]
             value = node__value[node]
@@ -148,9 +148,7 @@ class Data(object):
             block.node = node
             block.value = value
             self._change_check(id, value)
-        '''
-        '''
-        self._get_done = True
+        self._get_all_done = True
 
     def _change_check(self, _id_, _value_):
         block = self.id__block[_id_]

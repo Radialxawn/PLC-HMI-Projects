@@ -66,12 +66,13 @@ class Main(FloatLayout):
         text = ''
         for name in self.data.name__block:
             block = self.data.name__block[name]
-            text += f'{name} : {block.value} -> {block.change}\n'
+            if block.change > 0:
+                text += f'{name} : {block.value} -> {block.change}\n'
         self.ui.data.text = text
     
     def button_connect(self, _instance_):
         self._connect(self.data.address)
-        self.data.start(0.510)
+        self.data.start(0.010, 64)
         data_show = Clock.schedule_interval(self._data_show, 0.050)
         self._connect_clock = [data_show]
     
@@ -85,11 +86,11 @@ class Main(FloatLayout):
     
     def button_machine_run(self, _value_, _instance_):
         if self.uac.is_connected():
-            self.data.node('M.hmi.run').write_value(_value_)
+            self.data.set('hmi.run', _value_)
     
     def button_machine_stop(self, _value_, _instance_):
         if self.uac.is_connected():
-            self.data.node('M.hmi.stop').write_value(_value_)
+            self.data.set('hmi.stop', _value_)
 
     def button_download(self, _instance_):
         if self.uac.is_connected():
