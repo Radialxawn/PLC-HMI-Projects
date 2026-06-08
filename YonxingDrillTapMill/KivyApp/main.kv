@@ -1,0 +1,27 @@
+<ScreenHome>:
+    FloatLayout:
+        Button:
+            text: 'Goto setting'
+            size_hint: None, None
+            size: 200, 50
+            pos: 0, 600
+            on_press: root.manager.current = 'setting'
+        Button:
+            text: 'Quit'
+            size_hint: None, None
+            size: 200, 50
+            pos: 200, 600
+
+<ScreenSetting>:
+    FloatLayout:
+        Button:
+            text: 'My setting button'
+            size_hint: None, None
+            size: 200, 50
+            pos: 0, 600
+        Button:
+            text: 'Back to home'
+            size_hint: None, None
+            size: 200, 50
+            pos: 200, 600
+            on_press: root.manager.current = 'home'
