@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=App 
+Comment=OPCUA-MC500
+Exec=bash -c 'python KivyApp/main.py;$SHELL'
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=Application;

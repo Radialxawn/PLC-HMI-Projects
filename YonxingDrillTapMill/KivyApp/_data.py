@@ -1,3 +1,6 @@
+import os
+import platform
+import shutil
 from asyncua import ua
 from kivy.clock import Clock
 import xml.etree.ElementTree as ET
@@ -17,8 +20,12 @@ class Data(object):
         self.id__block = {}
         self.name__block = {}
 
-    def create(self, _xml_path_, _head_):
-        tree = ET.parse(_xml_path_)
+    def create(self, _xml_path_windows_, _head_):
+        current_os = platform.system()
+        if current_os == 'Windows':
+            shutil.copy(_xml_path_windows_, r'./tags.xml')
+        path = os.path.dirname(os.path.abspath(__file__)) + '/tags.xml'
+        tree = ET.parse(path)
         root = tree.getroot()
         stype__uatype = {
             'T_BOOL': ua.VariantType.Boolean,
@@ -108,7 +115,7 @@ class Data(object):
                 name = '%s.%s' % (_node_, sname)
                 part = stype.split('__')
                 elms = []
-                for i in range(int(part[1]), int(part[2])):
+                for i in range(int(part[1]), int(part[2]) + 1):
                     e = {
                         'iecname': '[%s]' % (i),
                         'type': 'T_%s' % (part[3][3:])

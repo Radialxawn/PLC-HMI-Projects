@@ -6,27 +6,30 @@ from kivy.uix.textinput import TextInput
 class UI(object):
     def __init__(self, _layout_):
         self.layout = _layout_
+        self.name__button = {}
     
     def create(self):
-        self.connect = Button(
+        btn = Button(
             text='Connect',
             font_size=32,
             size_hint=(None, None),
             size=(200, 50),
             pos=(0, 0)
             )
-        self.connect.bind(on_press=self.layout.button_connect)
-        self.layout.add_widget(self.connect)
+        btn.bind(on_press=self.layout.button_connect)
+        self.layout.add_widget(btn)
+        self.name__button['self.connect'] = btn
         #
-        self.disconnect = Button(
+        btn = Button(
             text='Disconnect',
             font_size=32,
             size_hint=(None, None),
             size=(200, 50),
             pos=(200, 0)
             )
-        self.disconnect.bind(on_press=self.layout.button_disconnect)
-        self.layout.add_widget(self.disconnect)
+        btn.bind(on_press=self.layout.button_disconnect)
+        self.layout.add_widget(btn)
+        self.name__button['self.disconnect'] = btn
         #
         self.data = Label(
             font_size=16,
@@ -34,34 +37,62 @@ class UI(object):
             )
         self.layout.add_widget(self.data)
         #
-        self.button_machine_run = Button(
+        btn = Button(
             text='Run',
             font_size=32,
             size_hint=(None, None),
-            size=(200, 50),
+            size=(100, 50),
             pos=(0, 50)
             )
-        self.button_machine_run.bind(on_press=functools.partial(self.layout.button_machine_run, True))
-        self.button_machine_run.bind(on_release=functools.partial(self.layout.button_machine_run, False))
-        self.layout.add_widget(self.button_machine_run)
+        btn.bind(on_press=functools.partial(self.layout.button_machine_run, True))
+        btn.bind(on_release=functools.partial(self.layout.button_machine_run, False))
+        self.layout.add_widget(btn)
+        self.name__button['hmi.run'] = btn
         #
-        self.button_machine_stop = Button(
+        btn = Button(
             text='Stop',
             font_size=32,
             size_hint=(None, None),
-            size=(200, 50),
+            size=(100, 50),
+            pos=(100, 50)
+            )
+        btn.bind(on_press=functools.partial(self.layout.button_machine_stop, True))
+        btn.bind(on_release=functools.partial(self.layout.button_machine_stop, False))
+        self.layout.add_widget(btn)
+        self.name__button['hmi.stop'] = btn
+        #
+        btn = Button(
+            text='Home',
+            font_size=32,
+            size_hint=(None, None),
+            size=(100, 50),
             pos=(200, 50)
             )
-        self.button_machine_stop.bind(on_press=functools.partial(self.layout.button_machine_stop, True))
-        self.button_machine_stop.bind(on_release=functools.partial(self.layout.button_machine_stop, False))
-        self.layout.add_widget(self.button_machine_stop)
+        btn.bind(on_press=functools.partial(self.layout.button_machine_home, True))
+        btn.bind(on_release=functools.partial(self.layout.button_machine_home, False))
+        self.layout.add_widget(btn)
+        self.name__button['hmi.home'] = btn
         #
-        self.button_download = Button(
+        self.button_face_indexs = []
+        for i in range(6):
+            btn = Button(
+                text=f'Face {i}',
+                font_size=32,
+                size_hint=(None, None),
+                size=(100, 50),
+                pos=(i * 100, 100)
+                )
+            btn.bind(on_press=functools.partial(self.layout.button_machine_face, i))
+            self.button_face_indexs.append(btn)
+            self.layout.add_widget(btn)
+        #
+        btn = Button(
             text='Download',
             font_size=32,
             size_hint=(None, None),
             size=(200, 50),
             pos=(400, 0)
             )
-        self.button_download.bind(on_press=self.layout.button_download)
-        self.layout.add_widget(self.button_download)
+        btn.bind(on_press=self.layout.button_download)
+        self.layout.add_widget(btn)
+        self.name__button['self.download'] = btn

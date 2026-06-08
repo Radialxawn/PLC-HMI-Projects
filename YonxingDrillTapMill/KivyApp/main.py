@@ -19,7 +19,9 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.core.window import Window
+from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.floatlayout import FloatLayout
+import kivy.utils
 
 class Main(FloatLayout):
     def __init__(self, **kvargs):
@@ -63,16 +65,29 @@ class Main(FloatLayout):
             raise
     
     def _data_show(self, _dt_):
+        for name in self.ui.name__button:
+            if name in self.data.name__block:
+                block = self.data.name__block[name]
+                btn = self.ui.name__button[name]
+                btn.color = kivy.utils.get_color_from_hex("#b9f542") if block.value == True else ("#414946")
+        for i in range(6):
+            block = self.data.name__block['hmi.face_index']
+            btn = self.ui.button_face_indexs[i]
+            btn.color = kivy.utils.get_color_from_hex("#b9f542") if block.value == i else ("#414946")
         text = ''
-        for name in self.data.name__block:
-            block = self.data.name__block[name]
-            if block.change > 0:
-                text += f'{name} : {block.value} -> {block.change}\n'
+        for i in range(13):
+            block = self.data.name__block[f'hmi.cf.gear_num[{i}]']
+            text += f'{block.value}, '
+        text = text[:-2] + '\n'
+        for i in range(13):
+            block = self.data.name__block[f'hmi.cf.gear_dir[{i}]']
+            text += f'{block.value}, '
+        text = text[:-2] + '\n'
         self.ui.data.text = text
     
     def button_connect(self, _instance_):
         self._connect(self.data.address)
-        self.data.start(0.010, 64)
+        self.data.start(0.010, 32)
         data_show = Clock.schedule_interval(self._data_show, 0.050)
         self._connect_clock = [data_show]
     
@@ -91,6 +106,14 @@ class Main(FloatLayout):
     def button_machine_stop(self, _value_, _instance_):
         if self.uac.is_connected():
             self.data.set('hmi.stop', _value_)
+    
+    def button_machine_home(self, _value_, _instance_):
+        if self.uac.is_connected():
+            self.data.set('hmi.home', _value_)
+    
+    def button_machine_face(self, _value_, _instance_):
+        if self.uac.is_connected():
+            self.data.set('hmi.face_index', _value_)
 
     def button_download(self, _instance_):
         if self.uac.is_connected():
