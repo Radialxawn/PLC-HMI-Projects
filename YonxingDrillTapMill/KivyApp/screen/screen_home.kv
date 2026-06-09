@@ -1,0 +1,42 @@
+<ScreenHome>:
+    AnchorLayout:
+        anchor_x: 'left'
+        anchor_y: 'top'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: None, None
+            size: 240, 60
+            spacing: 5
+            padding: 5
+            Button:
+                text: "Run"
+            Button:
+                text: "Stop"
+    AnchorLayout:
+        anchor_x: 'right'
+        anchor_y: 'bottom'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: None, None
+            size: 240, 60
+            spacing: 5
+            padding: 5
+            Button:
+                text: "In/Out"
+                on_press: root.manager.current = 'io'
+            Button:
+                text: "Setting"
+                on_press: root.manager.current = 'setting'
+    AnchorLayout:
+        anchor_x: 'left'
+        anchor_y: 'bottom'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: None, None
+            size: 240, 60
+            spacing: 5
+            padding: 5
+            Button:
+                text: "Connect"
+            Button:
+                text: "Disconnect"

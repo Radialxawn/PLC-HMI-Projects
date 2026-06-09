@@ -1,0 +1,13 @@
+<ScreenSettingAdvanced>:
+    AnchorLayout:
+        anchor_x: 'left'
+        anchor_y: 'top'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: None, None
+            size: 120, 60
+            spacing: 5
+            padding: 5
+            Button:
+                text: "Back"
+                on_press: root.manager.current = 'setting'

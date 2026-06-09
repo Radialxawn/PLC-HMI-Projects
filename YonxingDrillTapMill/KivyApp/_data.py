@@ -14,16 +14,18 @@ class DataBlock(object):
         self.value = None
 
 class Data(object):
-    def __init__(self, _uac_, _address_):
+    def __init__(self, _uac_, _address_, _xml_path_windows_, _tag_head_):
         self.uac = _uac_
         self.address = _address_
-        self.id__block = {}
+        self.xml_path_windows = _xml_path_windows_
+        self.tag_head = _tag_head_
         self.name__block = {}
+        self.id__block = {}
 
-    def create(self, _xml_path_windows_, _head_):
+    def create(self):
         current_os = platform.system()
         if current_os == 'Windows':
-            shutil.copy(_xml_path_windows_, r'./tags.xml')
+            shutil.copy(self.xml_path_windows, r'./tags.xml')
         path = os.path.dirname(os.path.abspath(__file__)) + '/tags.xml'
         tree = ET.parse(path)
         root = tree.getroot()
@@ -60,7 +62,7 @@ class Data(object):
                         if utype_last not in utype__elms:
                             utype__elms[utype_last] = []
         # node process
-        head_part = [_head_] + [''] * 5
+        head_part = [self.tag_head] + [''] * 5
         node__utype = {}
         level = 0
         last_is_leaf = False
