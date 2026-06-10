@@ -1,14 +1,181 @@
+import math
+import kivy.utils
+from asyncua import ua
+from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
+from kivy.uix.togglebutton import ToggleButton
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
+from kivy.uix.label import Label
 
 class ScreenSettingAdvanced(Screen):
     def __init__(self, **kvargs):
         super(ScreenSettingAdvanced, self).__init__(**kvargs)
-        t = Button(
-            text="Click Me!", 
-            size_hint=(None, None), 
-            size=(200, 100),
-            pos_hint={'center_x': 0.5, 'center_y': 0.5}
-        )
-        self.add_widget(t)
+        self.axiss_name = [
+            'R-x',
+            'RM-V-y',
+            'RM-V-z',
+            'RM-H-y',
+            'RM-H-z',
+            'L-x',
+            'LDT-V-y',
+            'LD-V-z',
+            'LD-L-z',
+            'LT-V-z',
+            'LT-V-a',
+            'LT-L-z',
+            'LT-L-a',
+        ]
+        self.axiss_index = [
+            0,
+            2,
+            1,
+            3,
+            4,
+            5,
+            7,
+            6,
+            10,
+            8,
+            9,
+            11,
+            12,
+        ]
+        self.axis_propertys = [
+            'max_rpm',
+            'gear_num',
+            'gear_den',
+            'gear_dir',
+            'home_torque_mNm',
+            'home_encoder_value',
+            'max_micro',
+            'overload_hold_torque_factor',
+            'overload_hold_torque_time_msec',
+            'overload_instant_torque_factor',
+            'ramp_time_msec',
+            'jerk_factor',
+        ]
+        self._grid_draw_done = False
+
+    def on_pre_enter(self, *args):
+        if not self._grid_draw_done:
+            self._label__data = {}
+            self._name__input = {}
+            self._grid_draw()
+            self._grid_draw_done = True
+
+    def on_enter(self, *args):
+        self._label_scroll_clock = Clock.schedule_interval(self._label_scroll, 0.2)
+        self._value_update_clock = Clock.schedule_interval(self._value_update, 0.2)
+
+    def on_leave(self, *args):
+        if hasattr(self, '_label_scroll_clock'):
+            Clock.unschedule(self._label_scroll_clock)
+            delattr(self, '_label_scroll_clock')
+    
+    def _label_scroll(self, _dt_):
+        for label in self._label__data:
+            data = self._label__data[label]
+            text = data[0]
+            index = data[1]
+            count = data[2]
+            if count <= 0:
+                continue
+            tl = len(text)
+            if tl > count:
+                index = (index + 1) % tl
+                data[1] = index
+                tc = text[index:index+count]
+                tcl = len(tc)
+                ih = max(0, count - tcl)
+                if tcl < count:
+                    tc += text[:ih]
+                label.text = tc
+    
+    def _value_update(self, _dt_):
+        app = App.get_running_app()
+        for name in self._name__input:
+            input = self._name__input[name]
+            if input.is_focus:
+                continue
+            block = app.data.name__block[name]
+            if block.type == ua.VariantType.Boolean:
+                value = block.value == 1
+                input.state = 'down' if value else 'normal'
+                input.text = 'THUẬN' if value else 'NGHỊCH'
+            else:
+                input.text = f'{block.value}' if block.value != None else ''
+        need = app.data.name__block['hmi.cfsh.need'].value
+        if need:
+            self.ids['hmi.cfsh.accept'].disabled = False
+            self.ids['hmi.cfsh.decline'].disabled = False
+        else:
+            self.ids['hmi.cfsh.accept'].disabled = True
+            self.ids['hmi.cfsh.decline'].disabled = True
+
+    def _grid_draw(self):
+        app = App.get_running_app()
+        axis_color = {
+            'x': kivy.utils.get_color_from_hex("#ff4444ff"),
+            'y': kivy.utils.get_color_from_hex("#95fe54ff"),
+            'z': kivy.utils.get_color_from_hex("#526fffff"),
+            'a': kivy.utils.get_color_from_hex("#fff644ff"),
+        }
+        grid = self.ids['grid']
+        grid.cols = len(self.axis_propertys) + 1
+        grid.rows = len(self.axiss_name) + 1
+        grid.add_widget(Label(
+            text='Servo'
+        ))
+        for p in self.axis_propertys:
+            label = Label()
+            data = [' | ' + p, 3, 10]
+            if len(p) <= data[2]:
+                label.text = p
+                data[2] = 0
+            self._label__data[label] = data
+            grid.add_widget(label)
+        for i in range(grid.cols):
+            for j in range(grid.rows - 1):
+                if j == 0:
+                    grid.add_widget(Label(
+                        text=self.axiss_name[i],
+                        color=axis_color[self.axiss_name[i][-1]]
+                    ))
+                else:
+                    oinput = None
+                    name = 'hmi.cf.%s[%d]' % (self.axis_propertys[j - 1], self.axiss_index[i])
+                    value_type = app.data.name__block[name].type
+                    if value_type == ua.VariantType.Boolean:
+                        oinput = ToggleButton(
+                            text='...',
+                            state='normal'
+                        )
+                        oinput.bind(on_press=self._on_toggle_press)
+                    else:
+                        oinput = TextInput(
+                            hint_text='...',
+                            halign='center',
+                            input_filter='int',
+                            multiline=False
+                        )
+                        oinput.bind(on_text_validate=self._on_text_input_validate)
+                        oinput.bind(focus=self._on_text_input_focus)
+                    oinput.name = name
+                    oinput.is_focus = False
+                    self._name__input[name] = oinput
+                    grid.add_widget(oinput)
+    
+    def _on_toggle_press(self, _instance_):
+        app = App.get_running_app()
+        value = _instance_.state == 'down'
+        app.data.set(_instance_.name, value)
+        
+    def _on_text_input_validate(self, _instance_):
+        app = App.get_running_app()
+        app.data.set(_instance_.name, int(_instance_.text))
+    
+    def _on_text_input_focus(self, _instance_, _value_):
+        _instance_.is_focus = _value_

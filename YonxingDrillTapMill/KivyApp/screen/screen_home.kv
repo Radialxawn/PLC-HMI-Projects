@@ -9,9 +9,9 @@
             spacing: 5
             padding: 5
             Button:
-                text: "Run"
+                text: "CHẠY"
             Button:
-                text: "Stop"
+                text: "DỪNG"
     AnchorLayout:
         anchor_x: 'right'
         anchor_y: 'bottom'
@@ -22,10 +22,10 @@
             spacing: 5
             padding: 5
             Button:
-                text: "In/Out"
+                text: "IN/OUT"
                 on_press: root.manager.current = 'io'
             Button:
-                text: "Setting"
+                text: "CÀI ĐẶT"
                 on_press: root.manager.current = 'setting'
     AnchorLayout:
         anchor_x: 'left'
@@ -37,8 +37,8 @@
             spacing: 5
             padding: 5
             Button:
-                text: "Connect"
+                text: "NỐI"
                 on_press: app.data.connect()
             Button:
-                text: "Disconnect"
+                text: "NGẮT"
                 on_press: app.data.disconnect()

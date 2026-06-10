@@ -1,7 +1,8 @@
 <ScreenSettingAdvanced>:
-    AnchorLayout:
-        anchor_x: 'left'
-        anchor_y: 'top'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 5
+        spacing: 5
         BoxLayout:
             orientation: 'horizontal'
             size_hint: None, None
@@ -9,5 +10,24 @@
             spacing: 5
             padding: 5
             Button:
-                text: "Back"
+                text: "THOÁT"
                 on_press: root.manager.current = 'setting'
+        GridLayout:
+            id: grid
+            spacing: 5
+            padding: 5
+            size_hint_y: 1.0
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: None, None
+            size: 240, 60
+            spacing: 5
+            padding: 5
+            Button:
+                id: hmi.cfsh.accept
+                text: 'LƯU'
+                on_press: app.save_accept()
+            Button:
+                id: hmi.cfsh.decline
+                text: 'KHÔNG'
+                on_press: app.save_decline()

@@ -28,8 +28,6 @@ class Data(object):
         self._connected = False
     
     def _reset(self):
-        self.name__block = {}
-        self.id__block = {}
         self.client = None
         self._connected = False
 
@@ -176,12 +174,15 @@ class Data(object):
             block.change += 1
     
     def set(self, _name_, _value_):
-        block = self.name__block[_name_]
-        block.node.set_value(ua.Variant(_value_, block.type))
+        if self._connected:
+            block = self.name__block[_name_]
+            block.node.set_value(ua.Variant(_value_, block.type))
     
     def get(self, _name_):
-        block = self.name__block[_name_]
-        return block.value
+        if self._connected:
+            block = self.name__block[_name_]
+            return block.value
+        return None
 
     def block(self, _name_) -> DataBlock:
         return self.name__block[_name_]
@@ -201,7 +202,7 @@ class Data(object):
                 return False
 
     def connect(self):
-        if not self.is_ip_active(self.address_ip, self.address_port, 0.2):
+        if not self.is_ip_active(self.address_ip, self.address_port, 0.1):
             print(f'Cannot connect to {self.address_ip}')
             return
         address = 'opc.tcp://%s:%d' % (self.address_ip, self.address_port)
@@ -213,8 +214,10 @@ class Data(object):
         self.client.load_enums()
         self.client.load_type_definitions()
         print('Connected')
+        self.start(0.050, 32)
 
     def disconnect(self):
+        self.stop()
         if self._connected:
             self._connected = False
             try:
@@ -222,16 +225,15 @@ class Data(object):
             finally:
                 self._reset()
                 print("Disconnected")
-    
-    def is_connected(self):
-        if not self._connected:
-            print('No connection')
-        return self._connected
 
     def id__node(self, _ids_):
-        nodes = [self.client.get_node(id) for id in _ids_]
-        return dict(zip(_ids_, nodes))
+        if self._connected:
+            nodes = [self.client.get_node(id) for id in _ids_]
+            return dict(zip(_ids_, nodes))
+        return None
     
     def node__value(self, _nodes_):
-        values = self.client.read_values(_nodes_)
-        return dict(zip(_nodes_, values))
+        if self._connected:
+            values = self.client.read_values(_nodes_)
+            return dict(zip(_nodes_, values))
+        return None
