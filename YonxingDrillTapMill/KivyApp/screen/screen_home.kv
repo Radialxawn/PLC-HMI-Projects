@@ -1,7 +1,8 @@
 <ScreenHome>:
-    AnchorLayout:
-        anchor_x: 'left'
-        anchor_y: 'top'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 5
+        spacing: 5
         BoxLayout:
             orientation: 'horizontal'
             size_hint: None, None
@@ -12,33 +13,54 @@
                 text: "CHẠY"
             Button:
                 text: "DỪNG"
-    AnchorLayout:
-        anchor_x: 'right'
-        anchor_y: 'bottom'
         BoxLayout:
             orientation: 'horizontal'
-            size_hint: None, None
-            size: 240, 60
-            spacing: 5
-            padding: 5
+            size_hint_y: 1.0
             Button:
-                text: "IN/OUT"
-                on_press: root.manager.current = 'io'
+                id: face_4
+                on_press: root._select_face(self)
             Button:
-                text: "CÀI ĐẶT"
-                on_press: root.manager.current = 'setting'
-    AnchorLayout:
-        anchor_x: 'left'
-        anchor_y: 'bottom'
+                id: face_2
+                on_press: root._select_face(self)
+            Button:
+                id: face_0
+                on_press: root._select_face(self)
         BoxLayout:
             orientation: 'horizontal'
-            size_hint: None, None
-            size: 240, 60
+            size_hint_y: 1.0
+            Button:
+                id: face_5
+                on_press: root._select_face(self)
+            Button:
+                id: face_3
+                on_press: root._select_face(self)
+            Button:
+                id: face_1
+                on_press: root._select_face(self)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 60
             spacing: 5
             padding: 5
             Button:
                 text: "NỐI"
+                size_hint_x: None
+                width: 120
                 on_press: app.data.connect()
             Button:
                 text: "NGẮT"
+                size_hint_x: None
+                width: 120
                 on_press: app.data.disconnect()
+            Widget:
+            Button:
+                text: "IN/OUT"
+                size_hint_x: None
+                width: 120
+                on_press: root.manager.current = 'io'
+            Button:
+                text: "CÀI ĐẶT"
+                size_hint_x: None
+                width: 120
+                on_press: root.manager.current = 'setting'

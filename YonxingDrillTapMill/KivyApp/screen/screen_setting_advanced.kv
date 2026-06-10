@@ -19,15 +19,32 @@
             size_hint_y: 1.0
         BoxLayout:
             orientation: 'horizontal'
-            size_hint: None, None
-            size: 240, 60
+            size_hint_y: None
+            height: 60
             spacing: 5
             padding: 5
             Button:
                 id: hmi.cfsh.accept
                 text: 'LƯU'
+                size_hint_x: None
+                width: 120
                 on_press: app.save_accept()
             Button:
                 id: hmi.cfsh.decline
                 text: 'KHÔNG'
+                size_hint_x: None
+                width: 120
                 on_press: app.save_decline()
+            Widget:
+            Button:
+                id: hmi.home
+                text: 'HOME'
+                size_hint_x: None
+                width: 90
+                on_press: app.home()
+            ToggleButton:
+                id: hmi.cf.home_encoder_value_recorded
+                text: 'HOME RECORED'
+                size_hint_x: None
+                width: 180
+                on_press: root._on_home_recorded_reset()

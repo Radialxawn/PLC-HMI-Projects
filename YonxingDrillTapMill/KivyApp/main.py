@@ -3,18 +3,21 @@ from _data import Data
 from _download import Download
 from kivy.app import App
 from kivy.lang import Builder
+from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, FadeTransition
 from screen.screen_load import ScreenLoad
 from screen.screen_home import ScreenHome
 from screen.screen_setting import ScreenSetting
 from screen.screen_io import ScreenIO
 from screen.screen_setting_advanced import ScreenSettingAdvanced
+from popup.popup_confirm import PopupConfirm
 
 Builder.load_file('screen/screen_load.kv')
 Builder.load_file('screen/screen_home.kv')
 Builder.load_file('screen/screen_io.kv')
 Builder.load_file('screen/screen_setting.kv')
 Builder.load_file('screen/screen_setting_advanced.kv')
+Builder.load_file('popup/popup_confirm.kv')
 
 class Main(App):
     def build(self):
@@ -43,10 +46,30 @@ class Main(App):
         self.data.disconnect()
     
     def save_accept(self):
-        print('Save accept')
+        self.data.set('hmi.cfsh.accept', True)
     
     def save_decline(self):
-        print('Save decline')
+        self.data.set('hmi.cfsh.decline', True)
+    
+    def save_need_check(self):
+        self.data.set('hmi.cfsh.need_check', True)
+    
+    def home(self):
+        self.data.set('hmi.home', True)
+    
+    def show_popup_confirm(self, _message_, _confirm_):
+        popup = Popup(
+            title="XÁC NHẬN",
+            size_hint=(None, None),
+            size=(320, 240),
+            auto_dismiss=False
+        )
+        popup.content = PopupConfirm(
+            _instance_=popup,
+            _confirm_=_confirm_
+        )
+        popup.content.ids['message'].text = _message_
+        popup.open()
 
 if __name__ == '__main__':
     Main().run()

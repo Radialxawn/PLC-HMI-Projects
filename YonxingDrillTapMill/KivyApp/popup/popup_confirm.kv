@@ -1,0 +1,19 @@
+<PopupConfirm>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            id: message
+            halign: 'center'
+            valign: 'middle'
+            text_size: self.size
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 5
+            size_hint_y: None
+            height: 60
+            Button:
+                text: 'KHÔNG'
+                on_release: root.on_cancel()
+            Button:
+                text: 'CÓ'
+                on_release: root.on_confirm()
