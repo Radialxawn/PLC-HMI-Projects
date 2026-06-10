@@ -1,11 +1,8 @@
-from kivy.config import Config
-Config.set('kivy', 'log_level', 'warning')
+import logging
 from _data import Data
-from _uaclient import UaClient
 from _download import Download
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, FadeTransition
 from screen.screen_load import ScreenLoad
 from screen.screen_home import ScreenHome
@@ -21,17 +18,14 @@ Builder.load_file('screen/screen_setting_advanced.kv')
 
 class MainWindow(App):
     def build(self):
+        self._log_mode()
         app = App.get_running_app()
-        app.uac = UaClient()
         app.data = Data(
-            _uac_=app.uac,
-            _address_='opc.tcp://192.168.2.3:4840',
+            _address_ip_='192.168.2.3', _address_port_=4840,
             _xml_path_windows_=r'D:/Github/PLC-HMI-Projects/YonxingDrillTapMill/MC500/MC500.Device.Application.xml',
             _tag_head_='ns=4;s=|var|LS'
         )
-        app.download = Download(self.uac, self.data)
-        app.connect = self.connect
-        app.disconnect = self.disconnect
+        app.download = Download(self.data)
         sm = ScreenManager(transition=FadeTransition(duration=0.3))
         sm.add_widget(ScreenLoad(name='load'))
         sm.add_widget(ScreenHome(name='home'))
@@ -40,26 +34,15 @@ class MainWindow(App):
         sm.add_widget(ScreenSettingAdvanced(name='setting_advanced'))
         return sm
 
-    def connect(self, _uri_):
-        app = App.get_running_app()
-        uri = _uri_.strip()
-        try:
-            app.uac.connect(uri)
-        except Exception as ex:
-            print(ex)
-            raise
-    
-    def disconnect(self):
-        app = App.get_running_app()
-        try:
-            app.uac.disconnect()
-        except Exception as ex:
-            print(ex)
-            raise
+    def _log_mode(self):
+        for k in logging.root.manager.loggerDict:
+            if 'asyncua' in k:
+                logger = logging.getLogger(k)
+                logger.setLevel(level=logging.CRITICAL)
 
     def on_stop(self):
         app = App.get_running_app()
-        app.disconnect()
+        app.data.disconnect()
 
 if __name__ == '__main__':
     MainWindow().run()

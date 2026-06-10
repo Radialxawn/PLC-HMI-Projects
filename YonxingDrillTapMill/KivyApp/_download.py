@@ -3,8 +3,7 @@ from pathlib import Path
 from kivy.clock import Clock
 
 class Download(object):
-    def __init__(self, _uac_, _data_):
-        self.uac = _uac_
+    def __init__(self, _data_):
         self.data = _data_
 
     def start(self, _index_):

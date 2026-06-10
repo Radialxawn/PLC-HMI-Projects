@@ -1,8 +1,11 @@
 import os
-import platform
 import shutil
+import socket
+import platform
+import subprocess
 from asyncua import ua
 from kivy.clock import Clock
+from asyncua.sync import Client
 import xml.etree.ElementTree as ET
 
 class DataBlock(object):
@@ -14,13 +17,21 @@ class DataBlock(object):
         self.value = None
 
 class Data(object):
-    def __init__(self, _uac_, _address_, _xml_path_windows_, _tag_head_):
-        self.uac = _uac_
-        self.address = _address_
+    def __init__(self, _address_ip_, _address_port_, _xml_path_windows_, _tag_head_):
+        self.address_ip = _address_ip_
+        self.address_port = _address_port_
         self.xml_path_windows = _xml_path_windows_
         self.tag_head = _tag_head_
         self.name__block = {}
         self.id__block = {}
+        self.client = None
+        self._connected = False
+    
+    def _reset(self):
+        self.name__block = {}
+        self.id__block = {}
+        self.client = None
+        self._connected = False
 
     def create(self):
         current_os = platform.system()
@@ -148,8 +159,8 @@ class Data(object):
         else:
             self._get_all_index += self._get_all_step
         ids = self.ids[si:se]
-        id__node = self.uac.id__node(ids)
-        node__value = self.uac.node__value(id__node.values())
+        id__node = self.id__node(ids)
+        node__value = self.node__value(id__node.values())
         for id in id__node:
             node = id__node[id]
             value = node__value[node]
@@ -174,3 +185,53 @@ class Data(object):
 
     def block(self, _name_) -> DataBlock:
         return self.name__block[_name_]
+    
+    ###################
+    # DATA CONNECTION #
+    ###################
+
+    def is_ip_active(self, _ip_, _port_, _timeout_):
+        address_family = socket.AF_INET6 if ":" in _ip_ else socket.AF_INET
+        with socket.socket(address_family, socket.SOCK_STREAM) as s:
+            s.settimeout(_timeout_)
+            try:
+                result = s.connect_ex((_ip_, _port_))
+                return result == 0
+            except socket.error:
+                return False
+
+    def connect(self):
+        if not self.is_ip_active(self.address_ip, self.address_port, 0.2):
+            print(f'Cannot connect to {self.address_ip}')
+            return
+        address = 'opc.tcp://%s:%d' % (self.address_ip, self.address_port)
+        self.disconnect()
+        self.client = Client(address)
+        self.client.connect()
+        self._connected = True
+        self.client.load_data_type_definitions()
+        self.client.load_enums()
+        self.client.load_type_definitions()
+        print('Connected')
+
+    def disconnect(self):
+        if self._connected:
+            self._connected = False
+            try:
+                self.client.disconnect()
+            finally:
+                self._reset()
+                print("Disconnected")
+    
+    def is_connected(self):
+        if not self._connected:
+            print('No connection')
+        return self._connected
+
+    def id__node(self, _ids_):
+        nodes = [self.client.get_node(id) for id in _ids_]
+        return dict(zip(_ids_, nodes))
+    
+    def node__value(self, _nodes_):
+        values = self.client.read_values(_nodes_)
+        return dict(zip(_nodes_, values))
