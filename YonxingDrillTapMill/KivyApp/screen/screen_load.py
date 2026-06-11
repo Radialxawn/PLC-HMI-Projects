@@ -22,7 +22,7 @@ class ScreenLoad(Screen):
         for i in range(100):
             if self.skip:
                 break
-            time.sleep(0.050)
+            time.sleep(0.05)
             Clock.schedule_once(lambda dt, p=i+1: self._update_progress(p))
         Clock.schedule_once(self._transition_to_main)
 
@@ -30,7 +30,7 @@ class ScreenLoad(Screen):
         self.ids.progress_bar.value = _value_
         self.ids.loading_label.text = f"{_value_}%"
 
-    def _transition_to_main(self, dt):
+    def _transition_to_main(self, _dt_):
         self.manager.current = "home"
     
     def _skip(self):

@@ -3,4 +3,24 @@
         orientation: 'vertical'
         FileChooserIconView:
             id: chooser
+            filters: ['*.cnc']
+            filter_dirs: False
             on_selection: root._select(*args)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 60
+            spacing: 5
+            padding: 5
+            Label:
+                id: warn
+                text: 'WARN'
+                halign: 'left'
+                color: 1, 0, 0, 1
+            Widget:
+            Button:
+                id: ok
+                text: 'CHỌN'
+                size_hint_x: None
+                width: 90
+                on_press: root._confirm()

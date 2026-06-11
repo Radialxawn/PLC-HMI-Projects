@@ -35,7 +35,7 @@ class ScreenHome(Screen):
             auto_dismiss=True
         )
         self.cnc_index = _instance_.cnc_index
-        popup.content = PopupFile(_callback_=self._download_cnc)
+        popup.content = PopupFile(popup, _callback_=self._download_cnc)
         popup.open()
     
     def _download_cnc(self, _source_path_):

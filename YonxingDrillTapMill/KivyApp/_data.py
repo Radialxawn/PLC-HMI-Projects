@@ -47,6 +47,7 @@ class Data(object):
             'T_DINT': ua.VariantType.Int32,
             'T_UDINT': ua.VariantType.UInt32,
             'T_STRING': ua.VariantType.String,
+            'T_STRING_255_': ua.VariantType.String,
         }
         # user type process
         utype_last = ''
@@ -252,21 +253,29 @@ class Data(object):
     #################
 
     def _download_read_file(self, _path_):
-        lines = []
         path = Path(_path_)
         if not path.is_file():
             print('File does not exist: %s' % (_path_))
-            return lines
+            return []
+        combine = ''
         with path.open(mode='r') as file:
+            index = 0
             for line in file:
-                lines.append(line.strip())
-        return lines
+                line = line.strip()
+                if len(line) > 0:
+                    combine += f'N{index} {line}\r\n'
+                    index += 1
+        chunk_size = 255
+        result = [
+            combine[i : i + chunk_size]
+            for i in range(0, len(combine), chunk_size)
+        ]
+        return result
 
     def _download_get_bridge_ids(self):
         return [self.name__block[n].id for n in self.name__block if n[:3] == 'fst']
 
     def download_start(self, _source_path_, _destination_index_, _progress_):
-        print(_source_path_, _destination_index_)
         if self._connect_state != 100:
             print('Not connected')
             return
