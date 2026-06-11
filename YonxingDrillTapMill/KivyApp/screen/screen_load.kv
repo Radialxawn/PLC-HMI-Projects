@@ -1,26 +1,42 @@
 <ScreenLoad>:
     BoxLayout:
-        orientation: 'horizontal'
-        padding: 50
-        spacing: 20
-        canvas.before:
-            Color:
-                rgba: 0.1, 0.1, 0.15, 1
-            Rectangle:
-                pos: self.pos
-                size: self.size
-        ProgressBar:
-            id: progress_bar
-            max: 100
-            value: 0
-            size_hint_x: 0.95
-            pos_hint: {'center_x': 0.5}
+        orientation: 'vertical'
+        padding: 5
+        spacing: 5
+        BoxLayout:
+            orientation: 'horizontal'
             size_hint_y: None
-            height: '20dp'
-        Label:
-            id: loading_label
-            font_size: '24'
-            bold: True
-            size_hint_x: 0.05
-            size_hint_y: None
-            height: self.texture_size[1]
+            height: 60
+            spacing: 5
+            padding: 5
+            Widget:
+            Button:
+                text: 'SKIP'
+                size_hint_x: None
+                width: 120
+                on_press: root._skip()
+        BoxLayout:
+            orientation: 'horizontal'
+            padding: 50
+            spacing: 20
+            canvas.before:
+                Color:
+                    rgba: 0, 0, 0, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            ProgressBar:
+                id: progress_bar
+                max: 100
+                value: 0
+                size_hint_x: 0.95
+                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                height: 30
+            Label:
+                id: loading_label
+                font_size: '24'
+                bold: True
+                size_hint_x: 0.05
+                size_hint_y: None
+                height: self.texture_size[1]

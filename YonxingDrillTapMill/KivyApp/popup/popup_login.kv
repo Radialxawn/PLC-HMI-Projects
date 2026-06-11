@@ -1,0 +1,27 @@
+<PopupLogin>:
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 5
+        padding: 5
+        Widget:
+        TextInput:
+            id: password
+            size_hint_y: None
+            height: 50
+            font_size: 30
+            halign: 'center'
+            valign: 'middle'
+            password: True
+            multiline: False
+        Widget:
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 5
+            size_hint_y: None
+            height: 50
+            Button:
+                text: 'THOÁT'
+                on_release: root.on_cancel()
+            Button:
+                text: 'XÁC NHẬN'
+                on_release: root.on_confirm(password)

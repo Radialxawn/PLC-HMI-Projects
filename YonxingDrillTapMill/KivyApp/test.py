@@ -9,3 +9,6 @@ data.create()
 for k, v in data.name__block.items():
     print(f'Name: {k}, ID: {v.id}, Type: {v.type}')
 print(len(data.name__block), 'tags')
+bridge = data._download_get_bridge_ids()
+for o in bridge:
+    print(o)

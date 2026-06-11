@@ -7,21 +7,31 @@ from kivy.uix.screenmanager import Screen
 class ScreenLoad(Screen):
     def __init__(self, **kvargs):
         super(ScreenLoad, self).__init__(**kvargs)
+        self.first_load = True
     
     def on_enter(self, *args):
-        threading.Thread(target=self.perform_heavy_task, daemon=True).start()
+        self.skip = False
+        threading.Thread(target=self._perform_heavy_task, daemon=True).start()
 
-    def perform_heavy_task(self):
+    def _perform_heavy_task(self):
         app = App.get_running_app()
-        app.data.create()
+        if self.first_load:
+            self.first_load = False
+            app.data.create()
+            app.auto_connect_start()
         for i in range(100):
-            time.sleep(0.001)
-            Clock.schedule_once(lambda dt, p=i+1: self.update_progress(p))
-        Clock.schedule_once(self.transition_to_main)
+            if self.skip:
+                break
+            time.sleep(0.050)
+            Clock.schedule_once(lambda dt, p=i+1: self._update_progress(p))
+        Clock.schedule_once(self._transition_to_main)
 
-    def update_progress(self, _value_):
+    def _update_progress(self, _value_):
         self.ids.progress_bar.value = _value_
         self.ids.loading_label.text = f"{_value_}%"
 
-    def transition_to_main(self, dt):
+    def _transition_to_main(self, dt):
         self.manager.current = "home"
+    
+    def _skip(self):
+        self.skip = True

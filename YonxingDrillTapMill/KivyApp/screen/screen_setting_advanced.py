@@ -114,7 +114,7 @@ class ScreenSettingAdvanced(Screen):
         self.ids['hmi.cfsh.decline'].disabled = not need
         self.ids['hmi.cf.home_encoder_value_recorded'].state = (
             'down' if app.data.name__block['hmi.cf.home_encoder_value_recorded'].value else 'normal')
-        self.ids['hmi.home'].disabled = not app.data.name__block['hmi.can_home'].value
+        self.ids['hmi.home'].disabled = not app.data.name__block['hmi.view_can_home'].value
 
     def _grid_draw(self):
         app = App.get_running_app()
@@ -173,23 +173,23 @@ class ScreenSettingAdvanced(Screen):
         app = App.get_running_app()
         value = _instance_.state == 'down'
         app.data.set(_instance_.name, value)
-        app.save_need_check()
+        app.m_save_need_check()
         
     def _on_text_input_validate(self, _instance_):
         app = App.get_running_app()
         app.data.set(_instance_.name, int(_instance_.text))
-        app.save_need_check()
+        app.m_save_need_check()
     
     def _on_text_input_focus(self, _instance_, _value_):
         _instance_.is_focus = _value_
     
     def _on_home_recorded_reset(self):
         app = App.get_running_app()
-        app.show_popup_confirm(
+        app.m_show_popup_confirm(
             _message_='RESET GỐC ENCODER?',
             _confirm_=self._on_home_recorded_reset_confirm)
-    
+
     def _on_home_recorded_reset_confirm(self):
         app = App.get_running_app()
         app.data.set('hmi.cf.home_encoder_value_recorded', False)
-        app.save_need_check()
+        app.m_save_need_check()
