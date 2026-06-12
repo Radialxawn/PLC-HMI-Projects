@@ -55,29 +55,36 @@
             spacing: 5
             padding: 5
             size_hint_y: 1.0
-            Button:
-                id: face_4
-                on_press: root._select_face(self)
-            Button:
-                id: face_2
-                on_press: root._select_face(self)
-            Button:
-                id: face_0
-                on_press: root._select_face(self)
-        BoxLayout:
-            orientation: 'horizontal'
-            spacing: 5
-            padding: 5
-            size_hint_y: 1.0
-            Button:
-                id: face_5
-                on_press: root._select_face(self)
-            Button:
-                id: face_3
-                on_press: root._select_face(self)
-            Button:
-                id: face_1
-                on_press: root._select_face(self)
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.5
+                spacing: 5
+                Button:
+                    id: face_4
+                    on_press: root._select_face(self)
+                Button:
+                    id: face_5
+                    on_press: root._select_face(self)
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.5
+                spacing: 5
+                Button:
+                    id: face_2
+                    on_press: root._select_face(self)
+                Button:
+                    id: face_3
+                    on_press: root._select_face(self)
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 1.0
+                spacing: 5
+                Button:
+                    id: face_0
+                    on_press: root._select_face(self)
+                Button:
+                    id: face_1
+                    on_press: root._select_face(self)
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None

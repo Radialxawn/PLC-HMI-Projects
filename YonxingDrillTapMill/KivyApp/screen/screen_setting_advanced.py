@@ -14,37 +14,22 @@ from kivy.uix.label import Label
 class ScreenSettingAdvanced(Screen):
     def __init__(self, **kvargs):
         super(ScreenSettingAdvanced, self).__init__(**kvargs)
-        self.axiss_name = [
-            'R-x',
-            'RM-V-y',
-            'RM-V-z',
-            'RM-H-y',
-            'RM-H-z',
-            'L-x',
-            'LDT-V-y',
-            'LD-V-z',
-            'LD-L-z',
-            'LT-V-z',
-            'LT-V-a',
-            'LT-L-z',
-            'LT-L-a',
-        ]
-        self.axiss_index = [
-            0,
-            2,
-            1,
-            3,
-            4,
-            5,
-            7,
-            6,
-            10,
-            8,
-            9,
-            11,
-            12,
-        ]
-        self.axis_propertys = [
+        self._axiss_name__index = {
+            'R-x':     0,
+            'RM-V-y':  2,
+            'RM-V-z':  1,
+            'RM-H-y':  3,
+            'RM-H-z':  4,
+            'L-x':     5,
+            'LDT-V-y': 7,
+            'LD-V-z':  6,
+            'LD-L-z':  10,
+            'LT-V-z':  8,
+            'LT-V-a':  9,
+            'LT-L-z':  11,
+            'LT-L-a':  12,
+        }
+        self._axis_propertys = [
             'max_rpm',
             'gear_num',
             'gear_den',
@@ -120,6 +105,11 @@ class ScreenSettingAdvanced(Screen):
 
     def _grid_draw(self):
         app = App.get_running_app()
+        axiss_name = []
+        axiss_index = []
+        for name in self._axiss_name__index:
+            axiss_name.append(name)
+            axiss_index.append(self._axiss_name__index[name])
         axis_color = {
             'x': kivy.utils.get_color_from_hex("#ff4444ff"),
             'y': kivy.utils.get_color_from_hex("#95fe54ff"),
@@ -127,12 +117,12 @@ class ScreenSettingAdvanced(Screen):
             'a': kivy.utils.get_color_from_hex("#fff644ff"),
         }
         grid = self.ids['grid']
-        grid.cols = len(self.axis_propertys) + 1
-        grid.rows = len(self.axiss_name) + 1
+        grid.cols = len(self._axis_propertys) + 1
+        grid.rows = len(axiss_name) + 1
         grid.add_widget(Label(
             text='Servo'
         ))
-        for p in self.axis_propertys:
+        for p in self._axis_propertys:
             label = Label()
             data = [' | ' + p, 3, 10]
             if len(p) <= data[2]:
@@ -144,12 +134,12 @@ class ScreenSettingAdvanced(Screen):
             for j in range(grid.rows - 1):
                 if j == 0:
                     grid.add_widget(Label(
-                        text=self.axiss_name[i],
-                        color=axis_color[self.axiss_name[i][-1]]
+                        text=axiss_name[i],
+                        color=axis_color[axiss_name[i][-1]]
                     ))
                 else:
                     oinput = None
-                    name = 'hmi.cf.%s[%d]' % (self.axis_propertys[j - 1], self.axiss_index[i])
+                    name = 'hmi.cf.%s[%d]' % (self._axis_propertys[j - 1], axiss_index[i])
                     value_type = app.data.name__block[name].type
                     if value_type == ua.VariantType.Boolean:
                         oinput = ToggleButton(

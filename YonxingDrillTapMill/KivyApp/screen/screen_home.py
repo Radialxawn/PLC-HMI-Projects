@@ -90,7 +90,7 @@ class ScreenHome(Screen):
             size_hint=(0.8, 0.8),
             auto_dismiss=False
         )
-        popup.content = PopupFile(popup, _folder_='PROFILE', _filter_=['*.profile'], _callback_=self._profile_load)
+        popup.content = PopupFile(popup, _folder_='PROFILE', _filter_=['*.profile'], _select_=self._profile_load)
         popup.open()
 
     def _profile_save_confirm(self):
@@ -116,7 +116,7 @@ class ScreenHome(Screen):
         if profile_name == '':
             return
         directory = PopupFile.path_get('PROFILE')
-        files = [f for f in directory.glob("*.profile")]
+        files = [f for f in directory.glob('*.profile')]
         message = 'LƯU TỆP MỚI?'
         for file in files:
             if profile_name == file.stem:
@@ -138,7 +138,7 @@ class ScreenHome(Screen):
             auto_dismiss=False
         )
         self.cnc_index = _instance_.cnc_index
-        popup.content = PopupFile(popup, _folder_='CNC', _filter_=['*.cnc'], _callback_=self._download_cnc)
+        popup.content = PopupFile(popup, _folder_='CNC', _filter_=['*.cnc'], _select_=self._download_cnc)
         popup.open()
     
     def _download_cnc(self, _source_path_):

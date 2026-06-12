@@ -2,10 +2,10 @@ from kivy.uix.boxlayout import BoxLayout
 from pathlib import Path
 
 class PopupFile(BoxLayout):
-    def __init__(self, _instance_, _folder_, _filter_, _callback_, **kwargs):
+    def __init__(self, _instance_, _folder_, _filter_, _select_, **kwargs):
         super().__init__(**kwargs)
-        self._instance = _instance_
-        self._callback = _callback_
+        self._instance_ = _instance_
+        self._select_ = _select_
         self.ids.chooser.rootpath = str(PopupFile.path_get(_folder_))
         self.ids.chooser.filters = _filter_
         self.ids.warn.opacity = 0.0
@@ -37,8 +37,8 @@ class PopupFile(BoxLayout):
             self.ids.warn.opacity = 0.0
     
     def _confirm(self):
-        self._callback(self._select_path)
-        self._instance.dismiss()
+        self._select_(self._select_path)
+        self._instance_.dismiss()
     
     def _cancel(self):
-        self._instance.dismiss()
+        self._instance_.dismiss()
