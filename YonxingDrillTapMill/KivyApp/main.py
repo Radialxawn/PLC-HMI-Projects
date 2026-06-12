@@ -16,6 +16,7 @@ from screen.screen_setting_advanced import ScreenSettingAdvanced
 from popup.popup_confirm import PopupConfirm
 from popup.popup_login import PopupLogin
 
+Builder.load_file('style.kv')
 Builder.load_file('screen/screen_load.kv')
 Builder.load_file('screen/screen_home.kv')
 Builder.load_file('screen/screen_io.kv')

@@ -1,25 +1,21 @@
 <ScreenSetting>:
-    AnchorLayout:
-        anchor_x: 'left'
-        anchor_y: 'top'
+    BoxLayout:
+        orientation: 'vertical'
         BoxLayout:
             orientation: 'horizontal'
-            size_hint: None, None
-            size: 120, 60
+            size_hint_y: None
+            height: 60
             spacing: 5
             padding: 5
             Button:
                 text: "THOÁT"
+                size_hint_x: None
+                width: 120
                 on_press: root.manager.current = 'home'
-    AnchorLayout:
-        anchor_x: 'right'
-        anchor_y: 'top'
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint: None, None
-            size: 120, 60
-            spacing: 5
-            padding: 5
+            Widget:
             Button:
                 text: "NÂNG CAO"
-                on_press: app.m_show_popup_login('7412369', 'setting_advanced') 
+                size_hint_x: None
+                width: 120
+                on_press: app.m_show_popup_login('7412369', 'setting_advanced')
+        BoxLayout:

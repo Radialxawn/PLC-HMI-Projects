@@ -1,32 +1,36 @@
 import re
 import json
-import kivy.utils
-import tkinter as tk
 from asyncua import ua
 from kivy.app import App
 from pathlib import Path
 from kivy.clock import Clock
-from tkinter import filedialog
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
-from kivy.uix.filechooser import FileChooserIconView
-from kivy.uix.boxlayout import BoxLayout
 from popup.popup_file import PopupFile
-from kivy.uix.button import Button
 from kivy.uix.popup import Popup
+from kivy.graphics import Color, Rectangle, RoundedRectangle
 
 class ScreenHome(Screen):
     def __init__(self, **kvargs):
         super(ScreenHome, self).__init__(**kvargs)
         for i in range(6):
             button = self.ids[f'face_{i}']
-            button.text = f'FACE-{i+1}'
+            button.text = f'MẶT {i+1}'
             button.face_index = i
         for i in range(6):
             button = self.ids[f'cnc_{i}']
-            button.text = f'CNC-{i+1}'
+            button.text = f'CNC {i+1}'
             button.cnc_index = i
         self._first_load = True
+        # test
+        with self.canvas:
+            Color(0.2, 0.6, 1, 1)
+            self.rect = RoundedRectangle(pos=(5, 120), size=(200, 100), radius=[20])
+
+    def on_touch_down(self, touch):
+        print(self.ids.area.pos)
+        self.rect.pos = (touch.x, touch.y)
+        self.rect.size = (150, 75)
     
     def on_enter(self, *args):
         if self._first_load:

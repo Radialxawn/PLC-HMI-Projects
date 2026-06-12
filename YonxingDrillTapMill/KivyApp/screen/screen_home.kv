@@ -1,8 +1,13 @@
+#:import hex kivy.utils.get_color_from_hex
 <ScreenHome>:
+    canvas:
+        Color:
+            rgba: hex('#aefbcd')
+        Rectangle:
+            pos: self.x + 5, self.y + 120
+            size: self.width - 10, self.height - 240
     BoxLayout:
         orientation: 'vertical'
-        padding: 5
-        spacing: 5
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
@@ -26,7 +31,7 @@
                 text: 'CẤU HÌNH'
                 size_hint_x: None
                 font_size: 20
-                width: 120
+                width: 100
                 halign: 'left'
                 valign: 'center'
                 text_size: self.size
@@ -35,7 +40,6 @@
                 size_hint_x: None
                 font_size: 30
                 width: 480
-                hint_text: '...'
                 halign: 'left'
                 input_filter: root._file_name_filter
                 multiline: False
@@ -52,39 +56,51 @@
                 on_press: root._profile_save()
         BoxLayout:
             orientation: 'horizontal'
+            size_hint_y: None
+            height: 60
             spacing: 5
             padding: 5
-            size_hint_y: 1.0
-            BoxLayout:
-                orientation: 'vertical'
+            Button:
+                id: face_4
+                size_hint_x: 0.3
+                on_press: root._select_face(self)
+            Button:
+                id: face_2
                 size_hint_x: 0.5
-                spacing: 5
-                Button:
-                    id: face_4
-                    on_press: root._select_face(self)
-                Button:
-                    id: face_5
-                    on_press: root._select_face(self)
-            BoxLayout:
-                orientation: 'vertical'
-                size_hint_x: 0.5
-                spacing: 5
-                Button:
-                    id: face_2
-                    on_press: root._select_face(self)
-                Button:
-                    id: face_3
-                    on_press: root._select_face(self)
-            BoxLayout:
-                orientation: 'vertical'
+                on_press: root._select_face(self)
+            Button:
+                id: face_0
                 size_hint_x: 1.0
-                spacing: 5
-                Button:
-                    id: face_0
-                    on_press: root._select_face(self)
-                Button:
-                    id: face_1
-                    on_press: root._select_face(self)
+                on_press: root._select_face(self)
+        Widget:
+            id: area
+            canvas:
+                Color:
+                    rgba: 1, 0, 0, 1
+                Line:
+                    ellipse: (self.x + self.width * 0.5 - 50, self.y + self.height * 0.5 - 50, 100, 100)
+                    width: 2
+                Ellipse:
+                    pos: self.x + self.width * 0.5 - 40, self.y + self.height * 0.5 - 40
+                    size: 80, 80
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 60
+            spacing: 5
+            padding: 5
+            Button:
+                id: face_5
+                size_hint_x: 0.3
+                on_press: root._select_face(self)
+            Button:
+                id: face_3
+                size_hint_x: 0.5
+                on_press: root._select_face(self)
+            Button:
+                id: face_1
+                size_hint_x: 1.0
+                on_press: root._select_face(self)
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
