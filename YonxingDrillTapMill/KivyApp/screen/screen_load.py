@@ -7,7 +7,7 @@ from kivy.uix.screenmanager import Screen
 class ScreenLoad(Screen):
     def __init__(self, **kvargs):
         super(ScreenLoad, self).__init__(**kvargs)
-        self.first_load = True
+        self._first_load = True
     
     def on_enter(self, *args):
         self.skip = False
@@ -15,8 +15,8 @@ class ScreenLoad(Screen):
 
     def _perform_heavy_task(self):
         app = App.get_running_app()
-        if self.first_load:
-            self.first_load = False
+        if self._first_load:
+            self._first_load = False
             app.data.create()
             app.auto_connect_start()
         for i in range(100):

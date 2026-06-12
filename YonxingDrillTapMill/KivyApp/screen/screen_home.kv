@@ -5,18 +5,51 @@
         spacing: 5
         BoxLayout:
             orientation: 'horizontal'
-            size_hint: None, None
-            size: 240, 60
+            size_hint_y: None
+            height: 60
             spacing: 5
             padding: 5
             Button:
                 text: "CHẠY"
+                size_hint_x: None
+                width: 120
                 on_press: app.m_run(True)
                 on_release: app.m_run(False)
             Button:
                 text: "DỪNG"
+                size_hint_x: None
+                width: 120
                 on_press: app.m_stop(True)
                 on_release: app.m_stop(False)
+            Widget:
+            Label:
+                text: 'CẤU HÌNH'
+                size_hint_x: None
+                font_size: 20
+                width: 120
+                halign: 'left'
+                valign: 'center'
+                text_size: self.size
+            TextInput:
+                id: profile_name
+                size_hint_x: None
+                font_size: 30
+                width: 480
+                hint_text: '...'
+                halign: 'left'
+                input_filter: root._file_name_filter
+                multiline: False
+                text_size: self.size
+            Button:
+                text: "MỞ"
+                size_hint_x: None
+                width: 120
+                on_press: root._profile_load_select()
+            Button:
+                text: "LƯU"
+                size_hint_x: None
+                width: 120
+                on_press: root._profile_save()
         BoxLayout:
             orientation: 'horizontal'
             spacing: 5

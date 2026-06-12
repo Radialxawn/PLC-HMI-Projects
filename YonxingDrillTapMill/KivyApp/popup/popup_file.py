@@ -6,22 +6,26 @@ class PopupFile(BoxLayout):
         super().__init__(**kwargs)
         self._instance = _instance_
         self._callback = _callback_
-        folder = f'Desktop/{_folder_}'
-        rootpath = Path.home() / folder
-        if not rootpath.exists():
-            rootpath.mkdir(parents=True, exist_ok=True)
-        self.ids.chooser.rootpath = str(rootpath)
+        self.ids.chooser.rootpath = str(PopupFile.path_get(_folder_))
         self.ids.chooser.filters = _filter_
         self.ids.warn.opacity = 0.0
         self.ids.ok.disabled = True
         self.ids.warn.text = f'TỆP PHẢI NHỎ HƠN 1MB'
 
+    @staticmethod
+    def path_get(_folder_):
+        folder = f'Desktop/{_folder_}'
+        rootpath = Path.home() / folder
+        if not rootpath.exists():
+            rootpath.mkdir(parents=True, exist_ok=True)
+        return rootpath
+
     def _select(self, *args):
         paths = args[1]
         is_file = len(paths) > 0
         if is_file:
-            self._select_path = paths[0]
-            size_mb = Path(self._select_path).stat().st_size / (1024 * 1024)
+            self._select_path = Path(paths[0])
+            size_mb = self._select_path.stat().st_size / (1024 * 1024)
             if size_mb >= 1.0:
                 self.ids.ok.disabled = True
                 self.ids.warn.opacity = 1.0
@@ -34,4 +38,7 @@ class PopupFile(BoxLayout):
     
     def _confirm(self):
         self._callback(self._select_path)
+        self._instance.dismiss()
+    
+    def _cancel(self):
         self._instance.dismiss()

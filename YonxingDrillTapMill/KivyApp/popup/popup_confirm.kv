@@ -12,8 +12,8 @@
             size_hint_y: None
             height: 60
             Button:
-                text: 'KHÔNG'
-                on_release: root.on_cancel()
-            Button:
                 text: 'CÓ'
-                on_release: root.on_confirm()
+                on_release: root._confirm()
+            Button:
+                text: 'KHÔNG'
+                on_release: root._cancel()

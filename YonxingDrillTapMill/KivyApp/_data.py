@@ -121,7 +121,8 @@ class Data(object):
                 _types_.append(tp)
             elif stype in _utype__elms_: # user define type
                 elms = _utype__elms_[stype]
-                self._create_generate('%s.%s' % (_node_, sname), elms, _stype__uatype_, _utype__elms_, _ids_, _types_)
+                dot = '' if sname[0] == '[' else '.'
+                self._create_generate('%s%s%s' % (_node_, dot, sname), elms, _stype__uatype_, _utype__elms_, _ids_, _types_)
             else: # array type
                 name = '%s.%s' % (_node_, sname)
                 part = stype.split('__')
@@ -250,12 +251,11 @@ class Data(object):
     #################
 
     def _download_read_file(self, _path_):
-        path = Path(_path_)
-        if not path.is_file():
+        if not _path_.is_file():
             print('File does not exist: %s' % (_path_))
             return []
         combine = ''
-        with path.open(mode='r') as file:
+        with _path_.open(mode='r') as file:
             index = 0
             for line in file:
                 line = line.strip()

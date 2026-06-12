@@ -1,7 +1,7 @@
 <PopupFile>:
     BoxLayout:
         orientation: 'vertical'
-        FileChooserIconView:
+        FileChooserListView:
             id: chooser
             filter_dirs: False
             on_selection: root._select(*args)
@@ -24,3 +24,8 @@
                 size_hint_x: None
                 width: 90
                 on_press: root._confirm()
+            Button:
+                text: 'THOÁT'
+                size_hint_x: None
+                width: 90
+                on_press: root._cancel()

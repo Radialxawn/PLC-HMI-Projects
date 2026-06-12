@@ -6,9 +6,9 @@ class PopupConfirm(Screen):
         self._instance = _instance_
         self._confirm = _confirm_
 
-    def on_confirm(self):
+    def _confirm(self):
         self._confirm()
         self._instance.dismiss()
 
-    def on_cancel(self):
+    def _cancel(self):
         self._instance.dismiss()
