@@ -5,13 +5,27 @@
         spacing: 5
         BoxLayout:
             orientation: 'horizontal'
-            size_hint: None, None
-            size: 120, 60
+            size_hint_y: None
+            height: 60
             spacing: 5
             padding: 5
             Button:
                 text: "THOÁT"
+                size_hint_x: None
+                width: 120
                 on_press: root.manager.current = 'setting'
+            Widget:
+            Button:
+                text: "LOAD"
+                size_hint_x: None
+                width: 120
+                on_press: root._config_load()
+            Button:
+                text: "SAVE"
+                size_hint_x: None
+                width: 120
+                on_press: root._config_save()
+
         GridLayout:
             id: grid
             spacing: 5

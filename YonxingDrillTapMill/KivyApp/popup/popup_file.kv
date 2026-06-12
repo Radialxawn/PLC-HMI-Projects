@@ -3,7 +3,6 @@
         orientation: 'vertical'
         FileChooserIconView:
             id: chooser
-            filters: ['*.cnc']
             filter_dirs: False
             on_selection: root._select(*args)
         BoxLayout:
@@ -17,6 +16,7 @@
                 text: 'WARN'
                 halign: 'left'
                 color: 1, 0, 0, 1
+                text_size: self.size
             Widget:
             Button:
                 id: ok

@@ -1,8 +1,6 @@
-import os
 import shutil
 import socket
 import platform
-import subprocess
 from asyncua import ua
 from pathlib import Path
 from kivy.clock import Clock
@@ -34,11 +32,10 @@ class Data(object):
         self._connect_state = 0
 
     def create(self):
-        current_os = platform.system()
-        if current_os == 'Windows':
+        if platform.system() == 'Windows':
             shutil.copy(self.xml_path_windows, r'./tags.xml')
-        path = os.path.dirname(os.path.abspath(__file__)) + '/tags.xml'
-        tree = ET.parse(path)
+        tags_path = Path(Path(__file__).resolve().parent, 'tags.xml')
+        tree = ET.parse(tags_path)
         root = tree.getroot()
         stype__uatype = {
             'T_BOOL': ua.VariantType.Boolean,
@@ -47,7 +44,7 @@ class Data(object):
             'T_DINT': ua.VariantType.Int32,
             'T_UDINT': ua.VariantType.UInt32,
             'T_STRING': ua.VariantType.String,
-            'T_STRING_255_': ua.VariantType.String,
+            'T_STRING_GVL_c_line_size_': ua.VariantType.String,
         }
         # user type process
         utype_last = ''
@@ -265,7 +262,7 @@ class Data(object):
                 if len(line) > 0:
                     combine += f'N{index} {line}\r\n'
                     index += 1
-        chunk_size = 255
+        chunk_size = 4095
         result = [
             combine[i : i + chunk_size]
             for i in range(0, len(combine), chunk_size)
@@ -329,13 +326,13 @@ class Data(object):
                         self.set('fst.line', dl['lines'][dl['line_index']])
                         dl['state'] += 1
             case 12:
-                if self.get('fst.line') == dl['lines'][dl['line_index']]:
+                if self.get('fst.ldone') == True:
                     dl['line_index'] += 1
                     dl['state'] += 1
             case 13:
                 if self.get('fst.state') == 30:
                     dl['progress'](dl['line_index'] * 100 / line_count)
-                    self.set('fst.next', True)
+                    self.set('fst.lnext', True)
                     dl['state'] = 11
             ##########
             case 99:

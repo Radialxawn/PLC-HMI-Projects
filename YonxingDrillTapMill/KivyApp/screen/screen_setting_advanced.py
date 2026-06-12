@@ -1,6 +1,8 @@
+import json
 import kivy.utils
 from asyncua import ua
 from kivy.app import App
+from pathlib import Path
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from kivy.uix.togglebutton import ToggleButton
@@ -193,3 +195,45 @@ class ScreenSettingAdvanced(Screen):
         app = App.get_running_app()
         app.data.set('hmi.cf.home_encoder_value_recorded', False)
         app.m_save_need_check()
+    
+    def _config_path(self):
+        return Path(Path(__file__).resolve().parent.parent, 'config.json')
+
+    def _config_load_confirm(self):
+        config = {}
+        app = App.get_running_app()
+        path = self._config_path()
+        if not path.exists():
+            return
+        with path.open(mode='r') as file:
+            config = json.load(file)
+        for name in config:
+            value = config[name]
+            if value == None:
+                continue
+            app.data.set(name, value)
+        app.m_save_need_check()
+
+    def _config_load(self):
+        app = App.get_running_app()
+        app.m_show_popup_confirm(
+            _message_='LẤY DỮ LIỆU TRÊN HMI?',
+            _confirm_=self._config_load_confirm)
+    
+    def _config_save_confirm(self):
+        config = {}
+        app = App.get_running_app()
+        for name in self._name__input:
+            block = app.data.name__block[name]
+            if block.type == ua.VariantType.Boolean:
+                config[name] = block.value == 1
+            else:
+                config[name] = block.value
+        with open(self._config_path(), 'w', encoding='utf-8') as file:
+            json.dump(config, file, indent=3)
+
+    def _config_save(self):
+        app = App.get_running_app()
+        app.m_show_popup_confirm(
+            _message_='LƯU DỮ LIỆU VÀO HMI?',
+            _confirm_=self._config_save_confirm)
