@@ -11,9 +11,9 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 
-class ScreenSettingAdvanced(Screen):
+class ScreenSettingAxis(Screen):
     def __init__(self, **kvargs):
-        super(ScreenSettingAdvanced, self).__init__(**kvargs)
+        super(ScreenSettingAxis, self).__init__(**kvargs)
         self._axiss_name__index = {
             'R-x':     0,
             'RM-V-y':  2,

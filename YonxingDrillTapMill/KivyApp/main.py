@@ -12,7 +12,7 @@ from screen.screen_load import ScreenLoad
 from screen.screen_home import ScreenHome
 from screen.screen_setting import ScreenSetting
 from screen.screen_io import ScreenIO
-from screen.screen_setting_advanced import ScreenSettingAdvanced
+from screen.screen_setting_axis import ScreenSettingAxis
 from popup.popup_confirm import PopupConfirm
 from popup.popup_login import PopupLogin
 
@@ -21,7 +21,7 @@ Builder.load_file('screen/screen_load.kv')
 Builder.load_file('screen/screen_home.kv')
 Builder.load_file('screen/screen_io.kv')
 Builder.load_file('screen/screen_setting.kv')
-Builder.load_file('screen/screen_setting_advanced.kv')
+Builder.load_file('screen/screen_setting_axis.kv')
 Builder.load_file('popup/popup_confirm.kv')
 Builder.load_file('popup/popup_file.kv')
 Builder.load_file('popup/popup_login.kv')
@@ -41,7 +41,7 @@ class Main(App):
         sm.add_widget(ScreenHome(name='home'))
         sm.add_widget(ScreenIO(name='io'))
         sm.add_widget(ScreenSetting(name='setting'))
-        sm.add_widget(ScreenSettingAdvanced(name='setting_advanced'))
+        sm.add_widget(ScreenSettingAxis(name='setting_axis'))
         return sm
 
     def _log_mode(self):
@@ -51,8 +51,7 @@ class Main(App):
                 logger.setLevel(level=logging.CRITICAL)
 
     def on_start(self):
-        current_os = platform.system()
-        if current_os == 'Linux':
+        if platform.system() == 'Linux':
             Window.maximize()
 
     def on_stop(self):
@@ -64,7 +63,7 @@ class Main(App):
     def _auto_connect(self, _dt_):
         if self.data.can_connect():
             if self.data.connect_state() == 0:
-                self.data.connect(0.050, 32)
+                self.data.connect(0.010, 32)
         else:
             if self.data.connect_state() == 100:
                 self.data.disconnect()

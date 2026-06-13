@@ -12,7 +12,6 @@ class DataBlock(object):
         self.id = _id_
         self.type = _type_
         self.node = {}
-        self.change = 0
         self.value = None
         self.active = False
 
@@ -151,8 +150,9 @@ class Data(object):
         if not self._get_all_done:
             return
         self._get_all_done = False
+        # gather active ids
         ids = []
-        count = 0, len(self.name_array)
+        count = len(self.name_array)
         for i in range(count):
             ioff = (i + self._get_all_index) % count
             name = self.name_array[ioff]
@@ -162,7 +162,7 @@ class Data(object):
                 if len(ids) >= self._get_all_step:
                     break
         self._get_all_index = (self._get_all_index + self._get_all_step) % count
-        #
+        # get data
         id__node = self.id__node(ids)
         node__value = self.node__value(id__node.values())
         for id in id__node:
@@ -171,13 +171,7 @@ class Data(object):
             block = self.id__block[id]
             block.node = node
             block.value = value
-            self._change_check(id, value)
         self._get_all_done = True
-
-    def _change_check(self, _id_, _value_):
-        block = self.id__block[_id_]
-        if _value_ != block.value:
-            block.change += 1
     
     def set(self, _name_, _value_):
         if self._connect_state == 100:
