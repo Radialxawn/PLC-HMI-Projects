@@ -111,10 +111,10 @@ class ScreenSettingAdvanced(Screen):
             axiss_name.append(name)
             axiss_index.append(self._axiss_name__index[name])
         axis_color = {
-            'x': kivy.utils.get_color_from_hex("#ff4444ff"),
-            'y': kivy.utils.get_color_from_hex("#95fe54ff"),
-            'z': kivy.utils.get_color_from_hex("#526fffff"),
-            'a': kivy.utils.get_color_from_hex("#fff644ff"),
+            'x': kivy.utils.get_color_from_hex('#ff4444ff'),
+            'y': kivy.utils.get_color_from_hex('#95fe54ff'),
+            'z': kivy.utils.get_color_from_hex('#526fffff'),
+            'a': kivy.utils.get_color_from_hex('#fff644ff'),
         }
         grid = self.ids['grid']
         grid.cols = len(self._axis_propertys) + 1

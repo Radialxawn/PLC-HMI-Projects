@@ -137,21 +137,6 @@
                 size_hint_x: None
                 width: 90
                 on_press: root._download_cnc_select(self)
-            ProgressBar:
-                id: cnc_bar
-                max: 100
-                value: 0
-                size_hint_x: None
-                width: 180
-            Label:
-                id: cnc_state
-                font_size: 25
-                bold: True
-                text: 'DONE'
-                size_hint_x: None
-                width: 90
-                opacity: 0.0
-                height: self.texture_size[1]
             Widget:
             Button:
                 text: "LOAD"

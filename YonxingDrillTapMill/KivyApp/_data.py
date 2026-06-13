@@ -14,26 +14,27 @@ class DataBlock(object):
         self.node = {}
         self.change = 0
         self.value = None
-        self.get = False
+        self.active = False
 
 class Data(object):
     def __init__(self, _address_ip_, _address_port_, _xml_path_windows_, _tag_head_):
-        self.address_ip = _address_ip_
-        self.address_port = _address_port_
-        self.xml_path_windows = _xml_path_windows_
-        self.tag_head = _tag_head_
+        self._address_ip_ = _address_ip_
+        self._address_port_ = _address_port_
+        self._xml_path_windows_ = _xml_path_windows_
+        self._tag_head_ = _tag_head_
+        self.name_array = []
         self.name__block = {}
         self.id__block = {}
-        self.client = None
+        self._client = None
         self._connect_state = 0
     
     def _reset(self):
-        self.client = None
+        self._client = None
         self._connect_state = 0
 
     def create(self):
         if platform.system() == 'Windows':
-            shutil.copy(self.xml_path_windows, r'./tags.xml')
+            shutil.copy(self._xml_path_windows_, r'./tags.xml')
         tags_path = Path(Path(__file__).resolve().parent, 'tags.xml')
         tree = ET.parse(tags_path)
         root = tree.getroot()
@@ -71,7 +72,7 @@ class Data(object):
                         if utype_last not in utype__elms:
                             utype__elms[utype_last] = []
         # node process
-        head_part = [self.tag_head] + [''] * 5
+        head_part = [self._tag_head_] + [''] * 5
         node__utype = {}
         level = 0
         last_is_leaf = False
@@ -106,6 +107,7 @@ class Data(object):
             name = id[len(head)+1:]
             self.id__block[id] = DataBlock(id, type)
             self.name__block[name] = self.id__block[id]
+            self.name_array.append(name)
     
     def _create_generate(self, _node_, _elms_, _stype__uatype_, _utype__elms_, _ids_, _types_):
         for e in _elms_:
@@ -149,14 +151,18 @@ class Data(object):
         if not self._get_all_done:
             return
         self._get_all_done = False
-        si = self._get_all_index
-        se = si + self._get_all_step
-        count = len(self.ids)
-        if se > count:
-            self._get_all_index = 0
-        else:
-            self._get_all_index += self._get_all_step
-        ids = self.ids[si:se]
+        ids = []
+        count = 0, len(self.name_array)
+        for i in range(count):
+            ioff = (i + self._get_all_index) % count
+            name = self.name_array[ioff]
+            block = self.name__block[name]
+            if block.active:
+                ids.append(block.id)
+                if len(ids) >= self._get_all_step:
+                    break
+        self._get_all_index = (self._get_all_index + self._get_all_step) % count
+        #
         id__node = self.id__node(ids)
         node__value = self.node__value(id__node.values())
         for id in id__node:
@@ -202,22 +208,22 @@ class Data(object):
                 return False
     
     def can_connect(self):
-        return self._is_ip_active(self.address_ip, self.address_port, 0.1)
+        return self._is_ip_active(self._address_ip_, self._address_port_, 0.1)
 
     def connect_state(self):
         return self._connect_state
 
     def connect(self, _interval_, _step_):
         if not self.can_connect():
-            print(f'Cannot connect to {self.address_ip}')
+            print(f'Cannot connect to {self._address_ip_}')
             return
         self._connect_state = 10
-        address = 'opc.tcp://%s:%d' % (self.address_ip, self.address_port)
-        self.client = Client(address)
-        self.client.connect()
-        self.client.load_data_type_definitions()
-        self.client.load_enums()
-        self.client.load_type_definitions()
+        address = 'opc.tcp://%s:%d' % (self._address_ip_, self._address_port_)
+        self._client = Client(address)
+        self._client.connect()
+        self._client.load_data_type_definitions()
+        self._client.load_enums()
+        self._client.load_type_definitions()
         self._connect_state = 100
         self._get_all_interval = _interval_
         self._get_all_step = _step_
@@ -230,19 +236,19 @@ class Data(object):
         self._get_all_stop()
         self._connect_state = 90
         if self.can_connect():
-            self.client.disconnect()
+            self._client.disconnect()
         self._reset()
         print("Disconnected")
 
     def id__node(self, _ids_):
         if self._connect_state == 100:
-            nodes = [self.client.get_node(id) for id in _ids_]
+            nodes = [self._client.get_node(id) for id in _ids_]
             return dict(zip(_ids_, nodes))
         return None
     
     def node__value(self, _nodes_):
         if self._connect_state == 100:
-            values = self.client.read_values(_nodes_)
+            values = self._client.read_values(_nodes_)
             return dict(zip(_nodes_, values))
         return None
 
@@ -250,7 +256,7 @@ class Data(object):
     # DATA DOWNLOAD #
     #################
 
-    def _download_read_file(self, _path_):
+    def _download_read_file(self, _path_, _progress_):
         if not _path_.is_file():
             print('File does not exist: %s' % (_path_))
             return []
@@ -263,40 +269,44 @@ class Data(object):
                     combine += f'N{index} {line}\r\n'
                     index += 1
         chunk_size = 4095
-        result = [
-            combine[i : i + chunk_size]
-            for i in range(0, len(combine), chunk_size)
-        ]
+        count = len(combine)
+        result = []
+        for i in range(0, count, chunk_size):
+            chunk = combine[i : i + chunk_size]
+            result.append(chunk)
+            _progress_(100 * i / count)
         return result
 
     def _download_get_bridge_ids(self):
         return [self.name__block[n].id for n in self.name__block if n[:3] == 'fst']
 
     def download_start(self, _source_path_, _destination_index_, _progress_):
-        if self._connect_state != 100:
-            print('Not connected')
-            return
         if hasattr(self, '_download_process_clock'):
             print('File downloading')
             return
         if not hasattr(self, '_dl'):
             self._dl = {
-                'line_index': 0,
+                'chunk_index': 0,
                 'progress': _progress_,
             }
         dl = self._dl
         dl['index'] = _destination_index_
-        dl['lines'] = self._download_read_file(_source_path_)
-        if len(dl['lines']) == 0:
+        dl['chunks'] = self._download_read_file(_source_path_, _progress_)
+        if len(dl['chunks']) == 0:
+            print('File empty')
+            return
+        if self._connect_state != 100:
+            print('Not connected')
             return
         dl['bridge_ids'] = self._download_get_bridge_ids()
         self._get_all_stop()
         dl['state'] = 1
+        dl['cancel'] = False
         self._download_process_clock = Clock.schedule_interval(self._download_process, 0.001)
 
     def _download_process(self, _):
         dl = self._dl
-        line_count = len(dl['lines'])
+        line_count = len(dl['chunks'])
         id__node = self.id__node(dl['bridge_ids'])
         node__value = self.node__value(id__node.values())
         for id in id__node:
@@ -305,11 +315,13 @@ class Data(object):
             block = self.id__block[id]
             block.node = node
             block.value = value
+        if dl['cancel']:
+            dl['state'] = 100
         match dl['state']:
             case 1:
                 if self.get('fst.state') == 10:
                     self.set('fst.index', dl['index'])
-                    dl['line_index'] = 0
+                    dl['chunk_index'] = 0
                     dl['state'] += 1
             case 2:
                 if self.get('fst.index') == dl['index']:
@@ -320,18 +332,18 @@ class Data(object):
             ##########
             case 11:
                 if self.get('fst.state') == 21:
-                    if dl['line_index'] >= line_count:
+                    if dl['chunk_index'] >= line_count:
                         dl['state'] = 99
                     else:
-                        self.set('fst.line', dl['lines'][dl['line_index']])
+                        self.set('fst.line', dl['chunks'][dl['chunk_index']])
                         dl['state'] += 1
             case 12:
                 if self.get('fst.ldone') == True:
-                    dl['line_index'] += 1
+                    dl['chunk_index'] += 1
                     dl['state'] += 1
             case 13:
                 if self.get('fst.state') == 30:
-                    dl['progress'](dl['line_index'] * 100 / line_count)
+                    dl['progress'](dl['chunk_index'] * 100 / line_count)
                     self.set('fst.lnext', True)
                     dl['state'] = 11
             ##########
@@ -342,8 +354,11 @@ class Data(object):
                 Clock.unschedule(self._download_process_clock)
                 delattr(self, '_download_process_clock')
                 dl['state'] = 0
-                dl['progress'](100)
+                dl['progress'](101)
                 self._get_all_start()
+    
+    def download_cancel(self):
+        self._dl['cancel'] = True
 
     def stop(self):
         if hasattr(self, '_download_index_clock'):

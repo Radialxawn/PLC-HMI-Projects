@@ -22,8 +22,8 @@ class ScreenLoad(Screen):
         for i in range(100):
             if self.skip:
                 break
-            time.sleep(0.05)
-            Clock.schedule_once(lambda dt, p=i+1: self._update_progress(p))
+            time.sleep(0.01)
+            Clock.schedule_once(lambda _, p=i+1: self._update_progress(p))
         Clock.schedule_once(self._transition_to_main)
 
     def _update_progress(self, _value_):

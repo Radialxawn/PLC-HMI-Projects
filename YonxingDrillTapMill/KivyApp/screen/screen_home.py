@@ -7,6 +7,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
 from popup.popup_file import PopupFile
+from popup.popup_progress import PopupProgress
 from kivy.uix.popup import Popup
 from kivy.graphics import Color, Rectangle, RoundedRectangle
 
@@ -22,15 +23,12 @@ class ScreenHome(Screen):
             button.text = f'CNC {i+1}'
             button.cnc_index = i
         self._first_load = True
-        # test
-        with self.canvas:
-            Color(0.2, 0.6, 1, 1)
-            self.rect = RoundedRectangle(pos=(5, 120), size=(200, 100), radius=[20])
-
+    
     def on_touch_down(self, touch):
-        print(self.ids.area.pos)
-        self.rect.pos = (touch.x, touch.y)
-        self.rect.size = (150, 75)
+        if self.ids.area.collide_point(*touch.pos):
+            print(f"Widget touched down at position: {touch.pos}")
+            return True
+        return super(ScreenHome, self).on_touch_down(touch)
     
     def on_enter(self, *args):
         if self._first_load:
@@ -141,21 +139,25 @@ class ScreenHome(Screen):
             size_hint=(0.8, 0.8),
             auto_dismiss=False
         )
-        self.cnc_index = _instance_.cnc_index
+        self._download_cnc_index = _instance_.cnc_index
         popup.content = PopupFile(popup, _folder_='CNC', _filter_=['*.cnc'], _select_=self._download_cnc)
         popup.open()
     
     def _download_cnc(self, _source_path_):
         app = App.get_running_app()
+        popup = Popup(
+            title='TẢI XUỐNG',
+            size_hint=(0.6, 0.6),
+            auto_dismiss=False
+        )
+        popup.content = PopupProgress(popup, _cancel_=app.data.download_cancel)
+        popup.open()
+        self._download_cnc_popup = popup
         app.data.download_start(
             _source_path_=_source_path_,
-            _destination_index_=self.cnc_index,
-            _progress_=self._download_cnc_bar
+            _destination_index_=self._download_cnc_index,
+            _progress_=self._download_cnc_update
         )
-
-    def _download_cnc_bar(self, _value_):
-        self.ids.cnc_bar.value = _value_
-        if _value_ == 100:
-            self.ids.cnc_state.opacity = 1.0
-        else:
-            self.ids.cnc_state.opacity = 0.0
+    
+    def _download_cnc_update(self, _value_):
+        self._download_cnc_popup.content.update(_value_)

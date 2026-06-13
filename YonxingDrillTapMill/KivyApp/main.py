@@ -22,9 +22,10 @@ Builder.load_file('screen/screen_home.kv')
 Builder.load_file('screen/screen_io.kv')
 Builder.load_file('screen/screen_setting.kv')
 Builder.load_file('screen/screen_setting_advanced.kv')
-Builder.load_file('popup/popup_file.kv')
 Builder.load_file('popup/popup_confirm.kv')
+Builder.load_file('popup/popup_file.kv')
 Builder.load_file('popup/popup_login.kv')
+Builder.load_file('popup/popup_progress.kv')
 
 class Main(App):
     def build(self):
