@@ -18,3 +18,8 @@ class PopupLogin(Screen):
         else:
             _input_.text = ''
             _input_.hint_text = 'SAI MẬT KHẨU'
+    
+    def _password_on_text(self, _input_):
+        if _input_.text == self._password_:
+            App.get_running_app().root.current = self._screen_
+            self._instance_.dismiss()

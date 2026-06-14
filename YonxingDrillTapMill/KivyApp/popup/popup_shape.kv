@@ -1,0 +1,55 @@
+#:import hex kivy.utils.get_color_from_hex
+<PopupShape>:
+    BoxLayout:
+        orientation: 'vertical'
+        Widget:
+            size_hint_y: None
+            height: 10
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 5
+            BoxLayout:
+                id: shape_property
+                orientation: 'vertical'
+                spacing: 5
+                size_hint_x: None
+                width: 180
+                Spinner:
+                    id: shape_id_selector
+                    size_hint_y: None
+                    height: 40
+                    on_text: root._on_shape_id_selector(self)
+                Widget:
+            Widget:
+                id: area
+                canvas.before:
+                    Color:
+                        rgba: hex('#84bf9c')
+                    Rectangle:
+                        pos: self.x, self.y
+                        size: self.width, self.height
+        Widget:
+            size_hint_y: None
+            height: 10
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 5
+            size_hint_y: None
+            height: 60
+            Button:
+                text: 'XOÁ'
+                size_hint_x: None
+                width: 120
+                on_release: root._delete()
+            Widget:
+            Button:
+                text: 'ÁP DỤNG'
+                size_hint_x: None
+                width: 120
+                on_release: root._apply()
+            Widget:
+            Button:
+                text: 'THOÁT'
+                size_hint_x: None
+                width: 120
+                on_release: root._cancel()

@@ -1,11 +1,5 @@
 #:import hex kivy.utils.get_color_from_hex
 <ScreenHome>:
-    canvas:
-        Color:
-            rgba: hex('#aefbcd')
-        Rectangle:
-            pos: self.x + 5, self.y + 120
-            size: self.width - 10, self.height - 240
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -74,15 +68,12 @@
                 on_press: root._select_face(self)
         Widget:
             id: area
-            canvas:
+            canvas.before:
                 Color:
-                    rgba: 1, 0, 0, 1
-                Line:
-                    ellipse: (self.x + self.width * 0.5 - 50, self.y + self.height * 0.5 - 50, 100, 100)
-                    width: 2
-                Ellipse:
-                    pos: self.x + self.width * 0.5 - 40, self.y + self.height * 0.5 - 40
-                    size: 80, 80
+                    rgba: hex('#84bf9c')
+                Rectangle:
+                    pos: self.x + 5, self.y
+                    size: self.width - 10, self.height
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None

@@ -1,3 +1,5 @@
+from kivy.config import Config
+Config.set('graphics', 'multisamples', '4')
 import sys
 import logging
 import platform
@@ -26,6 +28,7 @@ Builder.load_file('popup/popup_confirm.kv')
 Builder.load_file('popup/popup_file.kv')
 Builder.load_file('popup/popup_login.kv')
 Builder.load_file('popup/popup_progress.kv')
+Builder.load_file('popup/popup_shape.kv')
 
 class Main(App):
     def build(self):
@@ -84,7 +87,7 @@ class Main(App):
         self.data.set('hmi.stop', _value_)
 
     def m_home(self):
-        self.data.set('hmi.home', True)    
+        self.data.set('hmi.home', True)
     
     def m_show_popup_confirm(self, _message_, _confirm_):
         popup = Popup(

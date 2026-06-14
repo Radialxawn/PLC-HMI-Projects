@@ -163,14 +163,15 @@ class Data(object):
                     break
         self._get_all_index = (self._get_all_index + self._get_all_step) % count
         # get data
-        id__node = self.id__node(ids)
-        node__value = self.node__value(id__node.values())
-        for id in id__node:
-            node = id__node[id]
-            value = node__value[node]
-            block = self.id__block[id]
-            block.node = node
-            block.value = value
+        if len(ids) > 0:
+            id__node = self.id__node(ids)
+            node__value = self.node__value(id__node.values())
+            for id in id__node:
+                node = id__node[id]
+                value = node__value[node]
+                block = self.id__block[id]
+                block.node = node
+                block.value = value
         self._get_all_done = True
     
     def set(self, _name_, _value_):
@@ -179,10 +180,8 @@ class Data(object):
             block.node.set_value(ua.Variant(_value_, block.type))
     
     def get(self, _name_):
-        if self._connect_state == 100:
-            block = self.name__block[_name_]
-            return block.value
-        return None
+        block = self.name__block[_name_]
+        return block.value
 
     def block(self, _name_) -> DataBlock:
         return self.name__block[_name_]

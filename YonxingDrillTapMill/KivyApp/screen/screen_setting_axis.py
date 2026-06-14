@@ -51,6 +51,20 @@ class ScreenSettingAxis(Screen):
             self._name__input = {}
             self._grid_draw()
             self._grid_draw_done = True
+            name__hash = {}
+            for name in self._name__input:
+                name__hash[name] = False
+            name__hash['hmi.cfsh.need'] = False
+            name__hash['hmi.cfsh.need_check'] = False
+            name__hash['hmi.cfsh.accept'] = False
+            name__hash['hmi.cfsh.decline'] = False
+            name__hash['hmi.cf.home_encoder_value_recorded'] = False
+            name__hash['hmi.view_can_home'] = False
+            name__hash['hmi.home'] = False
+            self._name__hash = name__hash
+        app = App.get_running_app()
+        for name in app.data.name__block:
+            app.data.name__block[name].active = name in self._name__hash
 
     def on_enter(self, *args):
         self._label_scroll_clock = Clock.schedule_interval(self._label_scroll, 0.2)
@@ -96,12 +110,12 @@ class ScreenSettingAxis(Screen):
                 input.text = 'THUẬN' if value else 'NGHỊCH'
             else:
                 input.text = f'{block.value}' if block.value != None else ''
-        need = app.data.name__block['hmi.cfsh.need'].value
+        need = app.data.get('hmi.cfsh.need')
         self.ids['hmi.cfsh.accept'].disabled = not need
         self.ids['hmi.cfsh.decline'].disabled = not need
         self.ids['hmi.cf.home_encoder_value_recorded'].state = (
-            'down' if app.data.name__block['hmi.cf.home_encoder_value_recorded'].value else 'normal')
-        self.ids['hmi.home'].disabled = not app.data.name__block['hmi.view_can_home'].value
+            'down' if app.data.get('hmi.cf.home_encoder_value_recorded') else 'normal')
+        self.ids['hmi.home'].disabled = not app.data.get('hmi.view_can_home')
 
     def _grid_draw(self):
         app = App.get_running_app()
