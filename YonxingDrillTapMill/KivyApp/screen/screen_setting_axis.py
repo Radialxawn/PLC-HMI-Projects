@@ -63,8 +63,7 @@ class ScreenSettingAxis(Screen):
             name__hash['hmi.home'] = False
             self._name__hash = name__hash
         app = App.get_running_app()
-        for name in app.data.name__block:
-            app.data.name__block[name].active = name in self._name__hash
+        app.data.block_active(self._name__hash)
 
     def on_enter(self, *args):
         self._label_scroll_clock = Clock.schedule_interval(self._label_scroll, 0.2)
@@ -103,7 +102,7 @@ class ScreenSettingAxis(Screen):
             input = self._name__input[name]
             if input.is_focus:
                 continue
-            block = app.data.name__block[name]
+            block = app.data.block(name)
             if block.type == ua.VariantType.Boolean:
                 value = block.value == 1
                 input.state = 'down' if value else 'normal'
@@ -154,7 +153,7 @@ class ScreenSettingAxis(Screen):
                 else:
                     oinput = None
                     name = 'hmi.cf.%s[%d]' % (self._axis_propertys[j - 1], axiss_index[i])
-                    value_type = app.data.name__block[name].type
+                    value_type = app.data.block(name).type
                     if value_type == ua.VariantType.Boolean:
                         oinput = ToggleButton(
                             text='...',
@@ -228,7 +227,7 @@ class ScreenSettingAxis(Screen):
         config = {}
         app = App.get_running_app()
         for name in self._name__input:
-            block = app.data.name__block[name]
+            block = app.data.block(name)
             if block.type == ua.VariantType.Boolean:
                 config[name] = block.value == 1
             else:

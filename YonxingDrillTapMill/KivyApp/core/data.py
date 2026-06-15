@@ -21,9 +21,9 @@ class Data(object):
         self._address_port_ = _address_port_
         self._xml_path_windows_ = _xml_path_windows_
         self._tag_head_ = _tag_head_
-        self.name_array = []
-        self.name__block = {}
-        self.id__block = {}
+        self._names = []
+        self._name__block = {}
+        self._id__block = {}
         self._client = None
         self._connect_state = 0
     
@@ -34,7 +34,7 @@ class Data(object):
     def create(self):
         if platform.system() == 'Windows':
             shutil.copy(self._xml_path_windows_, r'./tags.xml')
-        tags_path = Path(Path(__file__).resolve().parent, 'tags.xml')
+        tags_path = Path(Path(__file__).resolve().parent.parent, 'tags.xml')
         tree = ET.parse(tags_path)
         root = tree.getroot()
         stype__uatype = {
@@ -104,9 +104,9 @@ class Data(object):
         head = '.'.join(item for item in head_part if item)
         for id, type in zip(ids, types):
             name = id[len(head)+1:]
-            self.id__block[id] = DataBlock(id, type)
-            self.name__block[name] = self.id__block[id]
-            self.name_array.append(name)
+            self._id__block[id] = DataBlock(id, type)
+            self._name__block[name] = self._id__block[id]
+            self._names.append(name)
     
     def _create_generate(self, _node_, _elms_, _stype__uatype_, _utype__elms_, _ids_, _types_):
         for e in _elms_:
@@ -150,41 +150,60 @@ class Data(object):
         if not self._get_all_done:
             return
         self._get_all_done = False
-        # gather active ids
-        ids = []
-        count = len(self.name_array)
+        names = []
+        count = len(self._names)
         for i in range(count):
             ioff = (i + self._get_all_index) % count
-            name = self.name_array[ioff]
-            block = self.name__block[name]
+            name = self._names[ioff]
+            block = self._name__block[name]
             if block.active:
-                ids.append(block.id)
-                if len(ids) >= self._get_all_step:
+                names.append(name)
+                if len(names) >= self._get_all_step:
                     break
         self._get_all_index = (self._get_all_index + self._get_all_step) % count
-        # get data
-        if len(ids) > 0:
-            id__node = self.id__node(ids)
-            node__value = self.node__value(id__node.values())
-            for id in id__node:
-                node = id__node[id]
-                value = node__value[node]
-                block = self.id__block[id]
-                block.node = node
-                block.value = value
+        self.gets(names)
         self._get_all_done = True
     
+    def get(self, _name_):
+        if self._connect_state == 100:
+            block = self._name__block[_name_]
+            return block.value
+        return None
+    
+    def gets(self, _names_):
+        if self._connect_state == 100:
+            nodes = []
+            for name in _names_:
+                block = self._name__block[name]
+                nodes.append(self._client.get_node(block.id))
+            if len(nodes) > 0:
+                values = self._client.read_values(nodes)
+            for i, node in enumerate(nodes):
+                block = self._name__block[_names_[i]]
+                block.node = node
+                block.value = values[i]
+
     def set(self, _name_, _value_):
         if self._connect_state == 100:
-            block = self.name__block[_name_]
+            block = self._name__block[_name_]
             block.node.set_value(ua.Variant(_value_, block.type))
     
-    def get(self, _name_):
-        block = self.name__block[_name_]
-        return block.value
+    def sets(self, _names_, _values_):
+        if self._connect_state == 100:
+            nodes = []
+            values = []
+            for i, name in enumerate(_names_):
+                block = self._name__block[name]
+                nodes.append(self._client.get_node(block.id))
+                values.append(ua.Variant(_values_[i], block.type))
+            self._client.write_values(nodes, values)
 
     def block(self, _name_) -> DataBlock:
-        return self.name__block[_name_]
+        return self._name__block[_name_]
+
+    def block_active(self, _name__hash_):
+        for name in self._name__block:
+            self._name__block[name].active = name in _name__hash_
 
     ###################
     # DATA CONNECTION #
@@ -233,18 +252,6 @@ class Data(object):
         self._reset()
         print("Disconnected")
 
-    def id__node(self, _ids_):
-        if self._connect_state == 100:
-            nodes = [self._client.get_node(id) for id in _ids_]
-            return dict(zip(_ids_, nodes))
-        return None
-    
-    def node__value(self, _nodes_):
-        if self._connect_state == 100:
-            values = self._client.read_values(_nodes_)
-            return dict(zip(_nodes_, values))
-        return None
-
     #################
     # DATA DOWNLOAD #
     #################
@@ -270,8 +277,8 @@ class Data(object):
             _progress_(100 * i / count)
         return result
 
-    def _download_get_bridge_ids(self):
-        return [self.name__block[n].id for n in self.name__block if n[:3] == 'fst']
+    def _download_get_bridge_names(self):
+        return [n for n in self._name__block if n[:3] == 'fst']
 
     def download_start(self, _source_path_, _destination_index_, _progress_):
         if hasattr(self, '_download_process_clock'):
@@ -291,7 +298,7 @@ class Data(object):
         if self._connect_state != 100:
             print('Not connected')
             return
-        dl['bridge_ids'] = self._download_get_bridge_ids()
+        dl['bridge_names'] = self._download_get_bridge_names()
         self._get_all_stop()
         dl['state'] = 1
         dl['cancel'] = False
@@ -300,14 +307,7 @@ class Data(object):
     def _download_process(self, _):
         dl = self._dl
         line_count = len(dl['chunks'])
-        id__node = self.id__node(dl['bridge_ids'])
-        node__value = self.node__value(id__node.values())
-        for id in id__node:
-            node = id__node[id]
-            value = node__value[node]
-            block = self.id__block[id]
-            block.node = node
-            block.value = value
+        self.gets(dl['bridge_names'])
         if dl['cancel']:
             dl['state'] = 100
         match dl['state']:

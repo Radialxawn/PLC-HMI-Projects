@@ -14,7 +14,7 @@ class PopupProgress(Screen):
         self._cancel_()
         self._instance_.dismiss()
     
-    def update(self, _value_):
+    def progress(self, _value_):
         self.ids.bar.value = _value_
         if _value_ == 101:
             self.ids.cancel.disabled = True

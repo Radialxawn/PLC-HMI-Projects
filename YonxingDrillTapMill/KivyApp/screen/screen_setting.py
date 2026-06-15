@@ -17,8 +17,7 @@ class ScreenSetting(Screen):
             name__hash['hmi.cfsh.decline'] = False
             self._name__hash = name__hash
         app = App.get_running_app()
-        for name in app.data.name__block:
-            app.data.name__block[name].active = name in self._name__hash
+        app.data.block_active(self._name__hash)
 
     def on_enter(self, *args):
         return

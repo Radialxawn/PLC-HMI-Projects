@@ -6,11 +6,12 @@ from pathlib import Path
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
-from popup.popup_file import PopupFile
 from popup.popup_progress import PopupProgress
 from popup.popup_shape import PopupShape
+from popup.popup_file import PopupFile
+from popup.popup_face import PopupFace
 from kivy.uix.popup import Popup
-from kivy.graphics import Color, Rectangle, RoundedRectangle
+from data.face import Face
 
 class ScreenHome(Screen):
     def __init__(self, **kvargs):
@@ -31,63 +32,21 @@ class ScreenHome(Screen):
             self._generate()
             name__hash = {}
             name__hash['hmi.face_index'] = False
+            name__hash['hmi.run'] = False
+            name__hash['hmi.stop'] = False
             self._name__hash = name__hash
         app = App.get_running_app()
-        for name in app.data.name__block:
-            app.data.name__block[name].active = name in self._name__hash
-
-    def on_enter(self, *args):
-        return
-
-    def on_leave(self, *args):
-        return
+        app.data.block_active(self._name__hash)
     
+    def _generate(self):
+        self._index__face = {}
+        for i in range(6):
+            face = Face(_index_=i, _z_count_=3, _shape_count_=10)
+            self._index__face[i] = face
+
     #################
     # LOAD AND SAVE #
     #################
-
-    def _generate(self):
-        count__property = {
-            1: [
-                'ox',
-                'oy',
-                'oz',
-                'tool_d',
-                'depth',
-                'feed',
-            ],
-            2: [
-                'z',
-                'zs',
-            ],
-            10: [
-                's_id',
-                's_x',
-                's_y',
-                's_va',
-                's_vb',
-                's_vc',
-                's_vd',
-                's_ve',
-            ]
-        }
-        app = App.get_running_app()
-        self._index__face = {}
-        for i in range(6):
-            face = {}
-            for count in count__property:
-                if count == 1:
-                    for p in count__property[count]:
-                        name = f'hmi.face[{i}].{p}'
-                        block = app.data.name__block[name]
-                        face[name] = block.value
-                else:
-                    for p in count__property[count]:
-                        for j in range(count):
-                            name = f'hmi.face[{i}].{p}[{j}]'
-                            block = app.data.name__block[name]
-                            face[name] = block.value
-            self._index__face[i] = face
 
     def _file_name_filter(self, _substring_, _from_undo_):
         pattern = re.compile(r'[^a-zA-Z0-9_-]')
@@ -95,6 +54,10 @@ class ScreenHome(Screen):
         return filtered
 
     def _profile_load(self, _path_):
+        index__face = {}
+        with _path_.open(mode='r') as file:
+            index__face = json.load(file)
+        self._index__face = index__face
         self.ids.profile_name.text = _path_.stem
 
     def _profile_load_select(self):
@@ -111,7 +74,7 @@ class ScreenHome(Screen):
         for i in self._index__face:
             face = self._index__face[i]
             for name in face:
-                block = app.data.name__block[name]
+                block = app.data.block(name)
                 if block.type == ua.VariantType.Boolean:
                     face[name] = block.value == 1
                 else:
@@ -138,16 +101,6 @@ class ScreenHome(Screen):
         app.m_show_popup_confirm(
             _message_=message,
             _confirm_=self._profile_save_confirm)
-
-    def _select_face(self, _instance_):
-        app = App.get_running_app()
-        face_index = _instance_.face_index
-        app.data.set('hmi.face_index', face_index)
-        for name in app.data.name__block:
-            app.data.name__block[name].active = name in self._name__hash
-        face = self._index__face[face_index]
-        for name in face:
-            app.data.name__block[name].active = True
     
     def _download_cnc_select(self, _instance_):
         popup = Popup(
@@ -180,59 +133,48 @@ class ScreenHome(Screen):
         app.data.download_start(
             _source_path_=_source_path_,
             _destination_index_=self._download_cnc_index,
-            _progress_=self._download_cnc_update
+            _progress_=self._download_cnc_progress
         )
     
-    def _download_cnc_update(self, _value_):
-        self._download_cnc_popup.content.update(_value_)
+    def _download_cnc_progress(self, _value_):
+        self._download_cnc_popup.content.progress(_value_)
     
-    ################
-    # PROFILE EDIT #
-    ################
+    #############
+    # FACE EDIT #
+    #############
 
-    def on_touch_down(self, touch):
-        if self.ids.area.collide_point(*touch.pos):
-            if touch.button == 'scrollup':
-                print('zoom out')
-            elif touch.button == 'scrolldown':
-                print('zoom in')
-            elif touch.button == 'left':
-                self._shape_select(touch.pos)
-            return True
-        return super().on_touch_down(touch)
+    def _profile_draw(self):
+        print(self._face.z)
+        print('draw profile')
 
-    def _shape_apply(self):
-        print(self._shape)
-        print('shape apply')
-    
-    def _shape_delete(self):
-        self._shape['id'] = 0
-        print('shape delete')
+    def _face_select(self, _instance_):
+        app = App.get_running_app()
+        face_index = _instance_.face_index
+        app.data.set('hmi.face_index', face_index)
+        app.data.block_active(self._name__hash)
+        for name in self._index__face[face_index].name__value():
+            app.data.block(name).active = True
+        if app.data.get('hmi.face_index') == face_index or app.offline:
+            self._face_open(face_index)
 
-    def _shape_select(self, _pos_):
-        print('shape select or create new')
-        self._shape_open()
-    
-    def _shape_open(self):
+    def _face_open(self, _index_):
         popup = Popup(
-            title='BIÊN DẠNG',
-            size_hint=(0.6, 0.8),
+            title=f'MẶT {_index_+1}',
+            size_hint=(0.9, 0.9),
             auto_dismiss=False,
         )
-        self._shape = {
-            'id': 0,
-            'x': 0,
-            'y': 0,
-            'va': 0,
-            'vb': 0,
-            'vc': 0,
-            'vd': 0,
-            've': 0,
-        }
-        popup.content = PopupShape(
+        self._face = self._index__face[_index_]
+        popup.content = PopupFace(
             _instance_=popup,
-            _shape_=self._shape,
-            _apply_=self._shape_apply,
-            _delete_=self._shape_delete
+            _face_=self._face,
+            _apply_=self._face_apply,
+            _delete_=self._face_delete
             )
         popup.open()
+    
+    def _face_apply(self):
+        print('face apply:', self._face)
+        self._profile_draw()
+
+    def _face_delete(self):
+        print('face delete')

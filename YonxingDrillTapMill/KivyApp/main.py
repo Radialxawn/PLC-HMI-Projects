@@ -1,9 +1,10 @@
 from kivy.config import Config
 Config.set('graphics', 'multisamples', '4')
+Config.set('input', 'mouse', 'mouse,disable_multitouch')
 import sys
 import logging
 import platform
-from _data import Data
+from core.data import Data
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
@@ -28,11 +29,17 @@ Builder.load_file('popup/popup_confirm.kv')
 Builder.load_file('popup/popup_file.kv')
 Builder.load_file('popup/popup_login.kv')
 Builder.load_file('popup/popup_progress.kv')
+Builder.load_file('popup/popup_face.kv')
 Builder.load_file('popup/popup_shape.kv')
 
 class Main(App):
     def build(self):
-        print(f'Run with parameters: {sys.argv[1:]}')
+        parameters = sys.argv[1:]
+        if len(parameters) > 0:
+            match parameters[0]:
+                case 'offline':
+                    self.offline = True
+                    print('Run offline mode')
         self._log_mode()
         self.data = Data(
             _address_ip_='192.168.2.3', _address_port_=4840,

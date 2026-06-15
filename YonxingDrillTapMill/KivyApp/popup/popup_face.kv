@@ -1,5 +1,5 @@
 #:import hex kivy.utils.get_color_from_hex
-<PopupShape>:
+<PopupFace>:
     BoxLayout:
         orientation: 'vertical'
         Widget:
@@ -9,21 +9,15 @@
             orientation: 'horizontal'
             spacing: 5
             BoxLayout:
-                id: shape_property
+                id: face_property
                 orientation: 'vertical'
                 spacing: 5
                 size_hint_x: None
-                Spinner:
-                    id: shape_id_selector
-                    size_hint_y: None
-                    height: 40
-                    on_text: root._on_shape_id_selector(self)
-                Widget:
             BoxLayout:
                 id: area
                 canvas.before:
                     Color:
-                        rgba: hex('#84bf9c')
+                        rgba: hex('#b084bf')
                     Rectangle:
                         pos: self.x, self.y
                         size: self.width, self.height
