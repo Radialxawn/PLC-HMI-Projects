@@ -41,7 +41,7 @@ class ScreenHome(Screen):
     def _generate(self):
         self._index__face = {}
         for i in range(6):
-            face = Face(_index_=i, _z_count_=3, _shape_count_=10)
+            face = Face(_z_count_=3, _shape_count_=10)
             self._index__face[i] = face
 
     #################
@@ -144,7 +144,6 @@ class ScreenHome(Screen):
     #############
 
     def _profile_draw(self):
-        print(self._face.z)
         print('draw profile')
 
     def _face_select(self, _instance_):
@@ -152,7 +151,8 @@ class ScreenHome(Screen):
         face_index = _instance_.face_index
         app.data.set('hmi.face_index', face_index)
         app.data.block_active(self._name__hash)
-        for name in self._index__face[face_index].name__value():
+        face = self._index__face[face_index]
+        for name in face.name__value(face_index):
             app.data.block(name).active = True
         if app.data.get('hmi.face_index') == face_index or app.offline:
             self._face_open(face_index)
@@ -164,6 +164,10 @@ class ScreenHome(Screen):
             auto_dismiss=False,
         )
         self._face = self._index__face[_index_]
+        for i, shape in enumerate(self._face.shape):
+            shape.id = 3
+            shape.x = (i * 20) * 1e3
+            shape.va = (10 + i * 5) * 1e3
         popup.content = PopupFace(
             _instance_=popup,
             _face_=self._face,

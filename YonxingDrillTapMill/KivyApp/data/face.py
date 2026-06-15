@@ -1,8 +1,7 @@
 from data.shape import Shape
 
 class Face(object):
-    def __init__(self, _index_, _z_count_, _shape_count_):
-        self._index_ = _index_
+    def __init__(self, _z_count_, _shape_count_):
         self.ox = 0
         self.oy = 0
         self.oz = 0
@@ -11,9 +10,9 @@ class Face(object):
         self.tool_d = 0
         self.depth = 0
         self.feed = 0
-        self.index__shape = {}
+        self.shape = []
         for i in range(_shape_count_):
-            self.index__shape[i] = Shape()
+            self.shape.append(Shape())
 
     def __getitem__(self, _key_):
         return getattr(self, _key_)
@@ -27,8 +26,8 @@ class Face(object):
     def from_json(self):
         return
 
-    def name__value(self):
-        head = f'hmi.face[{self._index_}]'
+    def name__value(self, _index_):
+        head = f'hmi.face[{_index_}]'
         kv = vars(self)
         n__v = {}
         for k in kv:
@@ -36,9 +35,9 @@ class Face(object):
             if k == 'z' or k == 'zs':
                 for i, iv in enumerate(v):
                     n__v[f'{head}.{k}[{i}]'] = iv
-            elif k == 'index__shape':
-                for index in v:
-                    s_kv = vars(v[index])
+            elif k == 'shape':
+                for index, value in enumerate(v):
+                    s_kv = vars(value)
                     for s_k in s_kv:
                         s_v = s_kv[s_k]
                         n__v[f'{head}.shape[{index}].{s_k}'] = s_v

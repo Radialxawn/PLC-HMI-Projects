@@ -1,15 +1,16 @@
 import re
 from kivy.app import App
-from kivy.uix.screenmanager import Screen
-from popup.popup_shape import PopupShape
-from kivy.uix.textinput import TextInput
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.widget import Widget
 from kivy.uix.label import Label
+from popup.popup_shape import PopupShape
+from kivy.uix.screenmanager import Screen
+from kivy.graphics import Color, Rectangle
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
 from kivy.uix.popup import Popup
-from kivy.graphics import Color, Line, Rectangle, Ellipse, RoundedRectangle
+from kivy.clock import Clock
 from core.draw import Draw
-from kivy.graphics import Color, StencilPush, StencilUse, StencilUnUse, Rectangle, Ellipse
+from kivy.utils import get_color_from_hex as clhex
 
 class PopupFace(Screen):
     def __init__(self, _instance_, _face_, _apply_, _delete_, **kwargs):
@@ -23,40 +24,61 @@ class PopupFace(Screen):
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
 
     def _generate(self):
-        self._fp__name = {
+        fp__name = {
             'ox':     'x',
             'oy':     'y',
             'oz':     'z',
-            'tool_d': 'đường kính dao',
+            'tool_d': 'đk dao',
             'depth':  'độ sâu',
             'feed':   'tốc độ',
         }
         self.ids.face_property.add_widget(Widget())
         self.ids.face_property.width = 320
-        for fp in self._fp__name:
+        for fp in fp__name:
             obox = BoxLayout(
                 orientation='horizontal',
                 size_hint_y=None,
                 height=40,
             )
             olabel = Label(
-                text=self._fp__name[fp].upper(),
+                text=fp__name[fp].upper(),
                 size_hint_x=None,
-                width=160
+                width=90
             )
-            oinput = TextInput(
-                hint_text='...',
-                halign='center',
-                input_filter=self._on_text_input_filter,
-                multiline=False
-            )
-            oinput.fp = fp
-            oinput.bind(on_text_validate=self._on_text_input_validate)
-            oinput.bind(focus=self._on_text_input_focus)
             obox.add_widget(olabel)
-            obox.add_widget(oinput)
+            self._generate_input(fp, self._face_[fp], obox)
             self.ids.face_property.add_widget(obox)
         self.ids.face_property.add_widget(Widget())
+        for i in range(len(self._face_.z)):
+            obox = BoxLayout(
+                orientation='horizontal',
+                size_hint_y=None,
+                spacing=5,
+                height=40,
+            )
+            olabel = Label(
+                text=f'Z{i+1}',
+                size_hint_x=None,
+                width=30
+            )
+            obox.add_widget(olabel)
+            self._generate_input(f'z[{i}]', self._face_.z[i], obox)
+            self._generate_input(f'zs[{i}]', self._face_.zs[i], obox)
+            self.ids.face_property.add_widget(obox)
+        self.ids.face_property.add_widget(Widget())
+
+    def _generate_input(self, _fp_, _value_, _parent_):
+        ip = TextInput(
+            halign='center',
+            input_filter=self._on_text_input_filter,
+            multiline=False
+        )
+        ip.fp = _fp_
+        ip.text = str(_value_*1e-3)
+        ip.bind(on_text_validate=self._on_text_input_validate)
+        ip.bind(focus=self._on_text_input_focus)
+        _parent_.add_widget(ip)
+        return ip
     
     def _on_text_input_filter(self, _substring_, _from_undo_):
         pattern = re.compile(r'[^0-9.]')
@@ -69,8 +91,15 @@ class PopupFace(Screen):
             value = int(float(_instance_.text)*1e3)
         except (ValueError, TypeError):
             _instance_.text = ''
-        if value != self._face_[_instance_.fp]:
+        changed = False
+        array = _instance_.fp.split('[')
+        if len(array) > 1:
+            self._face_[array[0]][int(array[1][:-1])] = value
+            changed = True
+        elif value != self._face_[_instance_.fp]:
             self._face_[_instance_.fp] = value
+            changed = True
+        if changed:
             self._update_canvas()
     
     def _on_text_input_focus(self, _instance_, _value_):
@@ -79,7 +108,7 @@ class PopupFace(Screen):
             self._on_text_input_validate(_instance_)
 
     def _update_canvas(self, *args):
-        print('update face')
+        self._shape_apply()
 
     def _apply(self):
         self._apply_()
@@ -104,10 +133,10 @@ class PopupFace(Screen):
         inside = 0 < dx < area_size[0] and 0 < dy < area_size[1]
         if inside:
             if touch.button == 'scrollup':
-                self._draw.set(1e-3, 0, 0)
+                self._draw.pixel_per_micro -= 1e-4
                 self._shape_apply()
             elif touch.button == 'scrolldown':
-                self._draw.set(5e-3, 0, 0)
+                self._draw.pixel_per_micro += 1e-4
                 self._shape_apply()
             elif touch.button == 'left':
                 self._shape_select(dx, dy)
@@ -117,26 +146,20 @@ class PopupFace(Screen):
     def _shape_apply(self):
         area = self.ids.area
         area.canvas.clear()
+        self._face_.shape.sort(key=lambda s: s.x)
         with area.canvas:
-            StencilPush()
-            Color(1, 1, 1, 1)
-            Ellipse(pos=(100, 100), size=(200, 200))
-            StencilUse()
-            Color(1, 0, 0, 1)
+            Color(rgba=clhex("#ff5656ff"))
             Rectangle(pos=[area.center_x, area.center_y], size=[area.size[0]*0.5, 1])
-            Color(0, 1, 0, 1)
+            Color(rgba=clhex("#56ff64ff"))
             Rectangle(pos=[area.center_x, area.center_y], size=[1, area.size[1]*0.5])
-        cx, cy = self._draw.pixel_to_micro(area.center_x, area.center_y)
-        for index in self._face_.index__shape:
-            shape = self._face_.index__shape[index]
-            px, py = cx + shape.x, cy + shape.y
-            self._draw.shape(
-                _area_=area,
-                _shape_=shape,
-                _position_=[px, py],
-            )
-        with area.canvas:
-            StencilUnUse()
+            cx, cy = self._draw.pixel_to_micro(area.center_x, area.center_y)
+            for i, shape in enumerate(self._face_.shape):
+                px, py = cx + shape.x, cy + shape.y
+                Color((i+1)/len(self._face_.shape), 0, 0, 1)
+                self._draw.shape(
+                    _shape_=shape,
+                    _position_=[px, py],
+                )
 
     def _shape_delete(self, _shape_):
         _shape_.id = 0
@@ -148,19 +171,18 @@ class PopupFace(Screen):
         dx, dy = self._draw.pixel_to_micro(dxp, dyp)
         shape_index = -1
         shape_index_free = -1
-        for index in self._face_.index__shape:
-            shape = self._face_.index__shape[index]
+        for i, shape in enumerate(self._face_.shape):
             if shape.id > 0:
                 if shape.contain(dx, dy, 10):
-                    shape_index = index
+                    shape_index = i
                     break
             else:
                 if shape_index_free == -1:
-                    shape_index_free = index
+                    shape_index_free = i
         if shape_index == -1 and shape_index_free != -1:
             shape_index = shape_index_free
         if shape_index != -1:
-            self._shape_open(self._face_.index__shape[shape_index])
+            self._shape_open(self._face_.shape[shape_index])
     
     def _shape_open(self, _shape_):
         popup = Popup(

@@ -17,10 +17,18 @@ def testa():
         print(o)
 
 def testb():
-    face = Face(0, 3, 10)
-    name__value = face.name__value()
+    face = Face(3, 10)
+    name__value = face.name__value(0)
     for name in name__value:
         print(name, name__value[name])
+
+def testc():
+    s = 'zs[0]'
+    array = s.split('[')
+    print(array, array[1][:-1])
+    s = 'wtf'
+    array = s.split('[')
+    print(array)
 
 parameters = sys.argv[1:]
 if len(parameters) > 0:
@@ -29,3 +37,5 @@ if len(parameters) > 0:
             testa()
         case 'b':
             testb()
+        case 'c':
+            testc()

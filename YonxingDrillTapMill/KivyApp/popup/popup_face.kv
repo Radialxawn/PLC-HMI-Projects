@@ -6,6 +6,7 @@
             size_hint_y: None
             height: 10
         BoxLayout:
+            id: main
             orientation: 'horizontal'
             spacing: 5
             BoxLayout:
@@ -13,7 +14,7 @@
                 orientation: 'vertical'
                 spacing: 5
                 size_hint_x: None
-            BoxLayout:
+            StencilView:
                 id: area
                 canvas.before:
                     Color:

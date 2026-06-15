@@ -1,15 +1,14 @@
 import re
-from core.draw import Draw
 from kivy.app import App
-from kivy.uix.screenmanager import Screen
-from kivy.graphics import Color, Line, Rectangle, Ellipse, RoundedRectangle
-from kivy.graphics import PushMatrix, PopMatrix, Scale
-from kivy.graphics.transformation import Matrix
-from kivy.uix.textinput import TextInput
+from core.draw import Draw
+from kivy.graphics import Color
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.screenmanager import Screen
+from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from data.shape import Shape
+from kivy.utils import get_color_from_hex as clhex
 
 class PopupShape(Screen):
     def __init__(self, _instance_, _shape_, _apply_, _delete_, **kwargs):
@@ -38,7 +37,7 @@ class PopupShape(Screen):
         }
         shape_id_selector = self.ids.shape_id_selector
         values = []
-        for shape_name in Shape.name__id:
+        for shape_name in Shape.name__data:
             values.append(shape_name)
             shape_id_selector.values = values
         self.ids.shape_property.width = 180
@@ -53,23 +52,27 @@ class PopupShape(Screen):
                 size_hint_x=None,
                 width=30
             )
-            oinput = TextInput(
-                hint_text='...',
-                halign='center',
-                input_filter=self._on_text_input_filter,
-                multiline=False
-            )
-            oinput.sp = sp
-            oinput.bind(on_text_validate=self._on_text_input_validate)
-            oinput.bind(focus=self._on_text_input_focus)
             obox.add_widget(olabel)
-            obox.add_widget(oinput)
+            oinput = self._generate_input(sp, self._shape_[sp], obox)
             self._sp__widget[sp].append(olabel)
             self._sp__widget[sp].append(oinput)
             self.ids.shape_property.add_widget(obox)
             if sp == 'y':
                 self.ids.shape_property.add_widget(Widget())
         self.ids.shape_property.add_widget(Widget())
+    
+    def _generate_input(self, _sp_, _value_, _parent_):
+        ip = TextInput(
+            halign='center',
+            input_filter=self._on_text_input_filter,
+            multiline=False
+        )
+        ip.sp = _sp_
+        ip.text = str(_value_*1e-3)
+        ip.bind(on_text_validate=self._on_text_input_validate)
+        ip.bind(focus=self._on_text_input_focus)
+        _parent_.add_widget(ip)
+        return ip
     
     def _on_text_input_filter(self, _substring_, _from_undo_):
         pattern = re.compile(r'[^0-9.]')
@@ -94,7 +97,7 @@ class PopupShape(Screen):
     def _on_shape_id_selector(self, _instance_):
         if self._ignore_shape_id_selector:
             return
-        self._shape_['id'] = Shape.name__id[_instance_.text]
+        self._shape_.id = Shape.name__data[_instance_.text]['id']
         self._shape_id_changed = True
         self._update_canvas()
 
@@ -103,11 +106,18 @@ class PopupShape(Screen):
         area.canvas.clear()
         cx, cy = self._draw.pixel_to_micro(area.center_x, area.center_y)
         self._shape_.limit()
-        active_sp = self._draw.shape(
-            _area_=area,
-            _shape_=self._shape_,
-            _position_=[cx, cy],
-        )
+        with area.canvas:
+            Color(rgba=clhex("#ff5656ff"))
+            self._draw.shape(
+                _shape_=self._shape_,
+                _position_=[cx, cy],
+            )
+        active_sp = []
+        for name in Shape.name__data:
+            data = Shape.name__data[name]
+            if data['id'] == self._shape_.id:
+                active_sp = data['sp']
+                break
         if self._shape_id_changed:
             for sp in self._sp__widget:
                 opacity = 1 if sp in active_sp else 0

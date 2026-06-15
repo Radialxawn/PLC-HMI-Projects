@@ -162,7 +162,6 @@ class ScreenSettingAxis(Screen):
                         oinput.bind(on_press=self._on_toggle_press)
                     else:
                         oinput = TextInput(
-                            hint_text='...',
                             halign='center',
                             input_filter='int',
                             multiline=False
