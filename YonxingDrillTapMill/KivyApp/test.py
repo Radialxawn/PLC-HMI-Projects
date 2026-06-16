@@ -17,8 +17,8 @@ def testa():
         print(o)
 
 def testb():
-    face = Face(3, 10)
-    name__value = face.name__value(0)
+    face = Face(0, 3, 10)
+    name__value = face.name__value()
     for name in name__value:
         print(name, name__value[name])
 

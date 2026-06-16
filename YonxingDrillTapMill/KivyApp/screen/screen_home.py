@@ -4,11 +4,10 @@ from asyncua import ua
 from kivy.app import App
 from pathlib import Path
 from kivy.clock import Clock
+from kivy.graphics import Color
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
 from popup.popup_progress import PopupProgress
-from kivy.graphics import Color, Rectangle
-from popup.popup_shape import PopupShape
 from popup.popup_file import PopupFile
 from popup.popup_face import PopupFace
 from kivy.uix.popup import Popup
@@ -27,7 +26,7 @@ class ScreenHome(Screen):
             button = self.ids[f'cnc_{i}']
             button.text = f'CNC {i+1}'
             button.cnc_index = i
-        self._draw = Draw(1e-3)
+        self._draw = Draw(1e-3, [0.1e-3, 5e-3])
         self._first_load = True
     
     def on_pre_enter(self, *args):
@@ -47,8 +46,7 @@ class ScreenHome(Screen):
     def _generate(self):
         self._index__face = {}
         for i in range(6):
-            face = Face(_z_count_=3, _shape_count_=10)
-            self._index__face[i] = face
+            self._index__face[i] = Face(i, _z_count_=3, _shape_count_=10)
 
     #################
     # LOAD AND SAVE #
@@ -60,11 +58,21 @@ class ScreenHome(Screen):
         return filtered
 
     def _profile_load(self, _path_):
-        index__face = {}
+        save_data = {}
         with _path_.open(mode='r') as file:
-            index__face = json.load(file)
-        self._index__face = index__face
+            save_data = json.load(file)
+        try:
+            for index in self._index__face:
+                face = self._index__face[index]
+                face.from_json(save_data[str(index)])
+        except:
+            app = App.get_running_app()
+            app.m_show_popup_error(
+                _message_='TỆP BỊ LỖI',
+                _acknowledge_=None)
+            return
         self.ids.profile_name.text = _path_.stem
+        self._face_apply()
 
     def _profile_load_select(self):
         popup = Popup(
@@ -76,22 +84,16 @@ class ScreenHome(Screen):
         popup.open()
 
     def _profile_save_confirm(self):
-        app = App.get_running_app()
-        for i in self._index__face:
-            face = self._index__face[i]
-            for name in face:
-                block = app.data.block(name)
-                if block.type == ua.VariantType.Boolean:
-                    face[name] = block.value == 1
-                else:
-                    face[name] = block.value
         profile_name = self.ids.profile_name.text.strip()
         if profile_name == '':
             return
         path = Path(PopupFile.path_get('PROFILE'), profile_name)
+        save_data = {}
+        for index in self._index__face:
+            save_data[index] = self._index__face[index].to_json()
         path_full = f'{str(path)}.profile'
         with open(path_full, 'w', encoding='utf-8') as file:
-            json.dump(self._index__face, file, indent=3)
+            json.dump(save_data, file, indent=3)
 
     def _profile_save(self):
         profile_name = self.ids.profile_name.text.strip()
@@ -102,7 +104,7 @@ class ScreenHome(Screen):
         message = 'LƯU TỆP MỚI?'
         for file in files:
             if profile_name == file.stem:
-                message = f'ĐÃ TỒN TẠI [{profile_name}]\nTHAY THẾ?'
+                message = f'ĐÃ TỒN TẠI [{profile_name}]\nGHI ĐÈ?'
         app = App.get_running_app()
         app.m_show_popup_confirm(
             _message_=message,
@@ -156,10 +158,11 @@ class ScreenHome(Screen):
             _face_indexs_=[4, 2, 0],
             _tool_ox_micro_=[0, 300_000, 1660_000],
             _axis_dir_x_=[1, 1, -1],
+            _axis_dir_y_=[1, 1, 1],
             _colors_=[
-                clhex("#ff5656ff"),
-                clhex("#ffff56ff"),
-                clhex("#61ff56ff"),
+                clhex("#8a2d2dff"),
+                clhex("#909033ff"),
+                clhex("#36942fff"),
             ]
         )
 
@@ -170,14 +173,15 @@ class ScreenHome(Screen):
             _face_indexs_=[5, 3, 1],
             _tool_ox_micro_=[0, 300_000, 1660_000],
             _axis_dir_x_=[1, 1, -1],
+            _axis_dir_y_=[1, 1, 1],
             _colors_=[
-                clhex("#56f1ffff"),
-                clhex("#b956ffff"),
-                clhex("#ff56cfff"),
+                clhex("#33858dff"),
+                clhex("#6a3094ff"),
+                clhex("#8c2e71ff"),
             ]
         )
 
-    def _profile_draw(self, _area_, _area_padding_x_, _face_indexs_, _tool_ox_micro_, _axis_dir_x_, _colors_):
+    def _profile_draw(self, _area_, _area_padding_x_, _face_indexs_, _tool_ox_micro_, _axis_dir_x_, _axis_dir_y_, _colors_):
         self._draw.pixel_per_micro = (_area_.size[0] - _area_padding_x_ * 2) / _tool_ox_micro_[-1]
         _area_.canvas.clear()
         with _area_.canvas:
@@ -188,6 +192,7 @@ class ScreenHome(Screen):
                 x, y = self._draw.pixel_to_micro(_area_.pos[0]+_area_padding_x_, _area_.center_y)
                 x += _tool_ox_micro_[i]
                 x += face.ox * _axis_dir_x_[i]
+                y += face.oy * _axis_dir_y_[i]
                 self._draw.face(face, [x, y])
 
     def _face_select(self, _instance_):
@@ -196,7 +201,7 @@ class ScreenHome(Screen):
         app.data.set('hmi.face_index', face_index)
         app.data.block_active(self._name__hash)
         face = self._index__face[face_index]
-        for name in face.name__value(face_index):
+        for name in face.name__value():
             app.data.block(name).active = True
         if app.data.get('hmi.face_index') == face_index or app.launcher.offline:
             self._face_open(face_index)
@@ -208,10 +213,6 @@ class ScreenHome(Screen):
             auto_dismiss=False,
         )
         self._face = self._index__face[_index_]
-        for i, shape in enumerate(self._face.shape):
-            shape.id = 3
-            shape.x = (i * 20) * 1e3
-            shape.va = (10 + i * 5) * 1e3
         popup.content = PopupFace(
             _instance_=popup,
             _face_=self._face,

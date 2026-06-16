@@ -1,0 +1,23 @@
+#:import hex kivy.utils.get_color_from_hex
+<PopupError>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            id: message
+            halign: 'center'
+            valign: 'middle'
+            color: hex('#ff2f2f')
+            text_size: self.size
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 5
+            size_hint_y: None
+            height: 60
+            Button:
+                id: acknowledge
+                text: 'XÁC NHẬN'
+                on_release: root._acknowledge()
+            Button:
+                id: exit
+                text: 'THOÁT'
+                on_release: root._exit()

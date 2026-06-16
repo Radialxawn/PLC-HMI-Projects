@@ -6,9 +6,7 @@ from pathlib import Path
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from kivy.uix.togglebutton import ToggleButton
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
 from kivy.uix.label import Label
 
 class ScreenSettingAxis(Screen):

@@ -1,6 +1,7 @@
 import re
 from kivy.app import App
 from core.draw import Draw
+from core.mouse import Mouse
 from kivy.graphics import Color
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
@@ -15,16 +16,18 @@ class PopupShape(Screen):
         super().__init__(**kwargs)
         self._instance_ = _instance_
         self._shape_ = _shape_
+        self._shape_edit = Shape().copy(_shape_)
         self._apply_ = _apply_
         self._delete_ = _delete_
-        self._draw = Draw(5e-3)
+        self._draw = Draw(5e-3, [1e-3, 10e-3])
+        self._mouse = Mouse()
         self._generate()
         self._shape_id_changed = True
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
 
     def _generate(self):
         self._sp__widget = {}
-        for k in vars(self._shape_):
+        for k in vars(self._shape_edit):
             self._sp__widget[k] = []
         self._sp__name = {
             'x':  'x',
@@ -36,10 +39,11 @@ class PopupShape(Screen):
             've': 'e',
         }
         shape_id_selector = self.ids.shape_id_selector
-        values = []
-        for shape_name in Shape.name__data:
-            values.append(shape_name)
-            shape_id_selector.values = values
+        datas = []
+        for data in Shape.name__data.values():    
+            datas.append(data)
+        datas.sort(key=lambda s: s['id'])
+        shape_id_selector.values = [d['namev'] for d in datas]
         self.ids.shape_property.width = 180
         for sp in self._sp__name:
             obox = BoxLayout(
@@ -53,7 +57,7 @@ class PopupShape(Screen):
                 width=30
             )
             obox.add_widget(olabel)
-            oinput = self._generate_input(sp, self._shape_[sp], obox)
+            oinput = self._generate_input(sp, self._shape_edit[sp], obox)
             self._sp__widget[sp].append(olabel)
             self._sp__widget[sp].append(oinput)
             self.ids.shape_property.add_widget(obox)
@@ -68,7 +72,7 @@ class PopupShape(Screen):
             multiline=False
         )
         ip.sp = _sp_
-        ip.text = str(_value_*1e-3)
+        ip.text = f'{(_value_*1e-3):.3f}'
         ip.bind(on_text_validate=self._on_text_input_validate)
         ip.bind(focus=self._on_text_input_focus)
         _parent_.add_widget(ip)
@@ -85,8 +89,8 @@ class PopupShape(Screen):
             value = int(float(_instance_.text)*1e3)
         except (ValueError, TypeError):
             _instance_.text = ''
-        if value != self._shape_[_instance_.sp]:
-            self._shape_[_instance_.sp] = value
+        if value != self._shape_edit[_instance_.sp]:
+            self._shape_edit[_instance_.sp] = value
             self._update_canvas()
     
     def _on_text_input_focus(self, _instance_, _value_):
@@ -97,7 +101,11 @@ class PopupShape(Screen):
     def _on_shape_id_selector(self, _instance_):
         if self._ignore_shape_id_selector:
             return
-        self._shape_.id = Shape.name__data[_instance_.text]['id']
+        for name in Shape.name__data:
+            data = Shape.name__data[name]
+            if _instance_.text == data['namev']:
+                self._shape_edit.id = data['id']
+                break
         self._shape_id_changed = True
         self._update_canvas()
 
@@ -105,17 +113,17 @@ class PopupShape(Screen):
         area = self.ids.area
         area.canvas.clear()
         cx, cy = self._draw.pixel_to_micro(area.center_x, area.center_y)
-        self._shape_.limit()
+        self._shape_edit.limit()
         with area.canvas:
             Color(rgba=clhex("#ff5656ff"))
             self._draw.shape(
-                _shape_=self._shape_,
-                _position_=[cx, cy],
+                _shape_=self._shape_edit,
+                _pos_micro_=[cx, cy],
             )
         active_sp = []
         for name in Shape.name__data:
             data = Shape.name__data[name]
-            if data['id'] == self._shape_.id:
+            if data['id'] == self._shape_edit.id:
                 active_sp = data['sp']
                 break
         if self._shape_id_changed:
@@ -125,11 +133,12 @@ class PopupShape(Screen):
                 for e in wg:
                     e.opacity = opacity
         self._ignore_shape_id_selector = True
-        self.ids.shape_id_selector.text = self.ids.shape_id_selector.values[self._shape_['id']]
+        self.ids.shape_id_selector.text = self.ids.shape_id_selector.values[self._shape_edit['id']]
         self._ignore_shape_id_selector = False
         self._shape_id_changed = False
 
     def _apply(self):
+        self._shape_.copy(self._shape_edit)
         self._apply_()
         self._instance_.dismiss()
     
@@ -139,3 +148,19 @@ class PopupShape(Screen):
 
     def _cancel(self):
         self._instance_.dismiss()
+    
+    def on_touch_down(self, touch):
+        dxp, dyp, inside = self._draw.touch_pos_to_center_of_widget(self, self.ids.area, touch.pos)
+        if inside:
+            changed = False
+            match touch.button:
+                case 'scrollup':
+                    self._draw.pixel_per_micro *= 0.9
+                    changed = True
+                case 'scrolldown':
+                    self._draw.pixel_per_micro *= 1.1
+                    changed = True
+            if changed:
+                self._update_canvas()
+        else:
+            return super().on_touch_down(touch)

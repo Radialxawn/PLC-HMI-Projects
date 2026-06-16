@@ -1,5 +1,6 @@
 import re
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.uix.label import Label
 from popup.popup_shape import PopupShape
 from kivy.uix.screenmanager import Screen
@@ -8,7 +9,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.popup import Popup
-from kivy.clock import Clock
+from core.mouse import Mouse
 from core.draw import Draw
 from kivy.utils import get_color_from_hex as clhex
 
@@ -19,12 +20,8 @@ class PopupFace(Screen):
         self._face_ = _face_
         self._apply_ = _apply_
         self._delete_ = _delete_
-        self._draw = Draw(1e-3)
-        self._drag = {
-            'active': False,
-            'begin': [0, 0],
-            'offset': [0, 0],
-        }
+        self._draw = Draw(1e-3, [0.5e-3, 5e-3])
+        self._mouse = Mouse()
         self._generate()
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
 
@@ -79,7 +76,7 @@ class PopupFace(Screen):
             multiline=False
         )
         ip.fp = _fp_
-        ip.text = str(_value_*1e-3)
+        ip.text = f'{(_value_*1e-3):.3f}'
         ip.bind(on_text_validate=self._on_text_input_validate)
         ip.bind(focus=self._on_text_input_focus)
         _parent_.add_widget(ip)
@@ -113,7 +110,7 @@ class PopupFace(Screen):
             self._on_text_input_validate(_instance_)
 
     def _update_canvas(self, *args):
-        self._shape_apply()
+        self._face_update()
 
     def _apply(self):
         self._apply_()
@@ -131,47 +128,73 @@ class PopupFace(Screen):
     ##############
 
     def on_touch_down(self, touch):
-        area_pos = [a + b for a, b in zip(self.pos, self.ids.area.pos)]
-        area_size = self.ids.area.size
-        dx = touch.pos[0] - area_pos[0]
-        dy = touch.pos[1] - area_pos[1]
-        inside = 0 < dx < area_size[0] and 0 < dy < area_size[1]
+        self._mouse.down_time_sec = Clock.get_time()
+        dxp, dyp, inside = self._draw.touch_pos_to_center_of_widget(self, self.ids.area, touch.pos)
         if inside:
             changed = False
             match touch.button:
                 case 'scrollup':
-                    self._draw.pixel_per_micro -= 1e-4
+                    self._draw.pixel_per_micro *= 0.9
                     changed = True
                 case 'scrolldown':
-                    self._draw.pixel_per_micro += 1e-4
+                    self._draw.pixel_per_micro *= 1.1
                     changed = True
                 case 'left':
-                    self._shape_select(dx, dy)
+                    dx, dy = self._draw.pixel_to_micro(dxp, dyp)
+                    shape = self._shape_select(dx, dy)
+                    if shape != None:
+                        self._mouse.selected_object = shape
+                        self._mouse.selected_object_pos = [dx, dy]
+                        self._mouse.drag = True
+                        self._mouse.drag_begin[0] = touch.pos[0]
+                        self._mouse.drag_begin[1] = touch.pos[1]
+                        self._mouse.drag_offset = [shape.x, shape.y]
                 case 'right':
-                    self._drag['active'] = True
-                    self._drag['begin'][0] = touch.pos[0]
-                    self._drag['begin'][1] = touch.pos[1]
-                    self._drag['offset'] = self._draw.offset_pixel
+                    self._mouse.drag = True
+                    self._mouse.drag_begin[0] = touch.pos[0]
+                    self._mouse.drag_begin[1] = touch.pos[1]
+                    self._mouse.drag_offset = self._draw.offset_pixel
             if changed:
-                self._shape_apply()
+                self._face_update()
         else:
             return super().on_touch_down(touch)
     
     def on_touch_move(self, touch):
-        if self._drag['active'] == True:
+        if self._mouse.drag == True:
             match touch.button:
+                case 'left':
+                    shape = self._mouse.selected_object
+                    if shape != None and shape.id > 0:
+                        dxp = touch.pos[0] - self._mouse.drag_begin[0]
+                        dyp = touch.pos[1] - self._mouse.drag_begin[1]
+                        dx, dy = self._draw.pixel_to_micro(dxp, dyp)
+                        offset = self._mouse.drag_offset
+                        shape.x = max(0, offset[0] + dx)
+                        shape.y = offset[1] + dy
+                        self._face_update()
                 case 'right':
-                    dx = touch.pos[0] - self._drag['begin'][0] + self._drag['offset'][0]
-                    dy = touch.pos[1] - self._drag['begin'][1] + self._drag['offset'][1]
-                    self._draw.offset_pixel = [dx, dy]
-                    self._shape_apply()
+                    dxp = touch.pos[0] - self._mouse.drag_begin[0] + self._mouse.drag_offset[0]
+                    dyp = touch.pos[1] - self._mouse.drag_begin[1] + self._mouse.drag_offset[1]
+                    self._draw.offset_pixel = [dxp, dyp]
+                    self._face_update()
         return super().on_touch_down(touch)
 
     def on_touch_up(self, touch):
-        self._drag['active'] = False
+        match touch.button:
+            case 'left':
+                shape = self._mouse.selected_object
+                if Clock.get_time() - self._mouse.down_time_sec < 0.2:
+                    if shape != None:
+                        if shape.id == 0:
+                            pos = self._mouse.selected_object_pos
+                            shape.x = max(0, pos[0])
+                            shape.y = pos[1]
+                        self._shape_open(shape)
+        self._mouse.drag = False
+        self._mouse.selected_object = None
         return super().on_touch_up(touch)
 
-    def _shape_apply(self):
+    def _face_update(self):
         area = self.ids.area
         area.canvas.clear()
         self._face_.shape.sort(key=lambda s: s.x)
@@ -183,23 +206,19 @@ class PopupFace(Screen):
                 Color((i+1)/len(self._face_.shape), 0, 0, 1)
                 self._draw.shape(
                     _shape_=shape,
-                    _position_=[px, py],
+                    _pos_micro_=[px, py],
                 )
 
     def _shape_delete(self, _shape_):
         _shape_.id = 0
-        self._shape_apply()
+        self._face_update()
 
-    def _shape_select(self, _lx_, _ly_):
-        area = self.ids.area
-        offsetp = self._draw.offset_pixel
-        dxp, dyp = _lx_ - area.size[0] * 0.5 - offsetp[0], _ly_ - area.size[1] * 0.5 - offsetp[1]
-        dx, dy = self._draw.pixel_to_micro(dxp, dyp)
+    def _shape_select(self, _dx_, _dy_):
         shape_index = -1
         shape_index_free = -1
         for i, shape in enumerate(self._face_.shape):
             if shape.id > 0:
-                if shape.contain(dx, dy, 10):
+                if shape.contain(_dx_, _dy_, 10):
                     shape_index = i
                     break
             else:
@@ -208,9 +227,11 @@ class PopupFace(Screen):
         if shape_index == -1 and shape_index_free != -1:
             shape_index = shape_index_free
         if shape_index != -1:
-            self._shape_open(self._face_.shape[shape_index])
+            return self._face_.shape[shape_index]
+        return None
     
     def _shape_open(self, _shape_):
+        _shape_.limit()
         popup = Popup(
             title='BIÊN DẠNG',
             size_hint=(0.8, 0.8),
@@ -219,7 +240,7 @@ class PopupFace(Screen):
         popup.content = PopupShape(
             _instance_=popup,
             _shape_=_shape_,
-            _apply_=self._shape_apply,
+            _apply_=self._face_update,
             _delete_=self._shape_delete
             )
         popup.open()

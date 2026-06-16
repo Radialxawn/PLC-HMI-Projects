@@ -23,6 +23,7 @@ from screen.screen_setting_axis import ScreenSettingAxis
 from popup.popup_confirm import PopupConfirm
 from screen.screen_load import ScreenLoad
 from popup.popup_login import PopupLogin
+from popup.popup_error import PopupError
 
 Builder.load_file('style.kv')
 Builder.load_file('screen/screen_load.kv')
@@ -36,6 +37,7 @@ Builder.load_file('popup/popup_login.kv')
 Builder.load_file('popup/popup_progress.kv')
 Builder.load_file('popup/popup_face.kv')
 Builder.load_file('popup/popup_shape.kv')
+Builder.load_file('popup/popup_error.kv')
 
 class Main(App):
     def build(self):
@@ -128,6 +130,20 @@ class Main(App):
             _password_=_password_,
             _screen_=_screen_
         )
+        popup.open()
+    
+    def m_show_popup_error(self, _message_, _acknowledge_):
+        popup = Popup(
+            title="LỖI",
+            size_hint=(None, None),
+            size=(320, 240),
+            auto_dismiss=False
+        )
+        popup.content = PopupError(
+            _instance_=popup,
+            _acknowledge_=_acknowledge_
+        )
+        popup.content.ids['message'].text = _message_
         popup.open()
 
 if __name__ == '__main__':

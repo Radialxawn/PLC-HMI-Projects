@@ -1,7 +1,8 @@
 from data.shape import Shape
 
 class Face(object):
-    def __init__(self, _z_count_, _shape_count_):
+    def __init__(self, _index_, _z_count_, _shape_count_):
+        self._index = _index_
         self.ox = 0
         self.oy = 0
         self.oz = 0
@@ -11,7 +12,7 @@ class Face(object):
         self.depth = 0
         self.feed = 0
         self.shape = []
-        for i in range(_shape_count_):
+        for _ in range(_shape_count_):
             self.shape.append(Shape())
 
     def __getitem__(self, _key_):
@@ -23,11 +24,38 @@ class Face(object):
         else:
             raise Exception(f'No {_key_} in this class')
 
-    def from_json(self):
-        return
+    def to_json(self):
+        result = {}
+        kv = vars(self)
+        for k in kv:
+            v = kv[k]
+            if k == 'z' or k == 'zs':
+                result[k] = []
+                for vi in v:
+                    result[k].append(int(vi))
+            elif k == 'shape':
+                result[k] = []
+                for vi in v:
+                    result[k].append(vi.to_json())
+            else:
+                result[k] = int(v)
+        return result
 
-    def name__value(self, _index_):
-        head = f'hmi.face[{_index_}]'
+    def from_json(self, _value_):
+        kv = vars(self)
+        for k in kv:
+            v = _value_[k]
+            if k == 'z' or k == 'zs':
+                for i, vi in enumerate(v):
+                    kv[k][i] = vi
+            elif k == 'shape':
+                for i, vi in enumerate(v):
+                    kv[k][i].from_json(vi)
+            else:
+                kv[k] = v
+
+    def name__value(self):
+        head = f'hmi.face[{self._index}]'
         kv = vars(self)
         n__v = {}
         for k in kv:

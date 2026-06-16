@@ -2,8 +2,9 @@ from kivy.graphics import Color, Line, Rectangle, Ellipse, RoundedRectangle
 from kivy.utils import get_color_from_hex as clhex
 
 class Draw(object):
-    def __init__(self, _pixel_per_micro_):
-        self._pixel_per_micro = _pixel_per_micro_
+    def __init__(self, _ppm_, _ppm_range_):
+        self._pixel_per_micro = _ppm_
+        self._ppm_range = _ppm_range_
         self._offset_pixel = [0, 0]
 
     @property
@@ -12,7 +13,7 @@ class Draw(object):
 
     @pixel_per_micro.setter
     def pixel_per_micro(self, _value_):
-        self._pixel_per_micro = max(0.5e-3, min(_value_, 5e-3))
+        self._pixel_per_micro = max(self._ppm_range[0], min(_value_, self._ppm_range[1]))
 
     @property
     def offset_pixel(self):
@@ -25,15 +26,25 @@ class Draw(object):
     
     def pixel_to_micro(self, _x_, _y_):
         return _x_ / self._pixel_per_micro, _y_ / self._pixel_per_micro
+    
+    def touch_pos_to_center_of_widget(self, _screen_, _widget_, _touch_pos_):
+        wgpos = [a + b for a, b in zip(_screen_.pos, _widget_.pos)]
+        wgsize = _widget_.size
+        dxp = _touch_pos_[0] - wgpos[0]
+        dyp = _touch_pos_[1] - wgpos[1]
+        inside = 0 < dxp < wgsize[0] and 0 < dyp < wgsize[1]
+        dxp -= wgsize[0] * 0.5 + self._offset_pixel[0]
+        dyp -= wgsize[1] * 0.5 + self._offset_pixel[1]
+        return dxp, dyp, inside
 
-    def axis(self, _area_, _position_):
-        pos = [_position_[0]+self._offset_pixel[0], _position_[1]+self._offset_pixel[1]]
+    def axis(self, _area_, _pos_pixel_):
+        pos = [_pos_pixel_[0]+self._offset_pixel[0], _pos_pixel_[1]+self._offset_pixel[1]]
         Color(rgba=clhex("#ff5656ff"))
         Rectangle(pos=pos, size=[_area_.size[0], 1])
         Color(rgba=clhex("#56ff64ff"))
         Rectangle(pos=pos, size=[1, _area_.size[1]])
 
-    def shape(self, _shape_, _position_):
+    def shape(self, _shape_, _pos_micro_):
         sid = _shape_.id
         ppm = self._pixel_per_micro
         sa = _shape_.va * ppm
@@ -41,8 +52,8 @@ class Draw(object):
         sc = _shape_.vc * ppm
         sd = _shape_.vd * ppm
         se = _shape_.ve * ppm
-        px = _position_[0] * ppm + self._offset_pixel[0]
-        py = _position_[1] * ppm + self._offset_pixel[1]
+        px = _pos_micro_[0] * ppm + self._offset_pixel[0]
+        py = _pos_micro_[1] * ppm + self._offset_pixel[1]
         match sid:
             case 3: # circle
                 Ellipse(pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])

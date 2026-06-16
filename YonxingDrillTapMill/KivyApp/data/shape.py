@@ -1,23 +1,23 @@
 class Shape(object):
     name__data = {
-        'NONE':     {'id': 0,  'sp': []},
-        'DRILL':    {'id': 1,  'sp': ['x', 'y', 'va', 'vb', 'vc']},
-        'TAP':      {'id': 2,  'sp': ['x', 'y', 'va', 'vb', 'vc']},
-        'CIRCLE':   {'id': 3,  'sp': ['x', 'y', 'va']},
-        'RECT':     {'id': 4,  'sp': ['x', 'y', 'va', 'vb']},
-        'CAPSULE':  {'id': 5,  'sp': ['x', 'y', 'va', 'vb']},
-        'RECT-R':   {'id': 6,  'sp': ['x', 'y', 'va', 'vb', 'vc']},
-        'ELLIPSE':  {'id': 7,  'sp': ['x', 'y', 'va', 'vb']},
-        'LOCKA':    {'id': 8,  'sp': ['x', 'y', 'va', 'vb', 'vc']},
-        'LOCKA-F':  {'id': 9,  'sp': ['x', 'y', 'va', 'vb', 'vc']},
-        'LOCKB':    {'id': 10, 'sp': ['x', 'y', 'va', 'vb', 'vc', 'vd']},
-        'LOCKB-F':  {'id': 11, 'sp': ['x', 'y', 'va', 'vb', 'vc', 'vd']},
-        'CNC-1':    {'id': 12, 'sp': ['x', 'y']},
-        'CNC-2':    {'id': 13, 'sp': ['x', 'y']},
-        'CNC-3':    {'id': 14, 'sp': ['x', 'y']},
-        'CNC-4':    {'id': 15, 'sp': ['x', 'y']},
-        'CNC-5':    {'id': 16, 'sp': ['x', 'y']},
-        'CNC-6':    {'id': 17, 'sp': ['x', 'y']},
+        'none':     {'id': 0,  'namev': '...',     'sp': []},
+        'drill':    {'id': 1,  'namev': 'KHOAN',   'sp': ['x', 'y', 'va', 'vb', 'vc']},
+        'tap':      {'id': 2,  'namev': 'TARO',    'sp': ['x', 'y', 'va', 'vb', 'vc']},
+        'circle':   {'id': 3,  'namev': 'TRÒN',    'sp': ['x', 'y', 'va']},
+        'rect':     {'id': 4,  'namev': 'HỘP',     'sp': ['x', 'y', 'va', 'vb']},
+        'capsule':  {'id': 5,  'namev': 'NANG',    'sp': ['x', 'y', 'va', 'vb']},
+        'rectr':    {'id': 6,  'namev': 'HỘP BO',  'sp': ['x', 'y', 'va', 'vb', 'vc']},
+        'ellipse':  {'id': 7,  'namev': 'BẦU DỤC', 'sp': ['x', 'y', 'va', 'vb']},
+        'locka':    {'id': 8,  'namev': 'KHOÁ 1A', 'sp': ['x', 'y', 'va', 'vb', 'vc']},
+        'lockaf':   {'id': 9,  'namev': 'KHOÁ 1B', 'sp': ['x', 'y', 'va', 'vb', 'vc']},
+        'lockb':    {'id': 10, 'namev': 'KHOÁ 2A', 'sp': ['x', 'y', 'va', 'vb', 'vc', 'vd']},
+        'lockbf':   {'id': 11, 'namev': 'KHOÁ 2B', 'sp': ['x', 'y', 'va', 'vb', 'vc', 'vd']},
+        'custom_0': {'id': 12, 'namev': 'CNC 1',   'sp': ['x', 'y']},
+        'custom_1': {'id': 13, 'namev': 'CNC 2',   'sp': ['x', 'y']},
+        'custom_2': {'id': 14, 'namev': 'CNC 3',   'sp': ['x', 'y']},
+        'custom_3': {'id': 15, 'namev': 'CNC 4',   'sp': ['x', 'y']},
+        'custom_4': {'id': 16, 'namev': 'CNC 5',   'sp': ['x', 'y']},
+        'custom_5': {'id': 17, 'namev': 'CNC 6',   'sp': ['x', 'y']},
     }
 
     def __init__(self):
@@ -29,6 +29,24 @@ class Shape(object):
         self.vc = 0
         self.vd = 0
         self.ve = 0
+    
+    def copy(self, _target_):
+        kv = vars(self)
+        for k in kv:
+            kv[k] = _target_[k]
+        return self
+    
+    def to_json(self):
+        result = {}
+        kv = vars(self)
+        for k in kv:
+            result[k] = int(kv[k])
+        return result
+
+    def from_json(self, _value_):
+        kv = vars(self)
+        for k in kv:
+            kv[k] = _value_[k]
 
     def __getitem__(self, _key_):
         return getattr(self, _key_)
@@ -40,6 +58,11 @@ class Shape(object):
             raise Exception(f'No {_key_} in this class')
     
     def limit(self):
+        self.va = max(2_000, self.va)
+        self.vb = max(2_000, self.vb)
+        self.vc = max(2_000, self.vc)
+        self.vd = max(2_000, self.vd)
+        self.ve = max(2_000, self.ve)
         match self.id:
             case 5: # capsule
                 self.vb = int(min(self.va, self.vb))
