@@ -48,6 +48,16 @@ class ScreenHome(Screen):
         for i in range(6):
             self._index__face[i] = Face(i, _z_count_=3, _shape_count_=10)
 
+    def on_enter(self, *args):
+        if not hasattr(self, '_profile_download_clock'):
+            self._profile_download_face_index = 0
+            self._profile_download_clock = Clock.schedule_interval(self._profile_download, 0.1)
+    
+    def on_leave(self, *args):
+        if hasattr(self, '_profile_download_clock'):
+            Clock.unschedule(self._profile_download_clock)
+            delattr(self, '_profile_download_clock')
+
     #################
     # LOAD AND SAVE #
     #################
@@ -194,6 +204,13 @@ class ScreenHome(Screen):
                 x += face.ox * _axis_dir_x_[i]
                 y += face.oy * _axis_dir_y_[i]
                 self._draw.face(face, [x, y])
+
+    def _profile_download(self, _dt_):
+        face = self._index__face[self._profile_download_face_index]
+        self._profile_download_face_index = (self._profile_download_face_index + 1) % len(self._index__face)
+        name__value = face.name__value()
+        app = App.get_running_app()
+        app.data.sets(list(name__value.keys()), list(name__value.values()))
 
     def _face_select(self, _instance_):
         app = App.get_running_app()

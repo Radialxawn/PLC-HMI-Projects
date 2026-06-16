@@ -197,7 +197,7 @@ class PopupFace(Screen):
     def _face_update(self):
         area = self.ids.area
         area.canvas.clear()
-        self._face_.shape.sort(key=lambda s: s.x)
+        self._face_.shape.sort(key=lambda s: (s.id == 0, s.x)) # sort using x value and push id = 0 object to the back
         with area.canvas:
             self._draw.axis(area, [area.center_x, area.center_y])
             cx, cy = self._draw.pixel_to_micro(area.center_x, area.center_y)

@@ -20,7 +20,13 @@ class ScreenSetting(Screen):
         app.data.block_active(self._name__hash)
 
     def on_enter(self, *args):
-        return
+        if not hasattr(self, '_value_update_clock'):
+            self._value_update_clock = Clock.schedule_interval(self._value_update, 0.2)
 
     def on_leave(self, *args):
-        return
+        if hasattr(self, '_value_update_clock'):
+            Clock.unschedule(self._value_update_clock)
+            delattr(self, '_value_update_clock')
+
+    def _value_update(self, _dt_):
+        app = App.get_running_app()

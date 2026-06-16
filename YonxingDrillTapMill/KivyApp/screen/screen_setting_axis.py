@@ -50,8 +50,10 @@ class ScreenSettingAxis(Screen):
             self._grid_draw()
             self._grid_draw_done = True
             name__hash = {}
+            self._name__value = {}
             for name in self._name__input:
                 name__hash[name] = False
+                self._name__value[name] = None
             name__hash['hmi.cfsh.need'] = False
             name__hash['hmi.cfsh.need_check'] = False
             name__hash['hmi.cfsh.accept'] = False
@@ -64,8 +66,9 @@ class ScreenSettingAxis(Screen):
         app.data.block_active(self._name__hash)
 
     def on_enter(self, *args):
-        self._label_scroll_clock = Clock.schedule_interval(self._label_scroll, 0.2)
-        self._value_update_clock = Clock.schedule_interval(self._value_update, 0.2)
+        if not hasattr(self, '_value_update_clock'):
+            self._label_scroll_clock = Clock.schedule_interval(self._label_scroll, 0.2)
+            self._value_update_clock = Clock.schedule_interval(self._value_update, 0.2)
 
     def on_leave(self, *args):
         if hasattr(self, '_label_scroll_clock'):
@@ -101,6 +104,10 @@ class ScreenSettingAxis(Screen):
             if input.is_focus:
                 continue
             block = app.data.block(name)
+            value = self._name__value[name]
+            if value == block.value:
+                continue
+            self._name__value[name] = block.value
             if block.type == ua.VariantType.Boolean:
                 value = block.value == 1
                 input.state = 'down' if value else 'normal'

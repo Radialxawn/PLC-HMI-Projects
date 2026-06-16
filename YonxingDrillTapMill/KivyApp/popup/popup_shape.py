@@ -115,6 +115,7 @@ class PopupShape(Screen):
         cx, cy = self._draw.pixel_to_micro(area.center_x, area.center_y)
         self._shape_edit.limit()
         with area.canvas:
+            self._draw.axis(area, [area.center_x, area.center_y])
             Color(rgba=clhex("#ff5656ff"))
             self._draw.shape(
                 _shape_=self._shape_edit,

@@ -21,6 +21,7 @@ def testb():
     name__value = face.name__value()
     for name in name__value:
         print(name, name__value[name])
+    print('Name count:', len(name__value))
 
 def testc():
     s = 'zs[0]'
