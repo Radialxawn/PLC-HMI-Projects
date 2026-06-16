@@ -56,24 +56,36 @@
             padding: 5
             Button:
                 id: face_4
-                size_hint_x: 0.3
+                size_hint_x: 0.2
                 on_press: root._face_select(self)
             Button:
                 id: face_2
-                size_hint_x: 0.5
+                size_hint_x: 0.3
                 on_press: root._face_select(self)
             Button:
                 id: face_0
                 size_hint_x: 1.0
                 on_press: root._face_select(self)
-        Widget:
-            id: area
-            canvas.before:
-                Color:
-                    rgba: hex('#84bf9c')
-                Rectangle:
-                    pos: self.x + 5, self.y
-                    size: self.width - 10, self.height
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 5
+            spacing: 5
+            StencilView:
+                id: area_top
+                canvas.before:
+                    Color:
+                        rgba: hex('#ffffff')
+                    Rectangle:
+                        pos: self.x, self.y
+                        size: self.width, self.height
+            StencilView:
+                id: area_front
+                canvas.before:
+                    Color:
+                        rgba: hex('#ffffff')
+                    Rectangle:
+                        pos: self.x, self.y
+                        size: self.width, self.height
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
@@ -82,11 +94,11 @@
             padding: 5
             Button:
                 id: face_5
-                size_hint_x: 0.3
+                size_hint_x: 0.2
                 on_press: root._face_select(self)
             Button:
                 id: face_3
-                size_hint_x: 0.5
+                size_hint_x: 0.3
                 on_press: root._face_select(self)
             Button:
                 id: face_1

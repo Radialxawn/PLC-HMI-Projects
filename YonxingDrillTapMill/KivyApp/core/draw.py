@@ -1,21 +1,37 @@
 from kivy.graphics import Color, Line, Rectangle, Ellipse, RoundedRectangle
+from kivy.utils import get_color_from_hex as clhex
 
 class Draw(object):
     def __init__(self, _pixel_per_micro_):
         self._pixel_per_micro = _pixel_per_micro_
-        self._offset_x = 0
-        self._offset_y = 0
+        self._offset_pixel = [0, 0]
 
     @property
     def pixel_per_micro(self):
         return self._pixel_per_micro
 
     @pixel_per_micro.setter
-    def pixel_per_micro(self, value):
-        self._pixel_per_micro = max(1e-3, min(value, 5e-3))
+    def pixel_per_micro(self, _value_):
+        self._pixel_per_micro = max(0.5e-3, min(_value_, 5e-3))
+
+    @property
+    def offset_pixel(self):
+        return self._offset_pixel.copy()
+    
+    @offset_pixel.setter
+    def offset_pixel(self, _value_):
+        self._offset_pixel[0] = _value_[0]
+        self._offset_pixel[1] = _value_[1]
     
     def pixel_to_micro(self, _x_, _y_):
         return _x_ / self._pixel_per_micro, _y_ / self._pixel_per_micro
+
+    def axis(self, _area_, _position_):
+        pos = [_position_[0]+self._offset_pixel[0], _position_[1]+self._offset_pixel[1]]
+        Color(rgba=clhex("#ff5656ff"))
+        Rectangle(pos=pos, size=[_area_.size[0], 1])
+        Color(rgba=clhex("#56ff64ff"))
+        Rectangle(pos=pos, size=[1, _area_.size[1]])
 
     def shape(self, _shape_, _position_):
         sid = _shape_.id
@@ -25,8 +41,8 @@ class Draw(object):
         sc = _shape_.vc * ppm
         sd = _shape_.vd * ppm
         se = _shape_.ve * ppm
-        px = _position_[0] * ppm
-        py = _position_[1] * ppm
+        px = _position_[0] * ppm + self._offset_pixel[0]
+        py = _position_[1] * ppm + self._offset_pixel[1]
         match sid:
             case 3: # circle
                 Ellipse(pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
@@ -55,3 +71,9 @@ class Draw(object):
             scid = sid - 11 - 1
         if scid >= 0:
             Line(rectangle=(px-sa*0.5, py-sa*0.5, sa, sa), width=2)
+    
+    def face(self, _face_, _position_):
+        for shape in _face_.shape:
+            px = _position_[0] + shape.x
+            py = _position_[1] + shape.y
+            self.shape(shape, [px,  py])

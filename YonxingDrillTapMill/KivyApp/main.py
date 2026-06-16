@@ -1,22 +1,27 @@
 from kivy.config import Config
+Config.set('graphics', 'width', '960')
+Config.set('graphics', 'height', '540')
+Config.set('graphics', 'minimum_width', '960')
+Config.set('graphics', 'minimum_height', '540')
 Config.set('graphics', 'multisamples', '4')
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 import sys
 import logging
 import platform
-from core.data import Data
 from kivy.app import App
+from core.data import Data
 from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.uix.popup import Popup
+from core.launcher import Launcher
 from kivy.core.window import Window
-from kivy.uix.screenmanager import ScreenManager, FadeTransition
-from screen.screen_load import ScreenLoad
+from screen.screen_io import ScreenIO
 from screen.screen_home import ScreenHome
 from screen.screen_setting import ScreenSetting
-from screen.screen_io import ScreenIO
+from kivy.uix.screenmanager import ScreenManager, FadeTransition
 from screen.screen_setting_axis import ScreenSettingAxis
 from popup.popup_confirm import PopupConfirm
+from screen.screen_load import ScreenLoad
 from popup.popup_login import PopupLogin
 
 Builder.load_file('style.kv')
@@ -34,11 +39,12 @@ Builder.load_file('popup/popup_shape.kv')
 
 class Main(App):
     def build(self):
+        self.launcher = Launcher()
         parameters = sys.argv[1:]
         if len(parameters) > 0:
             match parameters[0]:
                 case 'offline':
-                    self.offline = True
+                    self.launcher.offline = True
                     print('Run offline mode')
         self._log_mode()
         self.data = Data(

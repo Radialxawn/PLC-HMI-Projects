@@ -7,11 +7,14 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
 from popup.popup_progress import PopupProgress
+from kivy.graphics import Color, Rectangle
 from popup.popup_shape import PopupShape
 from popup.popup_file import PopupFile
 from popup.popup_face import PopupFace
 from kivy.uix.popup import Popup
 from data.face import Face
+from core.draw import Draw
+from kivy.utils import get_color_from_hex as clhex
 
 class ScreenHome(Screen):
     def __init__(self, **kvargs):
@@ -24,6 +27,7 @@ class ScreenHome(Screen):
             button = self.ids[f'cnc_{i}']
             button.text = f'CNC {i+1}'
             button.cnc_index = i
+        self._draw = Draw(1e-3)
         self._first_load = True
     
     def on_pre_enter(self, *args):
@@ -35,6 +39,8 @@ class ScreenHome(Screen):
             name__hash['hmi.run'] = False
             name__hash['hmi.stop'] = False
             self._name__hash = name__hash
+            self.ids.area_top.bind(pos=self._update_canvas_area_top, size=self._update_canvas_area_top)
+            self.ids.area_front.bind(pos=self._update_canvas_area_front, size=self._update_canvas_area_front)
         app = App.get_running_app()
         app.data.block_active(self._name__hash)
     
@@ -143,8 +149,46 @@ class ScreenHome(Screen):
     # FACE EDIT #
     #############
 
-    def _profile_draw(self):
-        print('draw profile')
+    def _update_canvas_area_top(self, *args):
+        self._profile_draw(
+            _area_=self.ids.area_top,
+            _area_padding_x_=50,
+            _face_indexs_=[4, 2, 0],
+            _tool_ox_micro_=[0, 300_000, 1660_000],
+            _axis_dir_x_=[1, 1, -1],
+            _colors_=[
+                clhex("#ff5656ff"),
+                clhex("#ffff56ff"),
+                clhex("#61ff56ff"),
+            ]
+        )
+
+    def _update_canvas_area_front(self, *args):
+        self._profile_draw(
+            _area_=self.ids.area_front,
+            _area_padding_x_=50,
+            _face_indexs_=[5, 3, 1],
+            _tool_ox_micro_=[0, 300_000, 1660_000],
+            _axis_dir_x_=[1, 1, -1],
+            _colors_=[
+                clhex("#56f1ffff"),
+                clhex("#b956ffff"),
+                clhex("#ff56cfff"),
+            ]
+        )
+
+    def _profile_draw(self, _area_, _area_padding_x_, _face_indexs_, _tool_ox_micro_, _axis_dir_x_, _colors_):
+        self._draw.pixel_per_micro = (_area_.size[0] - _area_padding_x_ * 2) / _tool_ox_micro_[-1]
+        _area_.canvas.clear()
+        with _area_.canvas:
+            self._draw.axis(_area_, [_area_padding_x_, _area_.center_y])
+            for i, index in enumerate(_face_indexs_):
+                Color(rgba=_colors_[i])
+                face = self._index__face[index]
+                x, y = self._draw.pixel_to_micro(_area_.pos[0]+_area_padding_x_, _area_.center_y)
+                x += _tool_ox_micro_[i]
+                x += face.ox * _axis_dir_x_[i]
+                self._draw.face(face, [x, y])
 
     def _face_select(self, _instance_):
         app = App.get_running_app()
@@ -154,7 +198,7 @@ class ScreenHome(Screen):
         face = self._index__face[face_index]
         for name in face.name__value(face_index):
             app.data.block(name).active = True
-        if app.data.get('hmi.face_index') == face_index or app.offline:
+        if app.data.get('hmi.face_index') == face_index or app.launcher.offline:
             self._face_open(face_index)
 
     def _face_open(self, _index_):
@@ -177,8 +221,10 @@ class ScreenHome(Screen):
         popup.open()
     
     def _face_apply(self):
-        print('face apply:', self._face)
-        self._profile_draw()
+        self._update_canvas_area_top()
+        self._update_canvas_area_front()
 
     def _face_delete(self):
-        print('face delete')
+        for shape in self._face.shape:
+            shape.id = 0
+        self._face_apply()

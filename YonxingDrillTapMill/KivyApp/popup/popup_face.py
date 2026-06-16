@@ -20,6 +20,11 @@ class PopupFace(Screen):
         self._apply_ = _apply_
         self._delete_ = _delete_
         self._draw = Draw(1e-3)
+        self._drag = {
+            'active': False,
+            'begin': [0, 0],
+            'offset': [0, 0],
+        }
         self._generate()
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
 
@@ -132,26 +137,46 @@ class PopupFace(Screen):
         dy = touch.pos[1] - area_pos[1]
         inside = 0 < dx < area_size[0] and 0 < dy < area_size[1]
         if inside:
-            if touch.button == 'scrollup':
-                self._draw.pixel_per_micro -= 1e-4
+            changed = False
+            match touch.button:
+                case 'scrollup':
+                    self._draw.pixel_per_micro -= 1e-4
+                    changed = True
+                case 'scrolldown':
+                    self._draw.pixel_per_micro += 1e-4
+                    changed = True
+                case 'left':
+                    self._shape_select(dx, dy)
+                case 'right':
+                    self._drag['active'] = True
+                    self._drag['begin'][0] = touch.pos[0]
+                    self._drag['begin'][1] = touch.pos[1]
+                    self._drag['offset'] = self._draw.offset_pixel
+            if changed:
                 self._shape_apply()
-            elif touch.button == 'scrolldown':
-                self._draw.pixel_per_micro += 1e-4
-                self._shape_apply()
-            elif touch.button == 'left':
-                self._shape_select(dx, dy)
         else:
-            super().on_touch_down(touch)
+            return super().on_touch_down(touch)
+    
+    def on_touch_move(self, touch):
+        if self._drag['active'] == True:
+            match touch.button:
+                case 'right':
+                    dx = touch.pos[0] - self._drag['begin'][0] + self._drag['offset'][0]
+                    dy = touch.pos[1] - self._drag['begin'][1] + self._drag['offset'][1]
+                    self._draw.offset_pixel = [dx, dy]
+                    self._shape_apply()
+        return super().on_touch_down(touch)
+
+    def on_touch_up(self, touch):
+        self._drag['active'] = False
+        return super().on_touch_up(touch)
 
     def _shape_apply(self):
         area = self.ids.area
         area.canvas.clear()
         self._face_.shape.sort(key=lambda s: s.x)
         with area.canvas:
-            Color(rgba=clhex("#ff5656ff"))
-            Rectangle(pos=[area.center_x, area.center_y], size=[area.size[0]*0.5, 1])
-            Color(rgba=clhex("#56ff64ff"))
-            Rectangle(pos=[area.center_x, area.center_y], size=[1, area.size[1]*0.5])
+            self._draw.axis(area, [area.center_x, area.center_y])
             cx, cy = self._draw.pixel_to_micro(area.center_x, area.center_y)
             for i, shape in enumerate(self._face_.shape):
                 px, py = cx + shape.x, cy + shape.y
@@ -167,7 +192,8 @@ class PopupFace(Screen):
 
     def _shape_select(self, _lx_, _ly_):
         area = self.ids.area
-        dxp, dyp = _lx_ - area.size[0] * 0.5, _ly_ - area.size[1] * 0.5
+        offsetp = self._draw.offset_pixel
+        dxp, dyp = _lx_ - area.size[0] * 0.5 - offsetp[0], _ly_ - area.size[1] * 0.5 - offsetp[1]
         dx, dy = self._draw.pixel_to_micro(dxp, dyp)
         shape_index = -1
         shape_index_free = -1
