@@ -1,2 +1,2 @@
-N0 G1 Z$VZ$
+N0 G1 Z$VA$
 N1 G0 Z0

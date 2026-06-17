@@ -1,5 +1,6 @@
 from kivy.graphics import Color, Line, Rectangle, Ellipse, RoundedRectangle
 from kivy.utils import get_color_from_hex as clhex
+from kivy.core.image import Image as CoreImage
 
 class Draw(object):
     def __init__(self, _ppm_, _ppm_range_):
@@ -58,6 +59,12 @@ class Draw(object):
         px = _pos_micro_[0] * ppm + self._offset_pixel[0]
         py = _pos_micro_[1] * ppm + self._offset_pixel[1]
         match sid:
+            case 1: # drill
+                texture = CoreImage('texture/drill.png').texture
+                Rectangle(texture=texture, pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
+            case 2: # tap
+                texture = CoreImage('texture/tap.png').texture
+                Rectangle(texture=texture, pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
             case 3: # circle
                 Ellipse(pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
             case 4: # rect

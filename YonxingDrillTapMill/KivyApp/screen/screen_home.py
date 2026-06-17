@@ -16,6 +16,7 @@ from kivy.uix.popup import Popup
 from data.face import Face
 from core.draw import Draw
 from core.ui import UI
+from types import SimpleNamespace
 from kivy.utils import get_color_from_hex as clhex
 
 class ScreenHome(Screen):
@@ -36,26 +37,28 @@ class ScreenHome(Screen):
     def on_pre_enter(self, *args):
         if self._first_load:
             self._first_load = False
-            self._generate()
             self._name__hash = {
                 'hmi.face_index',
+                'hmi.face_ready',
                 'hmi.run',
                 'hmi.stop',
                 'hmi.view_can_run',
                 'hmi.view_can_stop',
                 'hmi.view_work_ing',
             }
+            self._index__face, self._index__face_cog = self._generate()
             self.ids.area_top.bind(pos=self._update_canvas_area_top, size=self._update_canvas_area_top)
             self.ids.area_front.bind(pos=self._update_canvas_area_front, size=self._update_canvas_area_front)
         app = App.get_running_app()
         app.data.block_active(self._name__hash)
     
     def _generate(self):
-        self._index__face = {}
-        self._index__face_cog = {}
+        index__face = {}
+        index__face_cog = {}
         for i in range(6):
-            self._index__face[i] = Face(i, _z_count_=3, _shape_count_=10)
-            self._index__face_cog[i] = None
+            index__face[i] = Face(i, _z_count_=3, _shape_count_=10)
+            index__face_cog[i] = None
+        return index__face, index__face_cog
     
     def on_enter(self, *args):
         if not hasattr(self, '_value_update_clock'):
@@ -67,8 +70,7 @@ class ScreenHome(Screen):
             delattr(self, '_value_update_clock')
     
     def _value_update(self, _dt_):
-        app = App.get_running_app()
-        print('_value_update')
+        return
 
     #################
     # LOAD AND SAVE #
@@ -147,6 +149,12 @@ class ScreenHome(Screen):
         if hasattr(self, '_profile_download_clock'):
             return
         app = App.get_running_app()
+        for index in self._index__face:
+            name__value = self._index__face[index].name__value()
+            for name in name__value:
+                block = app.data.block(name)
+                block.active = True
+                block.value = None
         popup = Popup(
             title='TẢI XUỐNG',
             size_hint=(0.6, 0.6),
@@ -154,26 +162,80 @@ class ScreenHome(Screen):
         )
         popup.content = PopupProgress(
             _instance_=popup,
-            _cancel_=lambda : print('Profile download cancel')
+            _cancel_=self._profile_download_cancel
         )
         popup.open()
         self._popup_progress = popup
-        self._profile_download_face_index = 0
-        self._profile_download_progress_clock = Clock.schedule_interval(self._profile_download_progress, 0.1)
+        pdd = {
+            'state': 0,
+            'send_count': 0,
+            'send_count_max': len(self._index__face) * 5,
+            'index': 0,
+            'count': len(self._index__face),
+            'match': [False] * len(self._index__face),
+        }
+        self._profile_download_data = SimpleNamespace(**pdd)
+        self._profile_download_progress_clock = Clock.schedule_interval(self._profile_download_progress, 0.3)
+
+    def _profile_download_cancel(self):
+        self._profile_download_data.state = 11
 
     def _profile_download_progress(self, _dt_):
         app = App.get_running_app()
-        index, count = self._profile_download_face_index, len(self._index__face)
-        face = self._index__face[index]
-        name__value = face.name__value()
-        app.data.sets(list(name__value.keys()), list(name__value.values()))
-        self._popup_progress.content.progress(100 * index / count)
-        self._profile_download_face_index = (index + 1) % count
-        if self._profile_download_face_index == 0:
-            if hasattr(self, '_profile_download_progress_clock'):
-                Clock.unschedule(self._profile_download_progress_clock)
-                delattr(self, '_profile_download_progress_clock')
-            self._popup_progress.content.progress(101)
+        ppc = self._popup_progress.content
+        pdd = self._profile_download_data
+        match pdd.state:
+            case 0:
+                app.data.block('hmi.face_ready').value = None
+                app.data.set('hmi.face_ready', False)
+                ppc.progress(10)
+                pdd.state += 1
+            case 1:
+                if app.data.get('hmi.face_ready') == False:
+                    ppc.progress(20)
+                    pdd.state += 1
+            case 2:
+                if pdd.send_count >= pdd.send_count_max:
+                    pdd.state = 11
+                else:
+                    si = -1
+                    for i in range(pdd.count):
+                        if pdd.match[i] == False:
+                            si = i
+                            break
+                    if si == -1:
+                        pdd.state = 11
+                    else:
+                        pdd.index = si
+                        name__value = self._index__face[pdd.index].name__value()
+                        app.data.sets(list(name__value.keys()), list(name__value.values()))
+                        pdd.send_count += 1
+                        pdd.state += 1
+            case 3:
+                name__value = self._index__face[pdd.index].name__value()
+                pdd.match[pdd.index] = app.data.all(name__value)
+                ppc.progress(100 * pdd.send_count / pdd.send_count_max)
+                pdd.state = 2
+            case 11:
+                if all(pdd.match):
+                    ppc.progress(30)
+                    pdd.state = 21
+                else:
+                    ppc.progress(-1)
+                    pdd.state = 100
+            case 21:
+                ppc.progress(40)
+                app.data.set('hmi.face_ready', True)
+                pdd.state += 1
+            case 22:
+                if app.data.get('hmi.face_ready') == True:
+                    ppc.progress(101)
+                    pdd.state = 100
+            case 100:
+                if hasattr(self, '_profile_download_progress_clock'):
+                    Clock.unschedule(self._profile_download_progress_clock)
+                    delattr(self, '_profile_download_progress_clock')
+                app.data.block_active(self._name__hash)
 
     def _cnc_download(self, _instance_):
         popup = Popup(

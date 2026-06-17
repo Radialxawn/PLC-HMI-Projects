@@ -10,12 +10,12 @@ class ScreenSetting(Screen):
     def on_pre_enter(self, *args):
         if self._first_load:
             self._first_load = False
-            name__hash = {}
-            name__hash['hmi.cfsh.need'] = False
-            name__hash['hmi.cfsh.need_check'] = False
-            name__hash['hmi.cfsh.accept'] = False
-            name__hash['hmi.cfsh.decline'] = False
-            self._name__hash = name__hash
+            self._name__hash = {
+                'hmi.cfsh.need',
+                'hmi.cfsh.need_check',
+                'hmi.cfsh.accept',
+                'hmi.cfsh.decline',
+            }
         app = App.get_running_app()
         app.data.block_active(self._name__hash)
 

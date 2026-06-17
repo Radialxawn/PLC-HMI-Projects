@@ -24,12 +24,13 @@ def testb():
     print('Name count:', len(name__value))
 
 def testc():
-    s = 'zs[0]'
-    array = s.split('[')
-    print(array, array[1][:-1])
-    s = 'wtf'
-    array = s.split('[')
-    print(array)
+    a = {'a'}
+    b = {'b'}
+    ab(a, b)
+
+def ab(*params):
+    for param in params:
+        print(param)
 
 parameters = sys.argv[1:]
 if len(parameters) > 0:

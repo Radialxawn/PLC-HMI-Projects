@@ -46,7 +46,6 @@ class ScreenSettingAxis(Screen):
     def on_pre_enter(self, *args):
         if self._first_load:
             self._first_load = False
-            self._label__data, self._name__input, self._name__value = self._generate()
             self._name__hash = {
                 'hmi.cfsh.need',
                 'hmi.cfsh.need_check',
@@ -56,6 +55,7 @@ class ScreenSettingAxis(Screen):
                 'hmi.view_can_home',
                 'hmi.home',
             }
+            self._label__data, self._name__input, self._name__value = self._generate()
             self._name__hash.update(self._name__input)
         app = App.get_running_app()
         app.data.block_active(self._name__hash)

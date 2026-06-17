@@ -97,9 +97,9 @@ class Shape(object):
             case 0: # none
                 return False
             case 1: # drill
-                return False
+                return Shape._inside_local_circle(dx, dy, self.va*0.5)
             case 2: # tap
-                return False
+                return Shape._inside_local_circle(dx, dy, self.va*0.5)
             case 3: # circle
                 return Shape._inside_local_circle(dx, dy, self.va*0.5)
             case 4: # rect

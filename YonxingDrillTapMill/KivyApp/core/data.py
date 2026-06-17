@@ -198,12 +198,22 @@ class Data(object):
                 values.append(ua.Variant(_values_[i], block.type))
             self._client.write_values(nodes, values)
 
+    def all(self, _name__value_):
+        for name in _name__value_:
+            block = self._name__block[name]
+            if _name__value_[name] != block.value:
+                return False
+        return True
+
     def block(self, _name_) -> DataBlock:
         return self._name__block[_name_]
 
-    def block_active(self, _name__hash_):
+    def block_active(self, *_name__hash_):
         for name in self._name__block:
-            self._name__block[name].active = name in _name__hash_
+            inside = False
+            for name__hash in _name__hash_:
+                inside = inside or name in name__hash
+            self._name__block[name].active = inside
 
     ###################
     # DATA CONNECTION #
