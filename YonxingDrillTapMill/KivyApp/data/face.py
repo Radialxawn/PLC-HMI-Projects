@@ -1,6 +1,15 @@
 from data.shape import Shape
 
 class Face(object):
+    key__data = {
+        'ox':     {'namev': 'X',               'factor': 1e-3},
+        'oy':     {'namev': 'Y',               'factor': 1e-3},
+        'oz':     {'namev': 'Z',               'factor': 1e-3},
+        'tool_d': {'namev': 'ĐƯỜNG KÍNH DAO',  'factor': 1e-3},
+        'depth':  {'namev': 'ĐỘ SÂU',          'factor': 1e-3},
+        'feed':   {'namev': 'TỐC ĐỘ (mm/min)', 'factor': 1},
+    }
+
     def __init__(self, _index_, _z_count_, _shape_count_):
         self._index = _index_
         self.ox = 0
@@ -23,6 +32,23 @@ class Face(object):
             setattr(self, _key_, _value_)
         else:
             raise Exception(f'No {_key_} in this class')
+    
+    def clone(self):
+        return Face(self._index, len(self.z), len(self.shape)).copy(self)
+
+    def copy(self, _target_):
+        kv = vars(self)
+        for k in kv:
+            vt = _target_[k]
+            if k == 'z' or k == 'zs':
+                for i, vti in enumerate(vt):
+                    kv[k][i] = vti
+            elif k == 'shape':
+                for i, vti in enumerate(vt):
+                    kv[k][i].copy(vti)
+            else:
+                kv[k] = vt
+        return self
 
     def to_json(self):
         result = {}
@@ -53,6 +79,17 @@ class Face(object):
                     kv[k][i].from_json(vi)
             else:
                 kv[k] = v
+
+    def limit(self):
+        for i, v in enumerate(self.z):
+            self.z[i] = max(0, v)
+        for i, v in enumerate(self.zs):
+            self.zs[i] = max(0, v)
+        self.tool_d = max(0, self.tool_d)
+        self.depth = max(0, self.depth)
+        self.feed = max(1, self.feed)
+        for shape in self.shape:
+            shape.limit()
 
     def name__value(self):
         head = f'hmi.face[{self._index}]'

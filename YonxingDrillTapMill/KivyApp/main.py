@@ -5,6 +5,7 @@ Config.set('graphics', 'minimum_width', '960')
 Config.set('graphics', 'minimum_height', '540')
 Config.set('graphics', 'multisamples', '4')
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
+Config.set('kivy', 'exit_on_escape', '0')
 import sys
 import logging
 import platform
@@ -104,11 +105,14 @@ class Main(App):
     def m_home(self):
         self.data.set('hmi.home', True)
     
+    def m_face_run(self, _value_):
+        self.data.set('hmi.face_run', _value_)
+    
     def m_show_popup_confirm(self, _message_, _confirm_):
         popup = Popup(
             title="XÁC NHẬN",
             size_hint=(None, None),
-            size=(320, 240),
+            size=(480, 240),
             auto_dismiss=False
         )
         popup.content = PopupConfirm(
@@ -122,7 +126,7 @@ class Main(App):
         popup = Popup(
             title="ĐĂNG NHẬP",
             size_hint=(None, None),
-            size=(320, 240),
+            size=(480, 240),
             auto_dismiss=False
         )
         popup.content = PopupLogin(
@@ -136,7 +140,7 @@ class Main(App):
         popup = Popup(
             title="LỖI",
             size_hint=(None, None),
-            size=(320, 240),
+            size=(480, 240),
             auto_dismiss=False
         )
         popup.content = PopupError(

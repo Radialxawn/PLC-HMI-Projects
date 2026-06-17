@@ -41,27 +41,22 @@ class ScreenSettingAxis(Screen):
             'ramp_time_msec',
             'jerk_factor',
         ]
-        self._grid_draw_done = False
+        self._first_load = True
 
     def on_pre_enter(self, *args):
-        if not self._grid_draw_done:
-            self._label__data = {}
-            self._name__input = {}
-            self._grid_draw()
-            self._grid_draw_done = True
-            name__hash = {}
-            self._name__value = {}
-            for name in self._name__input:
-                name__hash[name] = False
-                self._name__value[name] = None
-            name__hash['hmi.cfsh.need'] = False
-            name__hash['hmi.cfsh.need_check'] = False
-            name__hash['hmi.cfsh.accept'] = False
-            name__hash['hmi.cfsh.decline'] = False
-            name__hash['hmi.cf.home_encoder_value_recorded'] = False
-            name__hash['hmi.view_can_home'] = False
-            name__hash['hmi.home'] = False
-            self._name__hash = name__hash
+        if self._first_load:
+            self._first_load = False
+            self._label__data, self._name__input, self._name__value = self._generate()
+            self._name__hash = {
+                'hmi.cfsh.need',
+                'hmi.cfsh.need_check',
+                'hmi.cfsh.accept',
+                'hmi.cfsh.decline',
+                'hmi.cf.home_encoder_value_recorded',
+                'hmi.view_can_home',
+                'hmi.home',
+            }
+            self._name__hash.update(self._name__input)
         app = App.get_running_app()
         app.data.block_active(self._name__hash)
 
@@ -121,10 +116,11 @@ class ScreenSettingAxis(Screen):
             'down' if app.data.get('hmi.cf.home_encoder_value_recorded') else 'normal')
         self.ids['hmi.home'].disabled = not app.data.get('hmi.view_can_home')
 
-    def _grid_draw(self):
+    def _generate(self):
         app = App.get_running_app()
         axiss_name = []
         axiss_index = []
+        label__data, name__input, name__value = {}, {}, {}
         for name in self._axiss_name__index:
             axiss_name.append(name)
             axiss_index.append(self._axiss_name__index[name])
@@ -134,7 +130,7 @@ class ScreenSettingAxis(Screen):
             'z': kivy.utils.get_color_from_hex('#526fffff'),
             'a': kivy.utils.get_color_from_hex('#fff644ff'),
         }
-        grid = self.ids['grid']
+        grid = self.ids.grid
         grid.cols = len(self._axis_propertys) + 1
         grid.rows = len(axiss_name) + 1
         grid.add_widget(Label(
@@ -146,7 +142,7 @@ class ScreenSettingAxis(Screen):
             if len(p) <= data[2]:
                 label.text = p
                 data[2] = 0
-            self._label__data[label] = data
+            label__data[label] = data
             grid.add_widget(label)
         for i in range(grid.cols):
             for j in range(grid.rows - 1):
@@ -161,7 +157,6 @@ class ScreenSettingAxis(Screen):
                     value_type = app.data.block(name).type
                     if value_type == ua.VariantType.Boolean:
                         oinput = ToggleButton(
-                            text='...',
                             state='normal'
                         )
                         oinput.bind(on_press=self._on_toggle_press)
@@ -175,8 +170,10 @@ class ScreenSettingAxis(Screen):
                         oinput.bind(focus=self._on_text_input_focus)
                     oinput.name = name
                     oinput.is_focus = False
-                    self._name__input[name] = oinput
+                    name__input[name] = oinput
+                    name__value[name] = None
                     grid.add_widget(oinput)
+        return label__data, name__input, name__value
     
     def _on_toggle_press(self, _instance_):
         app = App.get_running_app()
@@ -196,38 +193,44 @@ class ScreenSettingAxis(Screen):
         app = App.get_running_app()
         app.m_show_popup_confirm(
             _message_='RESET GỐC ENCODER?',
-            _confirm_=self._on_home_recorded_reset_confirm)
+            _confirm_=self._on_home_recorded_reset_confirm
+        )
 
     def _on_home_recorded_reset_confirm(self):
         app = App.get_running_app()
         app.data.set('hmi.cf.home_encoder_value_recorded', False)
         app.m_save_need_check()
     
-    def _config_path(self):
-        return Path(Path(__file__).resolve().parent.parent, 'config.json')
+    def _config_axis_path(self):
+        return Path(Path(__file__).resolve().parent.parent, 'config/axis.json')
 
-    def _config_load_confirm(self):
+    def _config_axis_load_confirm(self):
         config = {}
         app = App.get_running_app()
-        path = self._config_path()
+        path = self._config_axis_path()
         if not path.exists():
+            print(f'{path} does not exist')
             return
         with path.open(mode='r') as file:
             config = json.load(file)
+        names, values = [], []
         for name in config:
             value = config[name]
             if value == None:
                 continue
-            app.data.set(name, value)
+            names.append(name)
+            values.append(value)
+        app.data.sets(names, values)
         app.m_save_need_check()
 
-    def _config_load(self):
+    def _config_axis_load(self):
         app = App.get_running_app()
         app.m_show_popup_confirm(
             _message_='LẤY DỮ LIỆU TRÊN HMI?',
-            _confirm_=self._config_load_confirm)
+            _confirm_=self._config_axis_load_confirm
+        )
     
-    def _config_save_confirm(self):
+    def _config_axis_save_confirm(self):
         config = {}
         app = App.get_running_app()
         for name in self._name__input:
@@ -236,11 +239,12 @@ class ScreenSettingAxis(Screen):
                 config[name] = block.value == 1
             else:
                 config[name] = block.value
-        with open(self._config_path(), 'w', encoding='utf-8') as file:
+        with open(self._config_axis_path(), 'w', encoding='utf-8') as file:
             json.dump(config, file, indent=3)
 
-    def _config_save(self):
+    def _config_axis_save(self):
         app = App.get_running_app()
         app.m_show_popup_confirm(
             _message_='LƯU DỮ LIỆU VÀO HMI?',
-            _confirm_=self._config_save_confirm)
+            _confirm_=self._config_axis_save_confirm
+        )

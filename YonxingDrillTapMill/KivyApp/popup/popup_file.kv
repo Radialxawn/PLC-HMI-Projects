@@ -19,6 +19,12 @@
                 text_size: self.size
             Widget:
             Button:
+                id: delete
+                text: 'XOÁ'
+                size_hint_x: None
+                width: 90
+                on_press: root._delete()
+            Button:
                 id: ok
                 text: 'CHỌN'
                 size_hint_x: None

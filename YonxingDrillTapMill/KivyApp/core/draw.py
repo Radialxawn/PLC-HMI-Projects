@@ -37,12 +37,15 @@ class Draw(object):
         dyp -= wgsize[1] * 0.5 + self._offset_pixel[1]
         return dxp, dyp, inside
 
-    def axis(self, _area_, _pos_pixel_):
+    def axis(self, _area_, _pos_pixel_, _max_x_pixel_=None, _width_=1):
         pos = [_pos_pixel_[0]+self._offset_pixel[0], _pos_pixel_[1]+self._offset_pixel[1]]
         Color(rgba=clhex("#ff5656ff"))
-        Rectangle(pos=pos, size=[_area_.size[0], 1])
+        Rectangle(pos=pos, size=[_area_.size[0], _width_])
         Color(rgba=clhex("#56ff64ff"))
-        Rectangle(pos=pos, size=[1, _area_.size[1]])
+        Rectangle(pos=pos, size=[_width_, _area_.size[1]])
+        if _max_x_pixel_ != None:
+            Color(rgba=clhex("#000000ff"))
+            Rectangle(pos=[pos[0]+_max_x_pixel_, pos[1]-_area_.size[1]*0.5], size=[_width_, _area_.size[1]])
 
     def shape(self, _shape_, _pos_micro_):
         sid = _shape_.id

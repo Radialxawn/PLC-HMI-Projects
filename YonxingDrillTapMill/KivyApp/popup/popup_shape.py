@@ -9,14 +9,16 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from data.shape import Shape
+from core.ui import UI
 from kivy.utils import get_color_from_hex as clhex
 
 class PopupShape(Screen):
     def __init__(self, _instance_, _shape_, _apply_, _delete_, **kwargs):
         super().__init__(**kwargs)
         self._instance_ = _instance_
+        _shape_.limit()
         self._shape_ = _shape_
-        self._shape_edit = Shape().copy(_shape_)
+        self._shape_edit = _shape_.clone()
         self._apply_ = _apply_
         self._delete_ = _delete_
         self._draw = Draw(5e-3, [1e-3, 10e-3])
@@ -26,71 +28,45 @@ class PopupShape(Screen):
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
 
     def _generate(self):
-        self._sp__widget = {}
+        self._key__widget = {}
         for k in vars(self._shape_edit):
-            self._sp__widget[k] = []
-        self._sp__name = {
-            'x':  'x',
-            'y':  'y',
-            'va': 'a',
-            'vb': 'b',
-            'vc': 'c',
-            'vd': 'd',
-            've': 'e',
-        }
+            self._key__widget[k] = []
         shape_id_selector = self.ids.shape_id_selector
         datas = []
-        for data in Shape.name__data.values():    
+        for data in Shape.shape_name__data.values():    
             datas.append(data)
         datas.sort(key=lambda s: s['id'])
         shape_id_selector.values = [d['namev'] for d in datas]
         self.ids.shape_property.width = 180
-        for sp in self._sp__name:
+        for key in Shape.key__data:
+            data = Shape.key__data[key]
             obox = BoxLayout(
                 orientation='horizontal',
                 size_hint_y=None,
                 height=40,
             )
             olabel = Label(
-                text=self._sp__name[sp].upper(),
+                text=data['namev'],
                 size_hint_x=None,
                 width=30
             )
             obox.add_widget(olabel)
-            oinput = self._generate_input(sp, self._shape_edit[sp], obox)
-            self._sp__widget[sp].append(olabel)
-            self._sp__widget[sp].append(oinput)
+            oinput = UI.generate_text_input_number(self, key, data['factor'], self._shape_edit[key], obox)
+            self._key__widget[key].append(olabel)
+            self._key__widget[key].append(oinput)
             self.ids.shape_property.add_widget(obox)
-            if sp == 'y':
+            if key == 'y':
                 self.ids.shape_property.add_widget(Widget())
         self.ids.shape_property.add_widget(Widget())
-    
-    def _generate_input(self, _sp_, _value_, _parent_):
-        ip = TextInput(
-            halign='center',
-            input_filter=self._on_text_input_filter,
-            multiline=False
-        )
-        ip.sp = _sp_
-        ip.text = f'{(_value_*1e-3):.3f}'
-        ip.bind(on_text_validate=self._on_text_input_validate)
-        ip.bind(focus=self._on_text_input_focus)
-        _parent_.add_widget(ip)
-        return ip
-    
-    def _on_text_input_filter(self, _substring_, _from_undo_):
-        pattern = re.compile(r'[^0-9.]')
-        filtered = re.sub(pattern, '', _substring_)
-        return filtered
 
     def _on_text_input_validate(self, _instance_):
         value = 0
         try:
-            value = int(float(_instance_.text)*1e3)
+            value = int(float(_instance_.text)/_instance_.v_factor)
         except (ValueError, TypeError):
             _instance_.text = ''
-        if value != self._shape_edit[_instance_.sp]:
-            self._shape_edit[_instance_.sp] = value
+        if value != self._shape_edit[_instance_.v_key]:
+            self._shape_edit[_instance_.v_key] = value
             self._update_canvas()
     
     def _on_text_input_focus(self, _instance_, _value_):
@@ -101,8 +77,8 @@ class PopupShape(Screen):
     def _on_shape_id_selector(self, _instance_):
         if self._ignore_shape_id_selector:
             return
-        for name in Shape.name__data:
-            data = Shape.name__data[name]
+        for name in Shape.shape_name__data:
+            data = Shape.shape_name__data[name]
             if _instance_.text == data['namev']:
                 self._shape_edit.id = data['id']
                 break
@@ -113,24 +89,23 @@ class PopupShape(Screen):
         area = self.ids.area
         area.canvas.clear()
         cx, cy = self._draw.pixel_to_micro(area.center_x, area.center_y)
-        self._shape_edit.limit()
         with area.canvas:
-            self._draw.axis(area, [area.center_x, area.center_y])
+            self._draw.axis(area, [area.center_x, area.center_y], None, 2)
             Color(rgba=clhex("#ff5656ff"))
             self._draw.shape(
                 _shape_=self._shape_edit,
                 _pos_micro_=[cx, cy],
             )
         active_sp = []
-        for name in Shape.name__data:
-            data = Shape.name__data[name]
+        for name in Shape.shape_name__data:
+            data = Shape.shape_name__data[name]
             if data['id'] == self._shape_edit.id:
                 active_sp = data['sp']
                 break
         if self._shape_id_changed:
-            for sp in self._sp__widget:
+            for sp in self._key__widget:
                 opacity = 1 if sp in active_sp else 0
-                wg = self._sp__widget[sp]
+                wg = self._key__widget[sp]
                 for e in wg:
                     e.opacity = opacity
         self._ignore_shape_id_selector = True
@@ -139,6 +114,7 @@ class PopupShape(Screen):
         self._shape_id_changed = False
 
     def _apply(self):
+        self._shape_edit.limit()
         self._shape_.copy(self._shape_edit)
         self._apply_()
         self._instance_.dismiss()

@@ -1,4 +1,6 @@
 import time
+import json
+from pathlib import Path
 import threading
 from kivy.app import App
 from kivy.clock import Clock
@@ -13,12 +15,20 @@ class ScreenLoad(Screen):
         self.skip = False
         threading.Thread(target=self._perform_heavy_task, daemon=True).start()
 
+    def _config_machine_load(self):
+        path = Path(Path(__file__).resolve().parent.parent, 'config/machine.json')
+        if not path.exists():
+            raise Exception('No machine config')
+        with path.open(mode='r') as file:
+            return json.load(file)
+
     def _perform_heavy_task(self):
         app = App.get_running_app()
         if self._first_load:
             self._first_load = False
             app.data.create()
             app.auto_connect_start()
+            app.machine = self._config_machine_load()
         for i in range(100):
             if self.skip:
                 break

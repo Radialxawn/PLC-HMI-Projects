@@ -1,4 +1,12 @@
 shape = {
+	'drill': [
+		'N0 G1 Z$VZ$',
+		'N1 G0 Z0',
+	],
+	'tap': [
+		'N0 G1 Z$VZ$',
+		'N1 G0 Z0',
+	],
 	'circle' : [
 		'LET #r : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',
 		#
@@ -167,7 +175,7 @@ shape = {
 
 for k, v in shape.items():
 	for i, j in enumerate(v):
-		if j[:3] == 'LET':
+		if j[0] == 'N' or j[:3] == 'LET':
 			v[i] = '%s\n' % (j)
 		else:
 			v[i] = 'N%d %s\n' % (i, j)

@@ -1,5 +1,15 @@
 class Shape(object):
-    name__data = {
+    key__data = {
+        'x':  {'namev': 'X', 'factor': 1e-3},
+        'y':  {'namev': 'Y', 'factor': 1e-3},
+        'va': {'namev': 'A', 'factor': 1e-3},
+        'vb': {'namev': 'B', 'factor': 1e-3},
+        'vc': {'namev': 'C', 'factor': 1e-3},
+        'vd': {'namev': 'D', 'factor': 1e-3},
+        've': {'namev': 'E', 'factor': 1e-3},
+    }
+
+    shape_name__data = {
         'none':     {'id': 0,  'namev': '...',     'sp': []},
         'drill':    {'id': 1,  'namev': 'KHOAN',   'sp': ['x', 'y', 'va', 'vb', 'vc']},
         'tap':      {'id': 2,  'namev': 'TARO',    'sp': ['x', 'y', 'va', 'vb', 'vc']},
@@ -30,6 +40,18 @@ class Shape(object):
         self.vd = 0
         self.ve = 0
     
+    def __getitem__(self, _key_):
+        return getattr(self, _key_)
+
+    def __setitem__(self, _key_, _value_):
+        if _key_ in self.__dict__:
+            setattr(self, _key_, _value_)
+        else:
+            raise Exception(f'No {_key_} in this class')
+
+    def clone(self):
+        return Shape().copy(self)
+
     def copy(self, _target_):
         kv = vars(self)
         for k in kv:
@@ -47,15 +69,6 @@ class Shape(object):
         kv = vars(self)
         for k in kv:
             kv[k] = _value_[k]
-
-    def __getitem__(self, _key_):
-        return getattr(self, _key_)
-
-    def __setitem__(self, _key_, _value_):
-        if _key_ in self.__dict__:
-            setattr(self, _key_, _value_)
-        else:
-            raise Exception(f'No {_key_} in this class')
     
     def limit(self):
         self.va = max(2_000, self.va)

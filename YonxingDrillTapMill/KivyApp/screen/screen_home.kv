@@ -9,17 +9,25 @@
             spacing: 5
             padding: 5
             Button:
+                id: run
                 text: "CHẠY"
                 size_hint_x: None
-                width: 120
+                width: 70
                 on_press: app.m_run(True)
                 on_release: app.m_run(False)
             Button:
+                id: stop
                 text: "DỪNG"
                 size_hint_x: None
-                width: 120
+                width: 70
                 on_press: app.m_stop(True)
                 on_release: app.m_stop(False)
+            Button:
+                text: "CHẠY MẶT"
+                size_hint_x: None
+                width: 120
+                on_press: app.m_face_run(True)
+                on_release: app.m_face_run(False)
             Widget:
             Label:
                 text: 'CẤU HÌNH'
@@ -33,20 +41,24 @@
                 id: profile_name
                 size_hint_x: None
                 font_size: 30
-                width: 480
+                width: 360
                 halign: 'left'
-                input_filter: root._file_name_filter
                 multiline: False
                 text_size: self.size
             Button:
-                text: "MỞ"
+                text: "TẢI XUỐNG"
                 size_hint_x: None
                 width: 120
-                on_press: root._profile_load_select()
+                on_press: root._profile_download()
+            Button:
+                text: "MỞ"
+                size_hint_x: None
+                width: 60
+                on_press: root._profile_load()
             Button:
                 text: "LƯU"
                 size_hint_x: None
-                width: 120
+                width: 60
                 on_press: root._profile_save()
         BoxLayout:
             orientation: 'horizontal'
@@ -114,38 +126,33 @@
                 id: cnc_0
                 size_hint_x: None
                 width: 90
-                on_press: root._download_cnc_select(self)
+                on_press: root._cnc_download(self)
             Button:
                 id: cnc_1
                 size_hint_x: None
                 width: 90
-                on_press: root._download_cnc_select(self)
+                on_press: root._cnc_download(self)
             Button:
                 id: cnc_2
                 size_hint_x: None
                 width: 90
-                on_press: root._download_cnc_select(self)
+                on_press: root._cnc_download(self)
             Button:
                 id: cnc_3
                 size_hint_x: None
                 width: 90
-                on_press: root._download_cnc_select(self)
+                on_press: root._cnc_download(self)
             Button:
                 id: cnc_4
                 size_hint_x: None
                 width: 90
-                on_press: root._download_cnc_select(self)
+                on_press: root._cnc_download(self)
             Button:
                 id: cnc_5
                 size_hint_x: None
                 width: 90
-                on_press: root._download_cnc_select(self)
+                on_press: root._cnc_download(self)
             Widget:
-            Button:
-                text: "LOAD"
-                size_hint_x: None
-                width: 120
-                on_press: root.manager.current = 'load'
             Button:
                 text: "IN/OUT"
                 size_hint_x: None
