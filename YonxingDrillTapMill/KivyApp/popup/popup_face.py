@@ -12,7 +12,7 @@ from kivy.uix.popup import Popup
 from core.mouse import Mouse
 from core.draw import Draw
 from data.face import Face
-from core.ui import UI
+from core.ui import UITextInputInteger
 from kivy.utils import get_color_from_hex as clhex
 
 class PopupFace(Screen):
@@ -34,59 +34,85 @@ class PopupFace(Screen):
         self.ids.face_property.width = 320
         for key in Face.key__data:
             data = Face.key__data[key]
-            obox = BoxLayout(
+            box = BoxLayout(
                 orientation='horizontal',
                 size_hint_y=None,
                 height=40,
             )
-            olabel = Label(
+            label = Label(
                 text=data['namev'],
                 size_hint_x=None,
                 width=180
             )
-            obox.add_widget(olabel)
-            UI.generate_text_input_number(self, key, data['factor'], self._face_edit[key], obox)
-            self.ids.face_property.add_widget(obox)
+            box.add_widget(label)
+            input = UITextInputInteger(
+                halign='center',
+                multiline=False
+            ).data_set(
+                _key_=key,
+                _factor_=data['factor'],
+                _validate_=self._on_text_input_validate,
+                _focus_=None
+            )
+            input.v_value_set(self._face_edit[key])
+            box.add_widget(input)
+            self.ids.face_property.add_widget(box)
         self.ids.face_property.add_widget(Widget())
         for i in range(len(self._face_edit.z)):
-            obox = BoxLayout(
+            box = BoxLayout(
                 orientation='horizontal',
                 size_hint_y=None,
                 spacing=5,
                 height=40,
             )
-            olabel = Label(
+            zlabel = Label(
                 text=f'Z{i+1}',
                 size_hint_x=None,
                 width=30
             )
-            obox.add_widget(olabel)
-            UI.generate_text_input_number(self, f'z[{i}]', 1e-3, self._face_edit.z[i], obox)
-            UI.generate_text_input_number(self, f'zs[{i}]', 1e-3, self._face_edit.zs[i], obox)
-            self.ids.face_property.add_widget(obox)
+            zslabel = Label(
+                text=f'BƯỚC',
+                size_hint_x=None,
+                width=60
+            )
+            zinput = UITextInputInteger(
+                halign='center',
+                multiline=False
+            ).data_set(
+                _key_=f'z[{i}]',
+                _factor_=1e-3,
+                _validate_=self._on_text_input_validate,
+                _focus_=None
+            )
+            zinput.v_value_set(self._face_edit.z[i])
+            zsinput = UITextInputInteger(
+                halign='center',
+                multiline=False
+            ).data_set(
+                _key_=f'zs[{i}]',
+                _factor_=1e-3,
+                _validate_=self._on_text_input_validate,
+                _focus_=None
+            )
+            zsinput.v_value_set(self._face_edit.zs[i])
+            box.add_widget(zlabel)
+            box.add_widget(zinput)
+            box.add_widget(zslabel)
+            box.add_widget(zsinput)
+            self.ids.face_property.add_widget(box)
         self.ids.face_property.add_widget(Widget())
 
-    def _on_text_input_validate(self, _instance_):
-        value = 0
-        try:
-            value = int(float(_instance_.text)/_instance_.v_factor)
-        except (ValueError, TypeError):
-            _instance_.text = ''
+    def _on_text_input_validate(self, _instance_, _value_):
         changed = False
         array = _instance_.v_key.split('[')
         if len(array) > 1:
-            self._face_edit[array[0]][int(array[1][:-1])] = value
+            self._face_edit[array[0]][int(array[1][:-1])] = _value_
             changed = True
-        elif value != self._face_edit[_instance_.v_key]:
-            self._face_edit[_instance_.v_key] = value
+        elif _value_ != self._face_edit[_instance_.v_key]:
+            self._face_edit[_instance_.v_key] = _value_
             changed = True
         if changed:
-            self._update_canvas()
-    
-    def _on_text_input_focus(self, _instance_, _value_):
-        _instance_.is_focus = _value_
-        if not _value_:
-            self._on_text_input_validate(_instance_)
+            self._update_canvas()    
 
     def _update_canvas(self, *args):
         self._face_draw()

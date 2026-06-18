@@ -1,13 +1,39 @@
 <ScreenIO>:
-    AnchorLayout:
-        anchor_x: 'left'
-        anchor_y: 'top'
+    BoxLayout:
+        orientation: 'vertical'
         BoxLayout:
             orientation: 'horizontal'
-            size_hint: None, None
-            size: 120, 60
+            size_hint_y: None
+            height: 60
             spacing: 5
             padding: 5
             Button:
                 text: "THOÁT"
+                size_hint_x: None
+                width: 120
                 on_press: root.manager.current = 'home'
+            Widget:
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 5
+            padding: 5
+            BoxLayout:
+                size_hint_x: None
+                width: 180
+            BoxLayout:
+                orientation: 'vertical'
+                id: input
+                spacing: 2
+            BoxLayout:
+                orientation: 'vertical'
+                id: output
+                spacing: 2
+            BoxLayout:
+                size_hint_x: None
+                width: 60
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 60
+            spacing: 5
+            padding: 5

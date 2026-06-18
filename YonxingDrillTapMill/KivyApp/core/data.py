@@ -8,12 +8,42 @@ from asyncua.sync import Client
 import xml.etree.ElementTree as ET
 
 class DataBlock(object):
+    stype__uatype = {
+        'T_BOOL': ua.VariantType.Boolean,
+        'T_INT': ua.VariantType.Int16,
+        'T_UINT': ua.VariantType.UInt16,
+        'T_DINT': ua.VariantType.Int32,
+        'T_UDINT': ua.VariantType.UInt32,
+        'T_STRING': ua.VariantType.String,
+        'T_STRING_GVL_c_line_size_': ua.VariantType.String,
+    }
+
     def __init__(self, _id_, _type_):
         self.id = _id_
         self.type = _type_
         self.node = {}
         self.value = None
         self.active = False
+
+    @staticmethod
+    def _clamp(_value_, _a_, _b_):
+        if _value_ < _a_:
+            return _a_
+        elif _value_ > _b_:
+            return _b_
+        return _value_
+
+    def get_ua_value(self, _value_):
+        match self.type:
+            case ua.VariantType.Int16:
+                _value_ = DataBlock._clamp(_value_, -32768, 32767)
+            case ua.VariantType.UInt16:
+                _value_ = DataBlock._clamp(_value_, 0, 65535)
+            case ua.VariantType.Int32:
+                _value_ = DataBlock._clamp(_value_, -2147483648, 2147483647)
+            case ua.VariantType.UInt32:
+                _value_ = DataBlock._clamp(_value_, 0, 4294967295)
+        return ua.Variant(_value_, self.type)
 
 class Data(object):
     def __init__(self, _address_ip_, _address_port_, _xml_path_windows_, _tag_head_):
@@ -98,7 +128,7 @@ class Data(object):
         types = []
         for node, utype in node__utype.items():
             elms = utype__elms[utype]
-            self._create_generate(node, elms, stype__uatype, utype__elms, ids, types)
+            self._create_generate(node, elms, utype__elms, ids, types)
         # apply process
         self.ids = ids
         head = '.'.join(item for item in head_part if item)
@@ -108,22 +138,22 @@ class Data(object):
             self._name__block[name] = self._id__block[id]
             self._names.append(name)
     
-    def _create_generate(self, _node_, _elms_, _stype__uatype_, _utype__elms_, _ids_, _types_):
+    def _create_generate(self, _node_, _elms_, _utype__elms_, _ids_, _types_):
         for e in _elms_:
             sname = e['iecname']
             stype = e['type']
-            if stype in _stype__uatype_: # simple type
+            if stype in DataBlock.stype__uatype: # simple type
                 if sname[0] == '[': # array element
                     name = '%s%s' % (_node_, sname)
                 else:
                     name = '%s.%s' % (_node_, sname)
-                tp = _stype__uatype_[stype]
+                tp = DataBlock.stype__uatype[stype]
                 _ids_.append(name)
                 _types_.append(tp)
             elif stype in _utype__elms_: # user define type
                 elms = _utype__elms_[stype]
                 dot = '' if sname[0] == '[' else '.'
-                self._create_generate('%s%s%s' % (_node_, dot, sname), elms, _stype__uatype_, _utype__elms_, _ids_, _types_)
+                self._create_generate('%s%s%s' % (_node_, dot, sname), elms, _utype__elms_, _ids_, _types_)
             else: # array type
                 name = '%s.%s' % (_node_, sname)
                 part = stype.split('__')
@@ -134,7 +164,7 @@ class Data(object):
                         'type': 'T_%s' % (part[3][3:])
                     }
                     elms.append(e)
-                self._create_generate('%s.%s' % (_node_, sname), elms, _stype__uatype_, _utype__elms_, _ids_, _types_)
+                self._create_generate('%s.%s' % (_node_, sname), elms, _utype__elms_, _ids_, _types_)
     
     def _get_all_start(self):
         self._get_all_done = True
@@ -186,7 +216,7 @@ class Data(object):
     def set(self, _name_, _value_):
         if self._connect_state == 100:
             block = self._name__block[_name_]
-            block.node.set_value(ua.Variant(_value_, block.type))
+            block.node.set_value(block.get_ua_value(_value_))
     
     def sets(self, _names_, _values_):
         if self._connect_state == 100:
@@ -195,7 +225,7 @@ class Data(object):
             for i, name in enumerate(_names_):
                 block = self._name__block[name]
                 nodes.append(self._client.get_node(block.id))
-                values.append(ua.Variant(_values_[i], block.type))
+                values.append(block.get_ua_value(_values_[i]))
             self._client.write_values(nodes, values)
 
     def all(self, _name__value_):

@@ -6,10 +6,10 @@ from kivy.graphics import Color
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.textinput import TextInput
+from core.ui import UITextInputInteger
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from data.shape import Shape
-from core.ui import UI
 from kivy.utils import get_color_from_hex as clhex
 
 class PopupShape(Screen):
@@ -23,14 +23,14 @@ class PopupShape(Screen):
         self._delete_ = _delete_
         self._draw = Draw(5e-3, [1e-3, 10e-3])
         self._mouse = Mouse()
-        self._generate()
+        self._key__widget = self._generate()
         self._shape_id_changed = True
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
 
     def _generate(self):
-        self._key__widget = {}
+        key__widget = {}
         for k in vars(self._shape_edit):
-            self._key__widget[k] = []
+            key__widget[k] = []
         shape_id_selector = self.ids.shape_id_selector
         datas = []
         for data in Shape.shape_name__data.values():    
@@ -40,40 +40,42 @@ class PopupShape(Screen):
         self.ids.shape_property.width = 180
         for key in Shape.key__data:
             data = Shape.key__data[key]
-            obox = BoxLayout(
+            if data == None:
+                self.ids.shape_property.add_widget(Widget())
+                continue
+            box = BoxLayout(
                 orientation='horizontal',
                 size_hint_y=None,
                 height=40,
             )
-            olabel = Label(
+            label = Label(
                 text=data['namev'],
                 size_hint_x=None,
                 width=30
             )
-            obox.add_widget(olabel)
-            oinput = UI.generate_text_input_number(self, key, data['factor'], self._shape_edit[key], obox)
-            self._key__widget[key].append(olabel)
-            self._key__widget[key].append(oinput)
-            self.ids.shape_property.add_widget(obox)
-            if key == 'y':
-                self.ids.shape_property.add_widget(Widget())
+            input = UITextInputInteger(
+                halign='center',
+                multiline=False
+            ).data_set(
+                _key_=key,
+                _factor_=data['factor'],
+                _validate_=self._on_text_input_validate,
+                _focus_=None
+            )
+            input.v_value_set(self._shape_edit[key])
+            box.add_widget(label)
+            box.add_widget(input)
+            key__widget[key].append(label)
+            key__widget[key].append(input)
+            self.ids.shape_property.add_widget(box)
         self.ids.shape_property.add_widget(Widget())
+        return key__widget
 
-    def _on_text_input_validate(self, _instance_):
-        value = 0
-        try:
-            value = int(float(_instance_.text)/_instance_.v_factor)
-        except (ValueError, TypeError):
-            _instance_.text = ''
-        if value != self._shape_edit[_instance_.v_key]:
-            self._shape_edit[_instance_.v_key] = value
+    def _on_text_input_validate(self, _instance_, _value_):
+        if _value_ != self._shape_edit[_instance_.v_key]:
+            self._shape_edit[_instance_.v_key] = _value_
             self._update_canvas()
-    
-    def _on_text_input_focus(self, _instance_, _value_):
-        _instance_.is_focus = _value_
-        if not _value_:
-            self._on_text_input_validate(_instance_)
-    
+
     def _on_shape_id_selector(self, _instance_):
         if self._ignore_shape_id_selector:
             return

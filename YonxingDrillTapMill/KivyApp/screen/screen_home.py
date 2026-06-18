@@ -49,8 +49,6 @@ class ScreenHome(Screen):
             self._index__face, self._index__face_cog = self._generate()
             self.ids.area_top.bind(pos=self._update_canvas_area_top, size=self._update_canvas_area_top)
             self.ids.area_front.bind(pos=self._update_canvas_area_front, size=self._update_canvas_area_front)
-        app = App.get_running_app()
-        app.data.block_active(self._name__hash)
     
     def _generate(self):
         index__face = {}
@@ -61,6 +59,8 @@ class ScreenHome(Screen):
         return index__face, index__face_cog
     
     def on_enter(self, *args):
+        app = App.get_running_app()
+        app.data.block_active(self._name__hash)
         if not hasattr(self, '_value_update_clock'):
             self._value_update_clock = Clock.schedule_interval(self._value_update, 0.1)
 
@@ -70,7 +70,14 @@ class ScreenHome(Screen):
             delattr(self, '_value_update_clock')
     
     def _value_update(self, _dt_):
-        return
+        app = App.get_running_app()
+        self.ids.face_run.disabled = not app.data.get('hmi.face_ready')
+        self.ids.run.disabled = not app.data.get('hmi.view_can_run')
+        self.ids.stop.disabled = not app.data.get('hmi.view_can_stop')
+        face_index = app.data.get('hmi.face_index')
+        for i in self._index__face:
+            color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
+            self.ids[f'face_{i}'].background_color = color
 
     #################
     # LOAD AND SAVE #
@@ -332,6 +339,7 @@ class ScreenHome(Screen):
                 x += face.ox * machine_face['dir_x']
                 y += face.oy * machine_face['dir_y']
                 self._draw.face(face, [x, y])
+        return
         if self._index__face_cog[_face_indexs_[0]] == None:
             cog_texture = CoreImage('texture/cog.png').texture
             with _area_.canvas.after:

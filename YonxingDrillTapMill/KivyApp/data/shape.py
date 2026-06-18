@@ -2,6 +2,7 @@ class Shape(object):
     key__data = {
         'x':  {'namev': 'X', 'factor': 1e-3},
         'y':  {'namev': 'Y', 'factor': 1e-3},
+        '0': None,
         'va': {'namev': 'A', 'factor': 1e-3},
         'vb': {'namev': 'B', 'factor': 1e-3},
         'vc': {'namev': 'C', 'factor': 1e-3},

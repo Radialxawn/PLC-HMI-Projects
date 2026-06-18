@@ -19,3 +19,46 @@
                 width: 120
                 on_press: app.m_show_popup_login('7412369', 'setting_axis')
         BoxLayout:
+            orientation: 'horizontal'
+            spacing: 5
+            padding: 5
+            BoxLayout:
+                size_hint_x: None
+                width: 120
+            BoxLayout:
+                id: left
+                orientation: 'vertical'
+            BoxLayout:
+                size_hint_x: None
+                width: 10
+            BoxLayout:
+                id: right
+                orientation: 'vertical'
+            BoxLayout:
+                size_hint_x: None
+                width: 120
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 60
+            spacing: 5
+            padding: 5
+            Button:
+                id: hmi.cfsh.accept
+                text: 'LƯU'
+                size_hint_x: None
+                width: 120
+                on_press: app.m_save_accept()
+            Button:
+                id: hmi.cfsh.decline
+                text: 'KHÔNG'
+                size_hint_x: None
+                width: 120
+                on_press: app.m_save_decline()
+            Widget:
+            Button:
+                id: hmi.home
+                text: 'HOME'
+                size_hint_x: None
+                width: 90
+                on_press: app.m_home()

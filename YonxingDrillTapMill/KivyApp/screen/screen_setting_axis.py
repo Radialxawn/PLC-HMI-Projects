@@ -6,41 +6,43 @@ from pathlib import Path
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from kivy.uix.togglebutton import ToggleButton
-from kivy.uix.textinput import TextInput
+from core.ui import UITextInputInteger
 from kivy.uix.label import Label
 
 class ScreenSettingAxis(Screen):
+    axis_name__index = {
+        'R-x':     0,
+        'RM-V-y':  2,
+        'RM-V-z':  1,
+        'RM-H-y':  3,
+        'RM-H-z':  4,
+        'L-x':     5,
+        'LDT-V-y': 7,
+        'LD-V-z':  6,
+        'LD-L-z':  10,
+        'LT-V-z':  8,
+        'LT-V-a':  9,
+        'LT-L-z':  11,
+        'LT-L-a':  12,
+    }
+
+    property__data = {
+        'max_rpm':                        {'namev': 'Max RPM',               'factor': 1},
+        'gear_num':                       {'namev': 'Gear num',              'factor': 1},
+        'gear_den':                       {'namev': 'Gear den',              'factor': 1},
+        'gear_dir':                       {'namev': 'Gear dir',              'factor': 1},
+        'home_torque_mNm':                {'namev': 'Home torque',           'factor': 1e-3},
+        'home_encoder_value':             {'namev': 'Home encoder',          'factor': 1},
+        'max_micro':                      {'namev': 'Max travel',            'factor': 1e-3},
+        'overload_hold_torque_factor':    {'namev': 'Hold torque factor',    'factor': 1e-3},
+        'overload_hold_torque_time_msec': {'namev': 'Hold torque time',      'factor': 1e-3},
+        'overload_instant_torque_factor': {'namev': 'Instant torque factor', 'factor': 1e-3},
+        'ramp_time_msec':                 {'namev': 'Ramp time',             'factor': 1e-3},
+        'jerk_factor':                    {'namev': 'Jerk',                  'factor': 1},
+    }
+
     def __init__(self, **kvargs):
         super(ScreenSettingAxis, self).__init__(**kvargs)
-        self._axiss_name__index = {
-            'R-x':     0,
-            'RM-V-y':  2,
-            'RM-V-z':  1,
-            'RM-H-y':  3,
-            'RM-H-z':  4,
-            'L-x':     5,
-            'LDT-V-y': 7,
-            'LD-V-z':  6,
-            'LD-L-z':  10,
-            'LT-V-z':  8,
-            'LT-V-a':  9,
-            'LT-L-z':  11,
-            'LT-L-a':  12,
-        }
-        self._axis_propertys = [
-            'max_rpm',
-            'gear_num',
-            'gear_den',
-            'gear_dir',
-            'home_torque_mNm',
-            'home_encoder_value',
-            'max_micro',
-            'overload_hold_torque_factor',
-            'overload_hold_torque_time_msec',
-            'overload_instant_torque_factor',
-            'ramp_time_msec',
-            'jerk_factor',
-        ]
         self._first_load = True
 
     def on_pre_enter(self, *args):
@@ -56,11 +58,10 @@ class ScreenSettingAxis(Screen):
                 'hmi.home',
             }
             self._label__data, self._name__input, self._name__value = self._generate()
-            self._name__hash.update(self._name__input)
-        app = App.get_running_app()
-        app.data.block_active(self._name__hash)
 
     def on_enter(self, *args):
+        app = App.get_running_app()
+        app.data.block_active(self._name__hash, self._name__input)
         if not hasattr(self, '_value_update_clock'):
             self._label_scroll_clock = Clock.schedule_interval(self._label_scroll, 0.2)
             self._value_update_clock = Clock.schedule_interval(self._value_update, 0.2)
@@ -96,7 +97,7 @@ class ScreenSettingAxis(Screen):
         app = App.get_running_app()
         for name in self._name__input:
             input = self._name__input[name]
-            if input.is_focus:
+            if input.focus:
                 continue
             block = app.data.block(name)
             value = self._name__value[name]
@@ -108,7 +109,7 @@ class ScreenSettingAxis(Screen):
                 input.state = 'down' if value else 'normal'
                 input.text = 'THUẬN' if value else 'NGHỊCH'
             else:
-                input.text = f'{block.value}' if block.value != None else ''
+                input.v_value_set(block.value)
         need = app.data.get('hmi.cfsh.need')
         self.ids['hmi.cfsh.accept'].disabled = not need
         self.ids['hmi.cfsh.decline'].disabled = not need
@@ -118,61 +119,66 @@ class ScreenSettingAxis(Screen):
 
     def _generate(self):
         app = App.get_running_app()
-        axiss_name = []
-        axiss_index = []
+        axis_name_array = []
+        axis_index_array = []
         label__data, name__input, name__value = {}, {}, {}
-        for name in self._axiss_name__index:
-            axiss_name.append(name)
-            axiss_index.append(self._axiss_name__index[name])
-        axis_color = {
+        for name in ScreenSettingAxis.axis_name__index:
+            axis_name_array.append(name)
+            axis_index_array.append(ScreenSettingAxis.axis_name__index[name])
+        property_array = []
+        for property in ScreenSettingAxis.property__data:
+            property_array.append(property)
+        axis_type__color = {
             'x': kivy.utils.get_color_from_hex('#ff4444ff'),
             'y': kivy.utils.get_color_from_hex('#95fe54ff'),
             'z': kivy.utils.get_color_from_hex('#526fffff'),
             'a': kivy.utils.get_color_from_hex('#fff644ff'),
         }
         grid = self.ids.grid
-        grid.cols = len(self._axis_propertys) + 1
-        grid.rows = len(axiss_name) + 1
+        grid.cols = len(ScreenSettingAxis.property__data) + 1
+        grid.rows = len(axis_name_array) + 1
         grid.add_widget(Label(
             text='Servo'
         ))
-        for p in self._axis_propertys:
+        for property in ScreenSettingAxis.property__data:
             label = Label()
-            data = [' | ' + p, 3, 10]
-            if len(p) <= data[2]:
-                label.text = p
-                data[2] = 0
-            label__data[label] = data
+            namev = ScreenSettingAxis.property__data[property]['namev']
+            ld = [' | ' + namev, 3, 10]
+            if len(namev) <= ld[2]:
+                label.text = namev
+                ld[2] = 0
+            label__data[label] = ld
             grid.add_widget(label)
         for i in range(grid.cols):
             for j in range(grid.rows - 1):
                 if j == 0:
                     grid.add_widget(Label(
-                        text=axiss_name[i],
-                        color=axis_color[axiss_name[i][-1]]
+                        text=axis_name_array[i],
+                        color=axis_type__color[axis_name_array[i][-1]]
                     ))
                 else:
-                    oinput = None
-                    name = 'hmi.cf.%s[%d]' % (self._axis_propertys[j - 1], axiss_index[i])
-                    value_type = app.data.block(name).type
-                    if value_type == ua.VariantType.Boolean:
-                        oinput = ToggleButton(
-                            state='normal'
-                        )
-                        oinput.bind(on_press=self._on_toggle_press)
+                    input = None
+                    property = property_array[j - 1]
+                    data = ScreenSettingAxis.property__data[property]
+                    name = 'hmi.cf.%s[%d]' % (property, axis_index_array[i])
+                    if app.data.block(name).type == ua.VariantType.Boolean:
+                        input = ToggleButton()
+                        input.focus = False
+                        input.name = name
+                        input.bind(on_press=self._on_toggle_press)
                     else:
-                        oinput = TextInput(
+                        input = UITextInputInteger(
                             halign='center',
-                            input_filter='int',
                             multiline=False
+                        ).data_set(
+                            _key_=name,
+                            _factor_=data['factor'],
+                            _validate_=self._on_text_input_validate,
+                            _focus_=None
                         )
-                        oinput.bind(on_text_validate=self._on_text_input_validate)
-                        oinput.bind(focus=self._on_text_input_focus)
-                    oinput.name = name
-                    oinput.is_focus = False
-                    name__input[name] = oinput
+                    name__input[name] = input
                     name__value[name] = None
-                    grid.add_widget(oinput)
+                    grid.add_widget(input)
         return label__data, name__input, name__value
     
     def _on_toggle_press(self, _instance_):
@@ -181,13 +187,10 @@ class ScreenSettingAxis(Screen):
         app.data.set(_instance_.name, value)
         app.m_save_need_check()
         
-    def _on_text_input_validate(self, _instance_):
+    def _on_text_input_validate(self, _instance_, _value_):
         app = App.get_running_app()
-        app.data.set(_instance_.name, int(_instance_.text))
+        app.data.set(_instance_.v_key, _value_)
         app.m_save_need_check()
-    
-    def _on_text_input_focus(self, _instance_, _value_):
-        _instance_.is_focus = _value_
     
     def _on_home_recorded_reset(self):
         app = App.get_running_app()
