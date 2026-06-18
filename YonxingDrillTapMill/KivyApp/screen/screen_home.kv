@@ -26,18 +26,23 @@
                 id: face_run
                 text: "CHẠY MẶT"
                 size_hint_x: None
-                width: 120
+                width: 110
                 on_press: app.m_face_run(True)
                 on_release: app.m_face_run(False)
-            Widget:
-            Label:
-                text: 'CẤU HÌNH'
+            Button:
+                id: face_to_org
+                text: "TỚI GỐC MẶT"
                 size_hint_x: None
-                font_size: 20
-                width: 100
-                halign: 'left'
-                valign: 'center'
-                text_size: self.size
+                width: 135
+                on_press: app.m_face_to_org(True)
+                on_release: app.m_face_to_org(False)
+            Button:
+                id: run_pump
+                text: "BƠM"
+                size_hint_x: None
+                width: 60
+                on_press: app.m_run_pump_toggle()
+            Widget:
             TextInput:
                 id: profile_name
                 size_hint_x: None

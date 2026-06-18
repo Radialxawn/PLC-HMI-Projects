@@ -42,6 +42,9 @@ class ScreenHome(Screen):
                 'hmi.face_ready',
                 'hmi.run',
                 'hmi.stop',
+                'hmi.run_pump',
+                'hmi.face_run',
+                'hmi.face_to_org',
                 'hmi.view_can_run',
                 'hmi.view_can_stop',
                 'hmi.view_work_ing',
@@ -71,13 +74,17 @@ class ScreenHome(Screen):
     
     def _value_update(self, _dt_):
         app = App.get_running_app()
-        self.ids.face_run.disabled = not app.data.get('hmi.face_ready')
-        self.ids.run.disabled = not app.data.get('hmi.view_can_run')
         self.ids.stop.disabled = not app.data.get('hmi.view_can_stop')
+        view_can_run = app.data.get('hmi.view_can_run')
+        self.ids.run.disabled = not view_can_run
+        self.ids.face_run.disabled = not view_can_run
+        self.ids.face_to_org.disabled = not view_can_run
         face_index = app.data.get('hmi.face_index')
         for i in self._index__face:
             color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
             self.ids[f'face_{i}'].background_color = color
+        run_pump = app.data.get('hmi.run_pump')
+        self.ids.run_pump.background_color = clhex("#6AA145") if run_pump == True else clhex("#5F5F5F")
 
     #################
     # LOAD AND SAVE #
@@ -156,12 +163,21 @@ class ScreenHome(Screen):
         if hasattr(self, '_profile_download_clock'):
             return
         app = App.get_running_app()
+        chunk_array = []
+        chunk_size = 15
+        counter = 0
         for index in self._index__face:
             name__value = self._index__face[index].name__value()
             for name in name__value:
                 block = app.data.block(name)
                 block.active = True
                 block.value = None
+                if counter >= chunk_size:
+                    counter = 0
+                if counter == 0:
+                    chunk_array.append({})
+                chunk_array[-1][name] = name__value[name]
+                counter += 1
         popup = Popup(
             title='TẢI XUỐNG',
             size_hint=(0.6, 0.6),
@@ -176,13 +192,14 @@ class ScreenHome(Screen):
         pdd = {
             'state': 0,
             'send_count': 0,
-            'send_count_max': len(self._index__face) * 5,
+            'send_count_max': len(chunk_array) * 5,
             'index': 0,
-            'count': len(self._index__face),
-            'match': [False] * len(self._index__face),
+            'chunk_array': chunk_array,
+            'count': len(chunk_array),
+            'match': [False] * len(chunk_array),
         }
         self._profile_download_data = SimpleNamespace(**pdd)
-        self._profile_download_progress_clock = Clock.schedule_interval(self._profile_download_progress, 0.3)
+        self._profile_download_progress_clock = Clock.schedule_interval(self._profile_download_progress, 0.1)
 
     def _profile_download_cancel(self):
         self._profile_download_data.state = 11
@@ -214,14 +231,14 @@ class ScreenHome(Screen):
                         pdd.state = 11
                     else:
                         pdd.index = si
-                        name__value = self._index__face[pdd.index].name__value()
-                        app.data.sets(list(name__value.keys()), list(name__value.values()))
+                        name__value = pdd.chunk_array[pdd.index]
+                        app.data.sets(name__value)
                         pdd.send_count += 1
                         pdd.state += 1
             case 3:
-                name__value = self._index__face[pdd.index].name__value()
-                pdd.match[pdd.index] = app.data.all(name__value)
-                ppc.progress(100 * pdd.send_count / pdd.send_count_max)
+                for i, chunk in enumerate(pdd.chunk_array):
+                    pdd.match[i] = app.data.all(chunk)
+                ppc.progress(100 * pdd.send_count / pdd.count)
                 pdd.state = 2
             case 11:
                 if all(pdd.match):

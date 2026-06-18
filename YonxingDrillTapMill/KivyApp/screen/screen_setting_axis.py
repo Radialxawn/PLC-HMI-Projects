@@ -221,9 +221,7 @@ class ScreenSettingAxis(Screen):
             value = config[name]
             if value == None:
                 continue
-            names.append(name)
-            values.append(value)
-        app.data.sets(names, values)
+            app.data.set(name, value)
         app.m_save_need_check()
 
     def _config_axis_load(self):

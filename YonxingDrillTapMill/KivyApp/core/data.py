@@ -36,13 +36,13 @@ class DataBlock(object):
     def get_ua_value(self, _value_):
         match self.type:
             case ua.VariantType.Int16:
-                _value_ = DataBlock._clamp(_value_, -32768, 32767)
+                _value_ = int(DataBlock._clamp(_value_, -32768, 32767))
             case ua.VariantType.UInt16:
-                _value_ = DataBlock._clamp(_value_, 0, 65535)
+                _value_ = int(DataBlock._clamp(_value_, 0, 65535))
             case ua.VariantType.Int32:
-                _value_ = DataBlock._clamp(_value_, -2147483648, 2147483647)
+                _value_ = int(DataBlock._clamp(_value_, -2147483648, 2147483647))
             case ua.VariantType.UInt32:
-                _value_ = DataBlock._clamp(_value_, 0, 4294967295)
+                _value_ = int(DataBlock._clamp(_value_, 0, 4294967295))
         return ua.Variant(_value_, self.type)
 
 class Data(object):
@@ -67,15 +67,6 @@ class Data(object):
         tags_path = Path(Path(__file__).resolve().parent.parent, 'tags.xml')
         tree = ET.parse(tags_path)
         root = tree.getroot()
-        stype__uatype = {
-            'T_BOOL': ua.VariantType.Boolean,
-            'T_INT': ua.VariantType.Int16,
-            'T_UINT': ua.VariantType.UInt16,
-            'T_DINT': ua.VariantType.Int32,
-            'T_UDINT': ua.VariantType.UInt32,
-            'T_STRING': ua.VariantType.String,
-            'T_STRING_GVL_c_line_size_': ua.VariantType.String,
-        }
         # user type process
         utype_last = ''
         utype__elms = {}
@@ -218,14 +209,14 @@ class Data(object):
             block = self._name__block[_name_]
             block.node.set_value(block.get_ua_value(_value_))
     
-    def sets(self, _names_, _values_):
+    def sets(self, _name__value_):
         if self._connect_state == 100:
             nodes = []
             values = []
-            for i, name in enumerate(_names_):
+            for name in _name__value_:
                 block = self._name__block[name]
                 nodes.append(self._client.get_node(block.id))
-                values.append(block.get_ua_value(_values_[i]))
+                values.append(block.get_ua_value(_name__value_[name]))
             self._client.write_values(nodes, values)
 
     def all(self, _name__value_):
