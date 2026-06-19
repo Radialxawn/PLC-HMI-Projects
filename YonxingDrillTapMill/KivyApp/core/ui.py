@@ -4,13 +4,12 @@ from kivy.uix.textinput import TextInput
 class UITextInputInteger(TextInput):
     def data_set(self, _key_, _factor_, _validate_, _focus_) -> TextInput:
         self.v_key = _key_
-        self._v_factor = _factor_
+        self._v_factor = abs(_factor_)
         self._v_validate = _validate_
         self._v_focus = _focus_
         self._v_value = 0
-        factor = abs(_factor_)
         negative = _factor_ < 0
-        if factor == 1:
+        if self._v_factor == 1:
             if negative:
                 self._v_pattern = re.compile(r'[^0-9-]')
             else:
@@ -20,7 +19,7 @@ class UITextInputInteger(TextInput):
                 self._v_pattern = re.compile(r'[^0-9.-]')
             else:
                 self._v_pattern = re.compile(r'[^0-9.]')
-        match factor:
+        match self._v_factor:
             case 1e-3:
                 self._v_format = '{:.3f}'
             case 1e-2:

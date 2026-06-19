@@ -1,7 +1,7 @@
 class Shape(object):
     key__data = {
-        'x':  {'label': 'X', 'factor': 1e-3},
-        'y':  {'label': 'Y', 'factor': 1e-3},
+        'x':  {'label': 'X', 'factor': -1e-3},
+        'y':  {'label': 'Y', 'factor': -1e-3},
         '0': None,
         'va': {'label': 'A', 'factor': 1e-3},
         'vb': {'label': 'B', 'factor': 1e-3},

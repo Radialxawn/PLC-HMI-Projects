@@ -8,47 +8,51 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from core.ui import UI, UITextInputInteger
+from kivy.utils import get_color_from_hex as clhex
 
 class ScreenSetting(Screen):
     name__data = {
         'left': None,
-        '0': 0,
         '1': 0,
-        'hmi.cf.rapid_micro_per_sec':  {'namev': 'TỐC ĐỘ TỊNH TIẾN (mm/s)', 'factor': 1e-3},
-        'hmi.cf.tap_micro_per_rev[0]': {'namev': 'BƯỚC REN TARO ĐỨNG',      'factor': 1e-3},
-        'hmi.cf.tap_micro_per_rev[1]': {'namev': 'BƯỚC REN TARO NGHIÊNG',   'factor': 1e-3},
+        'hmi.cf.rapid_micro_per_sec':  {'label': 'TỐC ĐỘ TỊNH TIẾN (mm/s)', 'type': 'rw', 'factor': 1e-3},
+        'hmi.cf.tap_micro_per_rev[0]': {'label': 'BƯỚC REN TARO ĐỨNG',      'type': 'rw', 'factor': 1e-3},
+        'hmi.cf.tap_micro_per_rev[1]': {'label': 'BƯỚC REN TARO NGHIÊNG',   'type': 'rw', 'factor': 1e-3},
         '2': 0,
-        'hmi.cf.tool_z_ox_micro[0]':   {'namev': 'X DAO ĐỨNG',              'factor': 1e-3},
-        'hmi.cf.tool_z_oy_micro[0]':   {'namev': 'Y DAO ĐỨNG',              'factor': 1e-3},
-        'hmi.cf.tool_z_base_micro[0]': {'namev': 'Z CHUẨN DAO ĐỨNG',        'factor': 1e-3},
-        'hmi.cf.tool_z_micro[0]':      {'namev': 'Z DAO ĐỨNG',              'factor': 1e-3},
+        'hmi.cf.tool_z_ox_micro[0]':   {'label': 'X CẢM BIẾN DAO ĐỨNG',     'type': 'rw', 'factor': -1e-3},
+        'hmi.cf.tool_z_oy_micro[0]':   {'label': 'Y CẢM BIẾN DAO ĐỨNG',     'type': 'rw', 'factor': -1e-3},
+        'hmi.cf.tool_z_base_micro[0]': {'label': 'Z DAO ĐỨNG CHUẨN',        'type': 'rw', 'factor': -1e-3},
+        'hmi.cf.tool_z_micro[0]':      {'label': 'Z DAO ĐỨNG',              'type': 'ro', 'factor': -1e-3},
         '3': 0,
-        'hmi.cf.tool_z_ox_micro[1]':   {'namev': 'X DAO NGANG',             'factor': 1e-3},
-        'hmi.cf.tool_z_oy_micro[1]':   {'namev': 'X DAO NGANG',             'factor': 1e-3},
-        'hmi.cf.tool_z_base_micro[1]': {'namev': 'Z CHUẨN DAO NGANG',       'factor': 1e-3},
-        'hmi.cf.tool_z_micro[1]':      {'namev': 'Z DAO NGANG',             'factor': 1e-3},
+        'hmi.cf.tool_z_ox_micro[1]':   {'label': 'X CẢM BIẾN DAO NGANG',    'type': 'rw', 'factor': -1e-3},
+        'hmi.cf.tool_z_oy_micro[1]':   {'label': 'Y CẢM BIẾN DAO NGANG',    'type': 'rw', 'factor': -1e-3},
+        'hmi.cf.tool_z_base_micro[1]': {'label': 'Z DAO NGANG CHUẨN',       'type': 'rw', 'factor': -1e-3},
+        'hmi.cf.tool_z_micro[1]':      {'label': 'Z DAO NGANG',             'type': 'ro', 'factor': -1e-3},
         '4': 0,
         'right': None,
-        '100': 0,
         '101': 0,
-        'hmi.cf.air_burst_delay_msec[0]': {'namev': 'THỜI GIAN XỊT KHÍ MẶT 1', 'factor': 1e-3},
-        'hmi.cf.air_burst_delay_msec[1]': {'namev': 'THỜI GIAN XỊT KHÍ MẶT 2', 'factor': 1e-3},
-        'hmi.cf.air_burst_delay_msec[2]': {'namev': 'THỜI GIAN XỊT KHÍ MẶT 3', 'factor': 1e-3},
-        'hmi.cf.air_burst_delay_msec[3]': {'namev': 'THỜI GIAN XỊT KHÍ MẶT 4', 'factor': 1e-3},
-        'hmi.cf.air_burst_delay_msec[4]': {'namev': 'THỜI GIAN XỊT KHÍ MẶT 5', 'factor': 1e-3},
-        'hmi.cf.air_burst_delay_msec[5]': {'namev': 'THỜI GIAN XỊT KHÍ MẶT 6', 'factor': 1e-3},
+        'hmi.cf.air_burst_delay_msec[0]': {'label': 'THỜI GIAN XỊT KHÍ MẶT 1', 'type': 'rw', 'factor': 1e-3},
+        'hmi.cf.air_burst_delay_msec[1]': {'label': 'THỜI GIAN XỊT KHÍ MẶT 2', 'type': 'rw', 'factor': 1e-3},
+        'hmi.cf.air_burst_delay_msec[2]': {'label': 'THỜI GIAN XỊT KHÍ MẶT 3', 'type': 'rw', 'factor': 1e-3},
         '102': 0,
+        'hmi.cf.air_burst_delay_msec[3]': {'label': 'THỜI GIAN XỊT KHÍ MẶT 4', 'type': 'rw', 'factor': 1e-3},
+        'hmi.cf.air_burst_delay_msec[4]': {'label': 'THỜI GIAN XỊT KHÍ MẶT 5', 'type': 'rw', 'factor': 1e-3},
+        'hmi.cf.air_burst_delay_msec[5]': {'label': 'THỜI GIAN XỊT KHÍ MẶT 6', 'type': 'rw', 'factor': 1e-3},
         '103': 0,
         '104': 0,
+        'hmi.view_axis_tmp_micro[0]': {'label': 'VỊ TRÍ TRỤC X MẶT {}', 'type': 'ro', 'factor': -1e-3},
+        'hmi.view_axis_tmp_micro[1]': {'label': 'VỊ TRÍ TRỤC Y MẶT {}', 'type': 'ro', 'factor': -1e-3},
         '105': 0,
         '106': 0,
         '107': 0,
-        '108': 0,
-        '109': 0,
     }
 
     def __init__(self, **kvargs):
         super(ScreenSetting, self).__init__(**kvargs)
+        for i in range(6):
+            button = self.ids[f'face_{i}']
+            button.text = f'MẶT {i+1}'
+            button.face_index = i
+        self._face_index = -1
         self._first_load = True
     
     def on_pre_enter(self, *args):
@@ -61,6 +65,8 @@ class ScreenSetting(Screen):
                 'hmi.cfsh.decline',
                 'hmi.view_can_home',
                 'hmi.home',
+                'hmi.face_index',
+                'hmi.run_tool_setter',
             }
             self._name__input, self._name__value = self._generate()
 
@@ -80,17 +86,14 @@ class ScreenSetting(Screen):
                 side.add_widget(Widget())
                 continue
             box = BoxLayout(
-                orientation='horizontal',
-                size_hint_y=None,
-                height=40,
+                orientation='horizontal'
             )
             label = Label(
-                text=data['namev'],
+                text=data['label'],
                 halign='left',
                 valign='center'
             )
             label.bind(size=label.setter('text_size'))
-            box.add_widget(label)
             input = UITextInputInteger(
                 halign='center',
                 multiline=False
@@ -100,8 +103,11 @@ class ScreenSetting(Screen):
                 _validate_=self._on_text_input_validate,
                 _focus_=None
             )
+            input.disabled = data['type'] == 'ro'
+            input.v_label = label
             name__input[name] = input
             name__value[name] = None
+            box.add_widget(label)
             box.add_widget(input)
             side.add_widget(box)
         return name__input, name__value
@@ -110,7 +116,7 @@ class ScreenSetting(Screen):
         app = App.get_running_app()
         app.data.block_active(self._name__hash, self._name__input)
         if not hasattr(self, '_value_update_clock'):
-            self._value_update_clock = Clock.schedule_interval(self._value_update, 0.2)
+            self._value_update_clock = Clock.schedule_interval(self._value_update, 0.1)
 
     def on_leave(self, *args):
         if hasattr(self, '_value_update_clock'):
@@ -142,3 +148,22 @@ class ScreenSetting(Screen):
         self.ids['hmi.cfsh.accept'].disabled = not need
         self.ids['hmi.cfsh.decline'].disabled = not need
         self.ids['hmi.home'].disabled = not app.data.get('hmi.view_can_home')
+        face_index = app.data.get('hmi.face_index')
+        if face_index != None and face_index != self._face_index:
+            self._face_index = face_index
+            for i in range(6):
+                color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
+                self.ids[f'face_{i}'].background_color = color
+            for i in range(2):
+                name = f'hmi.view_axis_tmp_micro[{i}]'
+                data = ScreenSetting.name__data[name]
+                self._name__input[name].v_label.text = data['label'].format(face_index + 1)
+    
+    def _face_select(self, _instance_):
+        app = App.get_running_app()
+        face_index = _instance_.face_index
+        app.data.set('hmi.face_index', face_index)
+    
+    def _run_tool_setter(self, _value_):
+        app = App.get_running_app()
+        app.data.set('hmi.run_tool_setter', _value_)

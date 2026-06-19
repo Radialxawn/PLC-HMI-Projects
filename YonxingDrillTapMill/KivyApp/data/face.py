@@ -2,9 +2,9 @@ from data.shape import Shape
 
 class Face(object):
     key__data = {
-        'ox':     {'label': 'X',               'factor': 1e-3},
-        'oy':     {'label': 'Y',               'factor': 1e-3},
-        'oz':     {'label': 'Z',               'factor': 1e-3},
+        'ox':     {'label': 'X',               'factor': -1e-3},
+        'oy':     {'label': 'Y',               'factor': -1e-3},
+        'oz':     {'label': 'Z',               'factor': -1e-3},
         'tool_d': {'label': 'ĐƯỜNG KÍNH DAO',  'factor': 1e-3},
         'depth':  {'label': 'ĐỘ SÂU',          'factor': 1e-3},
         'feed':   {'label': 'TỐC ĐỘ (mm/min)', 'factor': 1},

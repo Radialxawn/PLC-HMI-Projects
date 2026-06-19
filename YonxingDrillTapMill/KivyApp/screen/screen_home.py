@@ -32,6 +32,7 @@ class ScreenHome(Screen):
             button.cnc_index = i
         self._draw = Draw(1e-3, [0.1e-3, 5e-3])
         self.ids.profile_name.input_filter = UI.filter_file_name
+        self._face_index = -1
         self._first_load = True
     
     def on_pre_enter(self, *args):
@@ -80,9 +81,11 @@ class ScreenHome(Screen):
         self.ids.face_run.disabled = not view_can_run
         self.ids.face_to_org.disabled = not view_can_run
         face_index = app.data.get('hmi.face_index')
-        for i in self._index__face:
-            color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
-            self.ids[f'face_{i}'].background_color = color
+        if face_index != self._face_index:
+            self._face_index = face_index
+            for i in range(6):
+                color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
+                self.ids[f'face_{i}'].background_color = color
     
     def m_run(self, _value_):
         app = App.get_running_app()
@@ -367,8 +370,8 @@ class ScreenHome(Screen):
                 x, y = self._draw.pixel_to_micro(_area_.pos[0]+_area_padding_x_, _area_.center_y)
                 x += machine_face['x']
                 y += machine_face['y']
-                x += face.ox * machine_face['dir_x']
-                y += face.oy * machine_face['dir_y']
+                x += face.ox
+                y += face.oy
                 self._draw.face(face, [x, y])
         return
         if self._index__face_cog[_face_indexs_[0]] == None:
@@ -383,7 +386,6 @@ class ScreenHome(Screen):
         app = App.get_running_app()
         face_index = _instance_.face_index
         app.data.set('hmi.face_index', face_index)
-        app.data.block_active(self._name__hash)
         face = self._index__face[face_index]
         for name in face.name__value():
             app.data.block(name).active = True
