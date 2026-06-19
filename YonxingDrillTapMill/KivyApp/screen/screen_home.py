@@ -42,12 +42,12 @@ class ScreenHome(Screen):
                 'hmi.face_ready',
                 'hmi.run',
                 'hmi.stop',
-                'hmi.run_pump',
                 'hmi.face_run',
                 'hmi.face_to_org',
                 'hmi.view_can_run',
                 'hmi.view_can_stop',
                 'hmi.view_work_ing',
+                'hmi.view_run_pump',
             }
             self._index__face, self._index__face_cog = self._generate()
             self.ids.area_top.bind(pos=self._update_canvas_area_top, size=self._update_canvas_area_top)
@@ -83,8 +83,22 @@ class ScreenHome(Screen):
         for i in self._index__face:
             color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
             self.ids[f'face_{i}'].background_color = color
-        run_pump = app.data.get('hmi.run_pump')
-        self.ids.run_pump.background_color = clhex("#6AA145") if run_pump == True else clhex("#5F5F5F")
+    
+    def m_run(self, _value_):
+        app = App.get_running_app()
+        app.data.set('hmi.run', _value_)
+    
+    def m_stop(self, _value_):
+        app = App.get_running_app()
+        app.data.set('hmi.stop', _value_)
+    
+    def m_face_run(self, _value_):
+        app = App.get_running_app()
+        app.data.set('hmi.face_run', _value_)
+    
+    def m_face_to_org(self, _value_):
+        app = App.get_running_app()
+        app.data.set('hmi.face_to_org', _value_)
 
     #################
     # LOAD AND SAVE #

@@ -2,12 +2,12 @@ from data.shape import Shape
 
 class Face(object):
     key__data = {
-        'ox':     {'namev': 'X',               'factor': 1e-3},
-        'oy':     {'namev': 'Y',               'factor': 1e-3},
-        'oz':     {'namev': 'Z',               'factor': 1e-3},
-        'tool_d': {'namev': 'ĐƯỜNG KÍNH DAO',  'factor': 1e-3},
-        'depth':  {'namev': 'ĐỘ SÂU',          'factor': 1e-3},
-        'feed':   {'namev': 'TỐC ĐỘ (mm/min)', 'factor': 1},
+        'ox':     {'label': 'X',               'factor': 1e-3},
+        'oy':     {'label': 'Y',               'factor': 1e-3},
+        'oz':     {'label': 'Z',               'factor': 1e-3},
+        'tool_d': {'label': 'ĐƯỜNG KÍNH DAO',  'factor': 1e-3},
+        'depth':  {'label': 'ĐỘ SÂU',          'factor': 1e-3},
+        'feed':   {'label': 'TỐC ĐỘ (mm/min)', 'factor': 1},
     }
 
     def __init__(self, _index_, _z_count_, _shape_count_):

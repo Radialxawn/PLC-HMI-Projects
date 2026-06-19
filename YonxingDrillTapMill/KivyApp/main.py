@@ -96,25 +96,8 @@ class Main(App):
     def m_save_need_check(self):
         self.data.set('hmi.cfsh.need_check', True)
     
-    def m_run(self, _value_):
-        self.data.set('hmi.run', _value_)
-    
-    def m_stop(self, _value_):
-        self.data.set('hmi.stop', _value_)
-
     def m_home(self):
         self.data.set('hmi.home', True)
-    
-    def m_face_run(self, _value_):
-        self.data.set('hmi.face_run', _value_)
-    
-    def m_face_to_org(self, _value_):
-        self.data.set('hmi.face_to_org', _value_)
-
-    def m_run_pump_toggle(self):
-        name = 'hmi.run_pump'
-        value = self.data.get(name)
-        self.data.set(name, not value)
     
     def m_show_popup_confirm(self, _message_, _confirm_):
         popup = Popup(

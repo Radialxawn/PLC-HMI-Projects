@@ -36,7 +36,7 @@ class PopupShape(Screen):
         for data in Shape.shape_name__data.values():    
             datas.append(data)
         datas.sort(key=lambda s: s['id'])
-        shape_id_selector.values = [d['namev'] for d in datas]
+        shape_id_selector.values = [d['label'] for d in datas]
         self.ids.shape_property.width = 180
         for key in Shape.key__data:
             data = Shape.key__data[key]
@@ -49,7 +49,7 @@ class PopupShape(Screen):
                 height=40,
             )
             label = Label(
-                text=data['namev'],
+                text=data['label'],
                 size_hint_x=None,
                 width=30
             )
@@ -81,7 +81,7 @@ class PopupShape(Screen):
             return
         for name in Shape.shape_name__data:
             data = Shape.shape_name__data[name]
-            if _instance_.text == data['namev']:
+            if _instance_.text == data['label']:
                 self._shape_edit.id = data['id']
                 break
         self._shape_id_changed = True

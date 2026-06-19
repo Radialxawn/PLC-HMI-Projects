@@ -13,35 +13,29 @@
                 text: "CHẠY"
                 size_hint_x: None
                 width: 70
-                on_press: app.m_run(True)
-                on_release: app.m_run(False)
+                on_press: root.m_run(True)
+                on_release: root.m_run(False)
             Button:
                 id: stop
                 text: "DỪNG"
                 size_hint_x: None
                 width: 70
-                on_press: app.m_stop(True)
-                on_release: app.m_stop(False)
+                on_press: root.m_stop(True)
+                on_release: root.m_stop(False)
             Button:
                 id: face_run
                 text: "CHẠY MẶT"
                 size_hint_x: None
                 width: 110
-                on_press: app.m_face_run(True)
-                on_release: app.m_face_run(False)
+                on_press: root.m_face_run(True)
+                on_release: root.m_face_run(False)
             Button:
                 id: face_to_org
                 text: "TỚI GỐC MẶT"
                 size_hint_x: None
                 width: 135
-                on_press: app.m_face_to_org(True)
-                on_release: app.m_face_to_org(False)
-            Button:
-                id: run_pump
-                text: "BƠM"
-                size_hint_x: None
-                width: 60
-                on_press: app.m_run_pump_toggle()
+                on_press: root.m_face_to_org(True)
+                on_release: root.m_face_to_org(False)
             Widget:
             TextInput:
                 id: profile_name

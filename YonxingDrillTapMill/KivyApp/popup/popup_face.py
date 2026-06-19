@@ -40,7 +40,7 @@ class PopupFace(Screen):
                 height=40,
             )
             label = Label(
-                text=data['namev'],
+                text=data['label'],
                 size_hint_x=None,
                 width=180
             )

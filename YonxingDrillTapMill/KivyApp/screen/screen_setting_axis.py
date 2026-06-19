@@ -27,18 +27,18 @@ class ScreenSettingAxis(Screen):
     }
 
     property__data = {
-        'max_rpm':                        {'namev': 'Max RPM',               'factor': 1},
-        'gear_num':                       {'namev': 'Gear num',              'factor': 1},
-        'gear_den':                       {'namev': 'Gear den',              'factor': 1},
-        'gear_dir':                       {'namev': 'Gear dir',              'factor': 1},
-        'home_torque_mNm':                {'namev': 'Home torque',           'factor': 1e-3},
-        'home_encoder_value':             {'namev': 'Home encoder',          'factor': 1},
-        'max_micro':                      {'namev': 'Max travel',            'factor': 1e-3},
-        'overload_hold_torque_factor':    {'namev': 'Hold torque factor',    'factor': 1e-3},
-        'overload_hold_torque_time_msec': {'namev': 'Hold torque time',      'factor': 1e-3},
-        'overload_instant_torque_factor': {'namev': 'Instant torque factor', 'factor': 1e-3},
-        'ramp_time_msec':                 {'namev': 'Ramp time',             'factor': 1e-3},
-        'jerk_factor':                    {'namev': 'Jerk',                  'factor': 1},
+        'max_rpm':                        {'label': 'Max RPM',               'factor': 1},
+        'gear_num':                       {'label': 'Gear num',              'factor': 1},
+        'gear_den':                       {'label': 'Gear den',              'factor': 1},
+        'gear_dir':                       {'label': 'Gear dir',              'factor': 1},
+        'home_torque_mNm':                {'label': 'Home torque',           'factor': 1e-3},
+        'home_encoder_value':             {'label': 'Home encoder',          'factor': 1},
+        'max_micro':                      {'label': 'Max travel',            'factor': 1e-3},
+        'overload_hold_torque_factor':    {'label': 'Hold torque factor',    'factor': 1e-3},
+        'overload_hold_torque_time_msec': {'label': 'Hold torque time',      'factor': 1e-3},
+        'overload_instant_torque_factor': {'label': 'Instant torque factor', 'factor': 1e-3},
+        'ramp_time_msec':                 {'label': 'Ramp time',             'factor': 1e-3},
+        'jerk_factor':                    {'label': 'Jerk',                  'factor': 1},
     }
 
     def __init__(self, **kvargs):
@@ -142,12 +142,12 @@ class ScreenSettingAxis(Screen):
         ))
         for property in ScreenSettingAxis.property__data:
             label = Label()
-            namev = ScreenSettingAxis.property__data[property]['namev']
-            ld = [' | ' + namev, 3, 10]
-            if len(namev) <= ld[2]:
-                label.text = namev
-                ld[2] = 0
-            label__data[label] = ld
+            labelv = ScreenSettingAxis.property__data[property]['label']
+            labeld = [' | ' + labelv, 3, 10]
+            if len(labelv) <= labeld[2]:
+                label.text = labelv
+                labeld[2] = 0
+            label__data[label] = labeld
             grid.add_widget(label)
         for i in range(grid.cols):
             for j in range(grid.rows - 1):
