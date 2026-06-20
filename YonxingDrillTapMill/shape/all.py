@@ -1,11 +1,15 @@
 shape = {
 	'drill': [
-		'N0 G1 Z$VA$',
-		'N1 G0 Z0',
+		'LET #f : LREAL := $VB$/60.0'
+		'N0 F#f',
+		'N1 G1 Z-$VA$',
+		'N2 G0 Z0',
 	],
 	'tap': [
-		'N0 G1 Z$VA$',
-		'N1 G0 Z0',
+		'LET #f : LREAL := $VB$/60.0'
+		'N0 F#f',
+		'N1 G1 Z-$VA$',
+		'N2 G1 Z0',
 	],
 	'circle' : [
 		'LET #r : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',

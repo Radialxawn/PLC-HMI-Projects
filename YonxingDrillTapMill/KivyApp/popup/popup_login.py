@@ -1,20 +1,19 @@
 from kivy.app import App
-from kivy.uix.screenmanager import Screen
+from kivy.uix.popup import Popup
 
-class PopupLogin(Screen):
-    def __init__(self, _instance_, _password_, _screen_, **kwargs):
-        super().__init__(**kwargs)
-        self._instance_ = _instance_
+class PopupLogin(Popup):
+    def set_data(self, _password_, _screen_):
         self._password_ = _password_
         self._screen_ = _screen_
+        return self
 
     def _cancel(self):
-        self._instance_.dismiss()
+        self.dismiss()
 
     def _confirm(self, _input_):
         if _input_.text == self._password_:
             App.get_running_app().root.current = self._screen_
-            self._instance_.dismiss()
+            self.dismiss()
         else:
             _input_.text = ''
             _input_.hint_text = 'SAI MẬT KHẨU'
@@ -22,4 +21,4 @@ class PopupLogin(Screen):
     def _password_on_text(self, _input_):
         if _input_.text == self._password_:
             App.get_running_app().root.current = self._screen_
-            self._instance_.dismiss()
+            self.dismiss()

@@ -15,47 +15,66 @@ from data.face import Face
 from core.ui import UITextInputInteger
 from kivy.utils import get_color_from_hex as clhex
 
-class PopupFace(Screen):
-    def __init__(self, _instance_, _face_, _apply_, _delete_, **kwargs):
-        super().__init__(**kwargs)
-        self._instance_ = _instance_
+class PopupFace(Popup):
+    def set_data(self, _face_, _rule_, _apply_, _delete_):
         _face_.limit()
         self._face_ = _face_
         self._face_edit = _face_.clone()
+        self._rule_ = _rule_
         self._apply_ = _apply_
         self._delete_ = _delete_
         self._draw = Draw(1e-3, [0.5e-3, 10e-3])
         self._mouse = Mouse()
-        self._generate()
+        self._name__input_view, self._name__value = self._generate()
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
+        return self
 
     def _generate(self):
+        name__input_view, name__value = {}, {}
         self.ids.face_property.add_widget(Widget())
-        self.ids.face_property.width = 320
-        for key in Face.key__data:
-            data = Face.key__data[key]
+        self.ids.face_property.width = 380
+        for property in Face.property__data:
+            data = Face.property__data[property]
             box = BoxLayout(
                 orientation='horizontal',
                 size_hint_y=None,
-                height=40,
+                height=35,
             )
             label = Label(
                 text=data['label'],
                 size_hint_x=None,
+                halign='left',
+                valign='center',
                 width=180
             )
+            label.bind(size=label.setter('text_size'))
             box.add_widget(label)
             input = UITextInputInteger(
                 halign='center',
                 multiline=False
             ).data_set(
-                _key_=key,
+                _key_=property,
                 _factor_=data['factor'],
                 _validate_=self._on_text_input_validate,
                 _focus_=None
             )
-            input.v_value_set(self._face_edit[key])
+            input.v_value_set(self._face_edit[property])
+            input.disabled = property in self._rule_['property_exclude']
             box.add_widget(input)
+            if 'name_view' in data and not input.disabled:
+                input_view = UITextInputInteger(
+                    halign='center',
+                    multiline=False
+                ).data_set(
+                    _key_=data['name_view'].format(self._face_edit.index_get()),
+                    _factor_=data['factor'],
+                    _validate_=None,
+                    _focus_=None
+                )
+                input_view.disabled = True
+                box.add_widget(input_view)
+                name__input_view[input_view.v_key] = input_view
+                name__value[input_view.v_key] = None
             self.ids.face_property.add_widget(box)
         self.ids.face_property.add_widget(Widget())
         for i in range(len(self._face_edit.z)):
@@ -63,7 +82,7 @@ class PopupFace(Screen):
                 orientation='horizontal',
                 size_hint_y=None,
                 spacing=5,
-                height=40,
+                height=35,
             )
             zlabel = Label(
                 text=f'Z{i+1}',
@@ -101,6 +120,38 @@ class PopupFace(Screen):
             box.add_widget(zsinput)
             self.ids.face_property.add_widget(box)
         self.ids.face_property.add_widget(Widget())
+        return name__input_view, name__value
+
+    def on_open(self, *args):
+        if not hasattr(self, '_value_update_clock'):
+            self._value_update_clock = Clock.schedule_interval(self._value_update, 0.1)
+
+    def on_dismiss(self, *args):
+        if hasattr(self, '_value_update_clock'):
+            Clock.unschedule(self._value_update_clock)
+            delattr(self, '_value_update_clock')
+    
+    def _face_run(self, _value_):
+        app = App.get_running_app()
+        app.data.set('hmi.face_run', _value_)
+    
+    def _face_to_org(self, _value_):
+        app = App.get_running_app()
+        app.data.set('hmi.face_to_org', _value_)
+
+    def _value_update(self, _dt_):
+        app = App.get_running_app()
+        for name in self._name__input_view:
+            input_view = self._name__input_view[name]
+            block = app.data.block(name)
+            value = self._name__value[name]
+            if value == block.value:
+                continue
+            self._name__value[name] = block.value
+            input_view.v_value_set(block.value)
+        view_can_run = app.data.get('hmi.view_can_run')
+        self.ids.face_run.disabled = not view_can_run
+        self.ids.face_to_org.disabled = not view_can_run
 
     def _on_text_input_validate(self, _instance_, _value_):
         changed = False
@@ -121,22 +172,24 @@ class PopupFace(Screen):
         self._face_edit.limit()
         self._face_.copy(self._face_edit)
         self._apply_()
-        self._instance_.dismiss()
+        self.dismiss()
     
     def _delete(self):
         self._delete_()
-        self._instance_.dismiss()
+        self.dismiss()
 
     def _cancel(self):
-        self._instance_.dismiss()
+        self.dismiss()
     
     ##############
     # SHAPE EDIT #
     ##############
 
     def on_touch_down(self, touch):
+        self._mouse.drag = False
+        self._mouse.selected_object = None
         self._mouse.down_time_sec = Clock.get_time()
-        dxp, dyp, inside = self._draw.touch_pos_to_center_of_widget(self, self.ids.area, touch.pos)
+        dxp, dyp, inside = self._draw.touch_pos_to_center_of_widget(self.ids.area, touch.pos)
         if inside:
             changed = False
             match touch.button:
@@ -163,8 +216,8 @@ class PopupFace(Screen):
                     self._mouse.drag_offset = self._draw.offset_pixel
             if changed:
                 self._face_draw()
-        else:
-            return super().on_touch_down(touch)
+            return True
+        return super().on_touch_down(touch)
     
     def on_touch_move(self, touch):
         if self._mouse.drag == True:
@@ -184,6 +237,7 @@ class PopupFace(Screen):
                     dyp = touch.pos[1] - self._mouse.drag_begin[1] + self._mouse.drag_offset[1]
                     self._draw.offset_pixel = [dxp, dyp]
                     self._face_draw()
+            return True
         return super().on_touch_down(touch)
 
     def on_touch_up(self, touch):
@@ -197,8 +251,7 @@ class PopupFace(Screen):
                             shape.x = pos[0]
                             shape.y = pos[1]
                         self._shape_open(shape)
-        self._mouse.drag = False
-        self._mouse.selected_object = None
+                return True
         return super().on_touch_up(touch)
     
     def _face_draw(self):
@@ -242,15 +295,10 @@ class PopupFace(Screen):
         return None
     
     def _shape_open(self, _shape_):
-        popup = Popup(
-            title='BIÊN DẠNG',
-            size_hint=(0.8, 0.8),
-            auto_dismiss=False,
-        )
-        popup.content = PopupShape(
-            _instance_=popup,
+        popup = PopupShape().set_data(
             _shape_=_shape_,
+            _rule_=self._rule_,
             _apply_=self._shape_apply,
             _delete_=self._shape_delete
-            )
+        )
         popup.open()

@@ -1,14 +1,13 @@
-from kivy.uix.screenmanager import Screen
+from kivy.uix.popup import Popup
 
-class PopupConfirm(Screen):
-    def __init__(self, _instance_, _confirm_, **kwargs):
-        super().__init__(**kwargs)
-        self._instance_ = _instance_
+class PopupConfirm(Popup):
+    def set_data(self, _confirm_):
         self._confirm_ = _confirm_
+        return self
 
     def _confirm(self):
         self._confirm_()
-        self._instance_.dismiss()
+        self.dismiss()
 
     def _cancel(self):
-        self._instance_.dismiss()
+        self.dismiss()

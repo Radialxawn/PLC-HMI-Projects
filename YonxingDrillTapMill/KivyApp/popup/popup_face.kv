@@ -1,5 +1,7 @@
 #:import hex kivy.utils.get_color_from_hex
 <PopupFace>:
+    size_hint: 0.9, 0.9
+    auto_dismiss: False
     BoxLayout:
         orientation: 'vertical'
         Widget:
@@ -35,12 +37,26 @@
                 size_hint_x: None
                 width: 120
                 on_release: root._delete()
-            Widget:
             Button:
                 text: 'ÁP DỤNG'
                 size_hint_x: None
                 width: 120
                 on_release: root._apply()
+            Widget:
+            Button:
+                id: face_to_org
+                text: "TIẾN TỚI GỐC"
+                size_hint_x: None
+                width: 135
+                on_press: root._face_to_org(True)
+                on_release: root._face_to_org(False)
+            Button:
+                id: face_run
+                text: "CHẠY MẶT"
+                size_hint_x: None
+                width: 110
+                on_press: root._face_run(True)
+                on_release: root._face_run(False)
             Widget:
             Button:
                 text: 'THOÁT'

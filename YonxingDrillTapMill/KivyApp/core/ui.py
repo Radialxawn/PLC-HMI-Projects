@@ -34,7 +34,8 @@ class UITextInputInteger(TextInput):
     
     def _v_on_validate(self, _instance_):
         self._v_value = self._v_parse(_instance_.text)
-        self._v_validate(_instance_, self.v_value_get())
+        if self._v_validate != None:
+            self._v_validate(_instance_, self.v_value_get())
     
     def _v_on_focus(self, _instance_, _value_):
         if self._v_focus != None:

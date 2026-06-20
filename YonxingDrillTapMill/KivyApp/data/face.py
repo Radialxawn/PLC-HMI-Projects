@@ -1,13 +1,23 @@
 from data.shape import Shape
 
 class Face(object):
-    key__data = {
-        'ox':     {'label': 'X',               'factor': -1e-3},
-        'oy':     {'label': 'Y',               'factor': -1e-3},
-        'oz':     {'label': 'Z',               'factor': -1e-3},
-        'tool_d': {'label': 'ĐƯỜNG KÍNH DAO',  'factor': 1e-3},
-        'depth':  {'label': 'ĐỘ SÂU',          'factor': 1e-3},
-        'feed':   {'label': 'TỐC ĐỘ (mm/min)', 'factor': 1},
+    property__data = {
+        'ox':            {'label': ' GỐC X',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[0]'},
+        'oy':            {'label': ' GỐC Y',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[1]'},
+        'oz':            {'label': ' GỐC Z',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[2]'},
+        'tool_diameter': {'label': ' ĐƯỜNG KÍNH DAO',  'factor': 1e-3},
+        'tool_offset':   {'label': ' DAO LỆCH CHUẨN',  'factor': 1e-3,  'name_view': 'hmi.view_tool_offset_micro[{}]'},
+        'depth':         {'label': ' ĐỘ SÂU MẶC ĐỊNH', 'factor': 1e-3},
+        'feed':          {'label': ' TỐC ĐỘ (mm/min)', 'factor': 1},
+    }
+
+    index__rule = {
+        0: {'property_exclude': [],                    'shape_exclude': ['tap']},
+        1: {'property_exclude': [],                    'shape_exclude': ['tap']},
+        2: {'property_exclude': ['tool_offset'],       'shape_exclude': ['tap']},
+        3: {'property_exclude': ['oy', 'tool_diameter', 'tool_offset'], 'shape_include': ['drill']},
+        4: {'property_exclude': ['tool_diameter','tool_offset'],        'shape_include': ['tap']},
+        5: {'property_exclude': ['oy', 'tool_diameter', 'tool_offset'], 'shape_include': ['tap']},
     }
 
     def __init__(self, _index_, _z_count_, _shape_count_):
@@ -17,7 +27,8 @@ class Face(object):
         self.oz = 0
         self.z = [0]*_z_count_
         self.zs = [0]*_z_count_
-        self.tool_d = 0
+        self.tool_diameter = 0
+        self.tool_offset = 0
         self.depth = 0
         self.feed = 0
         self.shape = []
@@ -85,7 +96,7 @@ class Face(object):
             self.z[i] = max(0, v)
         for i, v in enumerate(self.zs):
             self.zs[i] = max(0, v)
-        self.tool_d = max(0, self.tool_d)
+        self.tool_diameter = max(0, self.tool_diameter)
         self.depth = max(0, self.depth)
         self.feed = max(1, self.feed)
         for shape in self.shape:
@@ -109,3 +120,6 @@ class Face(object):
             elif k[0] != '_':
                 n__v[f'{head}.{k}'] = v
         return n__v
+
+    def index_get(self):
+        return self._index

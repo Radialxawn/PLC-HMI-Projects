@@ -100,45 +100,24 @@ class Main(App):
         self.data.set('hmi.home', True)
     
     def m_show_popup_confirm(self, _message_, _confirm_):
-        popup = Popup(
-            title="XÁC NHẬN",
-            size_hint=(None, None),
-            size=(480, 240),
-            auto_dismiss=False
-        )
-        popup.content = PopupConfirm(
-            _instance_=popup,
+        popup = PopupConfirm().set_data(
             _confirm_=_confirm_
         )
-        popup.content.ids['message'].text = _message_
+        popup.ids['message'].text = _message_
         popup.open()
     
     def m_show_popup_login(self, _password_, _screen_):
-        popup = Popup(
-            title="ĐĂNG NHẬP",
-            size_hint=(None, None),
-            size=(480, 240),
-            auto_dismiss=False
-        )
-        popup.content = PopupLogin(
-            _instance_=popup,
-            _password_=_password_,
+        popup = PopupLogin().set_data(
+            _password_=_password_,  
             _screen_=_screen_
         )
         popup.open()
     
     def m_show_popup_error(self, _message_, _acknowledge_):
-        popup = Popup(
-            title="LỖI",
-            size_hint=(None, None),
-            size=(480, 240),
-            auto_dismiss=False
-        )
-        popup.content = PopupError(
-            _instance_=popup,
+        popup = PopupError().set_data(
             _acknowledge_=_acknowledge_
         )
-        popup.content.ids['message'].text = _message_
+        popup.ids.message.text = _message_
         popup.open()
 
 if __name__ == '__main__':

@@ -1,34 +1,44 @@
 class Shape(object):
-    key__data = {
-        'x':  {'label': 'X', 'factor': -1e-3},
-        'y':  {'label': 'Y', 'factor': -1e-3},
+    property__data = {
+        'x':  {'label': ' X', 'factor': -1e-3},
+        'y':  {'label': ' Y', 'factor': -1e-3},
         '0': None,
-        'va': {'label': 'A', 'factor': 1e-3},
-        'vb': {'label': 'B', 'factor': 1e-3},
-        'vc': {'label': 'C', 'factor': 1e-3},
-        'vd': {'label': 'D', 'factor': 1e-3},
-        've': {'label': 'E', 'factor': 1e-3},
+        'va': {'label': ' A', 'factor': 1e-3},
+        'vb': {'label': ' B', 'factor': 1e-3},
+        'vc': {'label': ' C', 'factor': 1e-3},
+        'vd': {'label': ' D', 'factor': 1e-3},
+        've': {'label': ' E', 'factor': 1e-3},
     }
 
     shape_name__data = {
-        'none':     {'id': 0,  'label': '...',     'sp': []},
-        'drill':    {'id': 1,  'label': 'KHOAN',   'sp': ['x', 'y', 'va', 'vb']},
-        'tap':      {'id': 2,  'label': 'TARO',    'sp': ['x', 'y', 'va', 'vb']},
-        'circle':   {'id': 3,  'label': 'TRÒN',    'sp': ['x', 'y', 'va']},
-        'rect':     {'id': 4,  'label': 'HỘP',     'sp': ['x', 'y', 'va', 'vb']},
-        'capsule':  {'id': 5,  'label': 'NANG',    'sp': ['x', 'y', 'va', 'vb']},
-        'rectr':    {'id': 6,  'label': 'HỘP BO',  'sp': ['x', 'y', 'va', 'vb', 'vc']},
-        'ellipse':  {'id': 7,  'label': 'BẦU DỤC', 'sp': ['x', 'y', 'va', 'vb']},
-        'locka':    {'id': 8,  'label': 'KHOÁ 1A', 'sp': ['x', 'y', 'va', 'vb', 'vc']},
-        'lockaf':   {'id': 9,  'label': 'KHOÁ 1B', 'sp': ['x', 'y', 'va', 'vb', 'vc']},
-        'lockb':    {'id': 10, 'label': 'KHOÁ 2A', 'sp': ['x', 'y', 'va', 'vb', 'vc', 'vd']},
-        'lockbf':   {'id': 11, 'label': 'KHOÁ 2B', 'sp': ['x', 'y', 'va', 'vb', 'vc', 'vd']},
-        'custom_0': {'id': 12, 'label': 'CNC 1',   'sp': ['x', 'y']},
-        'custom_1': {'id': 13, 'label': 'CNC 2',   'sp': ['x', 'y']},
-        'custom_2': {'id': 14, 'label': 'CNC 3',   'sp': ['x', 'y']},
-        'custom_3': {'id': 15, 'label': 'CNC 4',   'sp': ['x', 'y']},
-        'custom_4': {'id': 16, 'label': 'CNC 5',   'sp': ['x', 'y']},
-        'custom_5': {'id': 17, 'label': 'CNC 6',   'sp': ['x', 'y']},
+        'none':     {'id': 0,  'label': '...',     'property__data': {}},
+        'drill':    {'id': 1,  'label': 'KHOAN',   'property__data': {'x': None, 'y': None,
+                'va': ' Z',
+                'vb': ' F'
+            },
+            'view_micro': 100_000
+        },
+        'tap':      {'id': 2,  'label': 'TARO',    'property__data': {'x': None, 'y': None,
+                'va': ' Z',
+                'vb': ' F'
+            },
+            'view_micro': 100_000
+        },
+        'circle':   {'id': 3,  'label': 'TRÒN',    'property__data': {'x': None, 'y': None, 'va': None}},
+        'rect':     {'id': 4,  'label': 'HỘP',     'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
+        'capsule':  {'id': 5,  'label': 'NANG',    'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
+        'rectr':    {'id': 6,  'label': 'HỘP BO',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
+        'ellipse':  {'id': 7,  'label': 'BẦU DỤC', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
+        'locka':    {'id': 8,  'label': 'KHOÁ 1A', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
+        'lockaf':   {'id': 9,  'label': 'KHOÁ 1B', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
+        'lockb':    {'id': 10, 'label': 'KHOÁ 2A', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
+        'lockbf':   {'id': 11, 'label': 'KHOÁ 2B', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
+        'custom_0': {'id': 12, 'label': 'CNC 1',   'property__data': {'x': None, 'y': None,}},
+        'custom_1': {'id': 13, 'label': 'CNC 2',   'property__data': {'x': None, 'y': None,}},
+        'custom_2': {'id': 14, 'label': 'CNC 3',   'property__data': {'x': None, 'y': None,}},
+        'custom_3': {'id': 15, 'label': 'CNC 4',   'property__data': {'x': None, 'y': None,}},
+        'custom_4': {'id': 16, 'label': 'CNC 5',   'property__data': {'x': None, 'y': None,}},
+        'custom_5': {'id': 17, 'label': 'CNC 6',   'property__data': {'x': None, 'y': None,}},
     }
 
     def __init__(self):
@@ -98,9 +108,11 @@ class Shape(object):
             case 0: # none
                 return False
             case 1: # drill
-                return Shape._inside_local_circle(dx, dy, self.va*0.5)
+                sa = Shape.shape_name__data['drill']['view_micro']
+                return Shape._inside_local_circle(dx, dy, sa*0.5)
             case 2: # tap
-                return Shape._inside_local_circle(dx, dy, self.va*0.5)
+                sa = Shape.shape_name__data['tap']['view_micro']
+                return Shape._inside_local_circle(dx, dy, sa*0.5)
             case 3: # circle
                 return Shape._inside_local_circle(dx, dy, self.va*0.5)
             case 4: # rect

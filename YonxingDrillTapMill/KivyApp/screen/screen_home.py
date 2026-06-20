@@ -49,6 +49,11 @@ class ScreenHome(Screen):
                 'hmi.view_can_stop',
                 'hmi.view_work_ing',
                 'hmi.view_run_pump',
+                'hmi.view_axis_tmp_micro[0]',
+                'hmi.view_axis_tmp_micro[1]',
+                'hmi.view_axis_tmp_micro[2]',
+                'hmi.view_tool_offset_micro[0]',
+                'hmi.view_tool_offset_micro[1]',
             }
             self._index__face, self._index__face_cog = self._generate()
             self.ids.area_top.bind(pos=self._update_canvas_area_top, size=self._update_canvas_area_top)
@@ -78,8 +83,6 @@ class ScreenHome(Screen):
         self.ids.stop.disabled = not app.data.get('hmi.view_can_stop')
         view_can_run = app.data.get('hmi.view_can_run')
         self.ids.run.disabled = not view_can_run
-        self.ids.face_run.disabled = not view_can_run
-        self.ids.face_to_org.disabled = not view_can_run
         face_index = app.data.get('hmi.face_index')
         if face_index != self._face_index:
             self._face_index = face_index
@@ -87,34 +90,22 @@ class ScreenHome(Screen):
                 color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
                 self.ids[f'face_{i}'].background_color = color
     
-    def m_run(self, _value_):
+    def _run(self, _value_):
         app = App.get_running_app()
         app.data.set('hmi.run', _value_)
     
-    def m_stop(self, _value_):
+    def _stop(self, _value_):
         app = App.get_running_app()
         app.data.set('hmi.stop', _value_)
-    
-    def m_face_run(self, _value_):
-        app = App.get_running_app()
-        app.data.set('hmi.face_run', _value_)
-    
-    def m_face_to_org(self, _value_):
-        app = App.get_running_app()
-        app.data.set('hmi.face_to_org', _value_)
 
     #################
     # LOAD AND SAVE #
     #################
 
     def _profile_load(self):
-        popup = Popup(
+        popup = PopupFile(
             title='CHỌN TỆP CẤU HÌNH',
-            size_hint=(0.8, 0.8),
-            auto_dismiss=False
-        )
-        popup.content = PopupFile(
-            _instance_=popup,
+        ).set_data(
             _folder_='PROFILE',
             _filter_=['*.profile'],
             _select_=self._profile_load_start,
@@ -195,13 +186,7 @@ class ScreenHome(Screen):
                     chunk_array.append({})
                 chunk_array[-1][name] = name__value[name]
                 counter += 1
-        popup = Popup(
-            title='TẢI XUỐNG',
-            size_hint=(0.6, 0.6),
-            auto_dismiss=False
-        )
-        popup.content = PopupProgress(
-            _instance_=popup,
+        popup = PopupProgress().set_data(
             _cancel_=self._profile_download_cancel
         )
         popup.open()
@@ -223,7 +208,7 @@ class ScreenHome(Screen):
 
     def _profile_download_progress(self, _dt_):
         app = App.get_running_app()
-        ppc = self._popup_progress.content
+        ppc = self._popup_progress
         pdd = self._profile_download_data
         match pdd.state:
             case 0:
@@ -279,14 +264,10 @@ class ScreenHome(Screen):
                 app.data.block_active(self._name__hash)
 
     def _cnc_download(self, _instance_):
-        popup = Popup(
-            title='CHỌN TỆP CNC',
-            size_hint=(0.8, 0.8),
-            auto_dismiss=False
-        )
         self._download_cnc_index = _instance_.cnc_index
-        popup.content = PopupFile(
-            _instance_=popup,
+        popup = PopupFile(
+            title='CHỌN TỆP CNC',
+        ).set_data(
             _folder_='CNC',
             _filter_=['*.cnc'],
             _select_=lambda p: self._cnc_download_confirm(p, _instance_.cnc_index),
@@ -303,13 +284,7 @@ class ScreenHome(Screen):
     
     def _cnc_download_start(self, _source_path_):
         app = App.get_running_app()
-        popup = Popup(
-            title='TẢI XUỐNG',
-            size_hint=(0.6, 0.6),
-            auto_dismiss=False
-        )
-        popup.content = PopupProgress(
-            _instance_=popup,
+        popup = PopupProgress().set_data(
             _cancel_=app.data.download_cancel
         )
         popup.open()
@@ -385,26 +360,21 @@ class ScreenHome(Screen):
     def _face_select(self, _instance_):
         app = App.get_running_app()
         face_index = _instance_.face_index
-        app.data.set('hmi.face_index', face_index)
-        face = self._index__face[face_index]
-        for name in face.name__value():
-            app.data.block(name).active = True
-        if app.data.get('hmi.face_index') == face_index or app.launcher.offline:
+        name = 'hmi.face_index'
+        app.data.set(name, face_index)
+        if app.data.get(name) == face_index or app.launcher.offline:
             self._face_open(face_index)
 
     def _face_open(self, _index_):
-        popup = Popup(
-            title=f'MẶT {_index_+1}',
-            size_hint=(0.9, 0.9),
-            auto_dismiss=False,
-        )
         self._face = self._index__face[_index_]
-        popup.content = PopupFace(
-            _instance_=popup,
+        popup = PopupFace(
+            title=f'MẶT {_index_+1}',
+        ).set_data(
             _face_=self._face,
+            _rule_=Face.index__rule[_index_],
             _apply_=self._face_apply,
             _delete_=self._face_delete
-            )
+        )
         popup.open()
     
     def _face_apply(self):

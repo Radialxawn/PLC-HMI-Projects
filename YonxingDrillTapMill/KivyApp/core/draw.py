@@ -1,6 +1,7 @@
 from kivy.graphics import Color, Line, Rectangle, Ellipse, RoundedRectangle
 from kivy.utils import get_color_from_hex as clhex
 from kivy.core.image import Image as CoreImage
+from data.shape import Shape
 
 class Draw(object):
     def __init__(self, _ppm_, _ppm_range_):
@@ -28,8 +29,8 @@ class Draw(object):
     def pixel_to_micro(self, _x_, _y_):
         return _x_ / self._pixel_per_micro, _y_ / self._pixel_per_micro
     
-    def touch_pos_to_center_of_widget(self, _screen_, _widget_, _touch_pos_):
-        wgpos = [a + b for a, b in zip(_screen_.pos, _widget_.pos)]
+    def touch_pos_to_center_of_widget(self, _widget_, _touch_pos_):
+        wgpos = _widget_.pos
         wgsize = _widget_.size
         dxp = _touch_pos_[0] - wgpos[0]
         dyp = _touch_pos_[1] - wgpos[1]
@@ -61,9 +62,11 @@ class Draw(object):
         match sid:
             case 1: # drill
                 texture = CoreImage('texture/drill.png').texture
+                sa = Shape.shape_name__data['drill']['view_micro'] * ppm
                 Rectangle(texture=texture, pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
             case 2: # tap
                 texture = CoreImage('texture/tap.png').texture
+                sa = Shape.shape_name__data['tap']['view_micro'] * ppm
                 Rectangle(texture=texture, pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
             case 3: # circle
                 Ellipse(pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])

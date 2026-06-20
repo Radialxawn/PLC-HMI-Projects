@@ -1,11 +1,9 @@
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
 from pathlib import Path
 
-class PopupFile(BoxLayout):
-    def __init__(self, _instance_, _folder_, _filter_, _select_, _deletable_, **kwargs):
-        super().__init__(**kwargs)
-        self._instance_ = _instance_
+class PopupFile(Popup):
+    def set_data(self, _folder_, _filter_, _select_, _deletable_):
         self._select_ = _select_
         self._deletable_ = _deletable_
         self.ids.chooser.rootpath = str(PopupFile.path_get(_folder_))
@@ -16,6 +14,7 @@ class PopupFile(BoxLayout):
         self.ids.warn.text = f'TỆP PHẢI NHỎ HƠN 1MB'
         if not _deletable_:
             self._widget_remove(self.ids.delete)
+        return self
 
     def _widget_remove(self, _instance_):
         if _instance_.parent:
@@ -60,7 +59,7 @@ class PopupFile(BoxLayout):
 
     def _confirm(self):
         self._select_(self._select_path)
-        self._instance_.dismiss()
+        self.dismiss()
     
     def _cancel(self):
-        self._instance_.dismiss()
+        self.dismiss()
