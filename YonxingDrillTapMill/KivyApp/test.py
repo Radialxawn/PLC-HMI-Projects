@@ -1,6 +1,9 @@
+import re
 import sys
+from pathlib import Path
 from core.data import Data
 from data.face import Face
+from core.gcode import GCode
 
 def testa():
     data = Data(
@@ -32,6 +35,15 @@ def ab(*params):
     for param in params:
         print(param)
 
+def testd():
+    path = Path(r'C:/Users/Admin/Desktop/CNC/test.cnc')
+    gcode = GCode().read(path)
+    for line in gcode.lines:
+        print(line)
+    print(len(gcode.combine))
+
+    print(GCode.image_get(path))
+
 parameters = sys.argv[1:]
 if len(parameters) > 0:
     match parameters[0]:
@@ -41,3 +53,5 @@ if len(parameters) > 0:
             testb()
         case 'c':
             testc()
+        case 'd':
+            testd()

@@ -6,6 +6,7 @@ from pathlib import Path
 from kivy.clock import Clock
 from asyncua.sync import Client
 import xml.etree.ElementTree as ET
+from core.gcode import GCode
 
 class DataBlock(object):
     stype__uatype = {
@@ -287,33 +288,15 @@ class Data(object):
     # DATA DOWNLOAD #
     #################
 
-    def _download_read_file(self, _path_, _progress_):
-        if not _path_.is_file():
-            print('File does not exist: %s' % (_path_))
-            return []
-        combine = ''
-        with _path_.open(mode='r') as file:
-            index = 0
-            for line in file:
-                line = line.strip()
-                if len(line) > 0:
-                    combine += f'N{index} {line}\r\n'
-                    index += 1
-        chunk_size = 4095
-        count = len(combine)
-        result = []
-        for i in range(0, count, chunk_size):
-            chunk = combine[i : i + chunk_size]
-            result.append(chunk)
-            _progress_(100 * i / count)
-        return result
-
     def _download_get_bridge_names(self):
         return [n for n in self._name__block if n[:3] == 'fst']
 
     def download_start(self, _source_path_, _destination_index_, _progress_):
         if hasattr(self, '_download_process_clock'):
             print('File downloading')
+            return
+        if not _source_path_.is_file():
+            print('File does not exist: %s' % (_source_path_))
             return
         if not hasattr(self, '_dl'):
             self._dl = {
@@ -322,7 +305,8 @@ class Data(object):
             }
         dl = self._dl
         dl['index'] = _destination_index_
-        dl['chunks'] = self._download_read_file(_source_path_, _progress_)
+        dl['gcode'] = GCode().read(_source_path_)
+        dl['chunks'] = dl['gcode'].chunks(4095)
         if len(dl['chunks']) == 0:
             print('File empty')
             return
@@ -333,6 +317,7 @@ class Data(object):
         self._get_all_stop()
         dl['state'] = 1
         dl['cancel'] = False
+        dl['gcode'].image_remove()
         self._download_process_clock = Clock.schedule_interval(self._download_process, 0.001)
 
     def _download_process(self, _):
@@ -379,6 +364,7 @@ class Data(object):
                 delattr(self, '_download_process_clock')
                 dl['state'] = 0
                 dl['progress'](101)
+                dl['gcode'].image_generate()
                 self._get_all_start()
     
     def download_cancel(self):

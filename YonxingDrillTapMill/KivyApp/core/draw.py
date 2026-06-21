@@ -28,6 +28,10 @@ class Draw(object):
     
     def pixel_to_micro(self, _x_, _y_):
         return _x_ / self._pixel_per_micro, _y_ / self._pixel_per_micro
+
+    def micro_to_pixel(self, _x_, _y_):
+        ppm = self._pixel_per_micro
+        return ppm * _x_ + self._offset_pixel[0], ppm * _y_ + self._offset_pixel[1]
     
     def touch_pos_to_center_of_widget(self, _widget_, _touch_pos_):
         wgpos = _widget_.pos
@@ -57,8 +61,7 @@ class Draw(object):
         sc = _shape_.vc * ppm
         sd = _shape_.vd * ppm
         se = _shape_.ve * ppm
-        px = _pos_micro_[0] * ppm + self._offset_pixel[0]
-        py = _pos_micro_[1] * ppm + self._offset_pixel[1]
+        px, py = self.micro_to_pixel(_pos_micro_[0], _pos_micro_[1])
         match sid:
             case 1: # drill
                 texture = CoreImage('texture/drill.png').texture
@@ -96,8 +99,15 @@ class Draw(object):
         if scid >= 0:
             Line(rectangle=(px-sa*0.5, py-sa*0.5, sa, sa), width=2)
     
-    def face(self, _face_, _position_):
+    def face(self, _face_, _position_, _color_):
+        px, py = _position_[0], _position_[1]
+        Color(rgba=clhex("#000000ff"))
+        pxp, pyp = self.micro_to_pixel(px, py)
+        Rectangle(pos=[pxp, pyp], size=[50, 1])
+        Rectangle(pos=[pxp, pyp], size=[1, 50])
+        for i, iz in enumerate(_face_.z):
+            _, izp = self.micro_to_pixel(0, py - iz)
+            Rectangle(pos=[pxp, izp], size=[50, 1])
+        Color(rgba=_color_)
         for shape in _face_.shape:
-            px = _position_[0] + shape.x
-            py = _position_[1] + shape.y
-            self.shape(shape, [px,  py])
+            self.shape(shape, [px + shape.x,  py + shape.y])

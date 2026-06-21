@@ -1,3 +1,4 @@
+# fucking corsair mouse slow down the fucking program load process
 from kivy.config import Config
 Config.set('graphics', 'width', '960')
 Config.set('graphics', 'height', '540')

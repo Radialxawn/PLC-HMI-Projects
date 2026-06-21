@@ -340,14 +340,13 @@ class ScreenHome(Screen):
             self._draw.axis(_area_, [_area_padding_x_, _area_.center_y], active_width_pixel, 2)
             for i, fi in enumerate(_face_indexs_):
                 machine_face = app.machine['index__face'][str(fi)]
-                Color(rgba=_colors_[i])
                 face = self._index__face[fi]
-                x, y = self._draw.pixel_to_micro(_area_.pos[0]+_area_padding_x_, _area_.center_y)
+                x, y = self._draw.pixel_to_micro(_area_.pos[0] + _area_padding_x_ - _area_.parent.padding[0], _area_.center_y)
                 x += machine_face['x']
                 y += machine_face['y']
                 x += face.ox
                 y += face.oy
-                self._draw.face(face, [x, y])
+                self._draw.face(_face_=face, _position_=[x, y], _color_=_colors_[i])
         return
         if self._index__face_cog[_face_indexs_[0]] == None:
             cog_texture = CoreImage('texture/cog.png').texture

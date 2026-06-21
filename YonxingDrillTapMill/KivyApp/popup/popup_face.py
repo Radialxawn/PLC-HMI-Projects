@@ -260,13 +260,7 @@ class PopupFace(Popup):
         with area.canvas:
             self._draw.axis(area, [area.center_x, area.center_y], None, 2)
             cx, cy = self._draw.pixel_to_micro(area.center_x, area.center_y)
-            for i, shape in enumerate(self._face_edit.shape):
-                px, py = cx + shape.x, cy + shape.y
-                Color((i+1)/len(self._face_edit.shape), 0, 0, 1)
-                self._draw.shape(
-                    _shape_=shape,
-                    _pos_micro_=[px, py],
-                )
+            self._draw.face(_face_=self._face_edit, _position_=[cx, cy], _color_=clhex("#be3e3eff"))
 
     def _shape_apply(self):
         self._face_edit.shape.sort(key=lambda s: (s.id == 0, s.x)) # sort using x value and push id = 0 object to the back
