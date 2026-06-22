@@ -22,7 +22,7 @@ class GCode(object):
         self.path = _path_
         with self.path.open(mode='r') as file:
             for line in file:
-                l = re.sub(GCode.read_pattern, ' ', GCode._clean(line))
+                l = re.sub(GCode.read_pattern, ' ', GCode._clean(line).upper())
                 if len(l) > 0:
                     self.raw.append(l)
         imax = len(self.raw) - 1
@@ -48,50 +48,33 @@ class GCode(object):
                 else:
                     l[letter.lower()] = True
             self.parsed.append(l)
-    
+
     def linear(self, _tolerance_):
-        relative = False
         cx, cy, cz = 0, 0, 0
         points = [[cx, cy, cz]]
         for line in self.parsed:
             if 'g' in line:
                 gc = line['g']
                 if gc == 0 or gc == 1:
-                    x = line['x'] if 'x' in line else None
-                    y = line['y'] if 'y' in line else None
-                    z = line['z'] if 'z' in line else None
-                    if relative:
-                        x = cx if x == None else x + cx
-                        y = cy if y == None else y + cy
-                        z = cz if z == None else z + cz
-                    else:
-                        x = cx if x == None else x
-                        y = cy if y == None else y
-                        z = cz if z == None else z
+                    x = line['x'] if 'x' in line else cx
+                    y = line['y'] if 'y' in line else cy
+                    z = line['z'] if 'z' in line else cz
                     points.append([x, y, z])
                     cx, cy, cz = x, y, z
                 elif gc == 2 or gc == 3:
-                    x = line['x'] if 'x' in line else None
-                    y = line['y'] if 'y' in line else None
-                    z = line['z'] if 'z' in line else None
+                    x = line['x'] if 'x' in line else cx
+                    y = line['y'] if 'y' in line else cy
+                    z = line['z'] if 'z' in line else cz
                     i = line['i'] if 'i' in line else 0
                     j = line['j'] if 'j' in line else 0
                     r = line['r'] if 'r' in line else None
-                    if relative:
-                        x = cx if x == None else cx
-                        y = cy if y == None else cy
-                        z = cz if z == None else cz
-                    else:
-                        x = cx if x == None else x
-                        y = cy if y == None else y
-                        z = cz if z == None else z
                     arc_points = GCode._linear_arc(gc, cx, cy, cz, x, y, z, i, j, r, _tolerance_)
                     points.extend(arc_points)
                     cx, cy, cz = arc_points[-1]
                 elif gc == 90:
-                    relative = False
-                elif gc == 91:
-                    relative = True
+                    continue
+                else:
+                    raise Exception(f'G{gc} Not supported')
         return points
     
     @staticmethod

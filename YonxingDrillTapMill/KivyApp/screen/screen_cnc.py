@@ -1,31 +1,40 @@
+import math
 from kivy.app import App
+from core.draw import Draw
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from popup.popup_progress import PopupProgress
 from popup.popup_file import PopupFile
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.widget import Widget
+from core.mouse import Mouse
 from core.ui import UITextInputInteger
+from kivy.graphics import Color, Line, Rectangle, Ellipse, RoundedRectangle
 from kivy.utils import get_color_from_hex as clhex
 
 class ScreenCNC(Screen):
     def __init__(self, **kvargs):
         super(ScreenCNC, self).__init__(**kvargs)
+        self._draw = Draw(2e-3, [1e-3, 10e-3])
+        self._mouse = Mouse()
         self._first_load = True
         self._cnc_id = -1
         self._cnc_id_selector_active = False
+        self._line_points = []
+        self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
     
     def on_pre_enter(self, *args):
         if self._first_load:
             self._first_load = False
             self._name__hash = {
                 'hmi.cnc_id',
+                'hmi.cnc_run',
                 'hmi.cnc_feed',
+                'hmi.view_cnc_error',
                 'hmi.view_cnc_micro[0]',
                 'hmi.view_cnc_micro[1]',
                 'hmi.view_cnc_micro[2]',
+                'hmi.view_state[1]',
                 'hmi.view_can_run',
             }
             self._name__index, self._name__input, self._name__value = self._generate()
@@ -83,7 +92,7 @@ class ScreenCNC(Screen):
         app = App.get_running_app()
         app.data.block_active(self._name__hash)
         if not hasattr(self, '_value_update_clock'):
-            self._value_update_clock = Clock.schedule_interval(self._value_update, 0.1)
+            self._value_update_clock = Clock.schedule_interval(self._value_update, 0.05)
 
     def on_leave(self, *args):
         self._cnc_id_selector_active = False
@@ -107,14 +116,88 @@ class ScreenCNC(Screen):
                 continue
             self._name__value[name] = block.value
             input.v_value_set(block.value)
-        view_can_run = app.data.get('hmi.view_can_run')
-        self.ids.cnc_run.disabled = not view_can_run
+        work_state = app.data.get('hmi.view_state[1]')
+        if work_state == None:
+            work_state = 0
+        self.ids.cnc_run.background_color = clhex("#6AA145") if work_state > 500 else clhex("#5F5F5F")
+        self.ids.cnc_error.opacity = 1 if app.data.get('hmi.view_cnc_error') else 0
         cnc_id = app.data.get('hmi.cnc_id')
         if cnc_id != self._cnc_id:
             self._cnc_id = cnc_id
             for i in range(6):
                 color = clhex("#6AA145") if cnc_id == i else clhex("#5F5F5F")
                 self.ids[f'cnc_{i}'].background_color = color
+        if work_state == 510:
+            self._line_update()
+    
+    def _update_canvas(self, *args):
+        self._redraw(True)
+    
+    def _redraw(self, _canvas_):
+        area = self.ids.area
+        area.canvas.clear()
+        if _canvas_:
+            self._draw.offset_pixel = [area.center_x, area.center_y]
+        with area.canvas:
+            self._draw.axis(area, [0, 0], None, 2)
+            Color(rgba=clhex("#41bc41"))
+            self._line = Line(points=self._line_points_to_pixel(), width=2)
+
+    def on_touch_down(self, touch):
+        _, _, inside = self._draw.touch_pos_to_center_of_widget(self.ids.area, touch.pos)
+        if inside:
+            changed = False
+            match touch.button:
+                case 'scrollup':
+                    self._draw.pixel_per_micro *= 0.9
+                    changed = True
+                case 'scrolldown':
+                    self._draw.pixel_per_micro *= 1.1
+                    changed = True
+                case 'right':
+                    self._mouse.drag = True
+                    self._mouse.drag_begin[0] = touch.pos[0]
+                    self._mouse.drag_begin[1] = touch.pos[1]
+                    self._mouse.drag_offset = self._draw.offset_pixel
+            if changed:
+                self._redraw(False)
+        else:
+            return super().on_touch_down(touch)
+
+    def on_touch_move(self, touch):
+        if self._mouse.drag == True:
+            match touch.button:
+                case 'right':
+                    dxp = touch.pos[0] - self._mouse.drag_begin[0] + self._mouse.drag_offset[0]
+                    dyp = touch.pos[1] - self._mouse.drag_begin[1] + self._mouse.drag_offset[1]
+                    self._draw.offset_pixel = [dxp, dyp]
+                    self._redraw(False)
+            return True
+        return super().on_touch_down(touch)
+
+    def _line_update(self):
+        app = App.get_running_app()
+        x = app.data.get('hmi.view_cnc_micro[0]')
+        y = app.data.get('hmi.view_cnc_micro[1]')
+        count = len(self._line_points)
+        add = False
+        if count == 0:
+            add = True
+        else:
+            lx, ly = self._line_points[-1]
+            add = x != lx or y != ly
+        if add:
+            self._line_points.append([x, y])
+        if count > 1500:
+            self._line_points.pop(0)
+        self._line.points = self._line_points_to_pixel()
+    
+    def _line_points_to_pixel(self):
+        points = []
+        for point in self._line_points:
+            xp, yp = self._draw.micro_to_pixel(point[0], point[1])
+            points.append([xp, yp])
+        return points
     
     def _on_cnc_id_selector(self, _instance_):
         if not self._cnc_id_selector_active:
@@ -158,5 +241,6 @@ class ScreenCNC(Screen):
         self._popup_progress.progress(_value_)
     
     def _cnc_run(self, _value_):
+        self._line_points = []
         app = App.get_running_app()
         app.data.set('hmi.cnc_run', _value_)

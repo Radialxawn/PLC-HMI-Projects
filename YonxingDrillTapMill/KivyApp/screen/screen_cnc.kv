@@ -15,6 +15,12 @@
                 on_press: root.manager.current = 'home'
             Widget:
             Button:
+                id: cnc_error
+                text: "TỆP LỖI"
+                size_hint_x: None
+                width: 120
+                background_color: clhex('#e64848')
+            Button:
                 id: cnc_run
                 text: "CHẠY THỬ"
                 size_hint_x: None
@@ -36,7 +42,7 @@
                 spacing: 5
                 size_hint_x: None
             StencilView:
-                id: area_top
+                id: area
                 canvas.before:
                     Color:
                         rgba: clhex('#ffffff')

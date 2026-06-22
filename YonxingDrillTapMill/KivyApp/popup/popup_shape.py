@@ -91,13 +91,13 @@ class PopupShape(Popup):
     def _update_canvas(self, *args):
         area = self.ids.area
         area.canvas.clear()
-        cx, cy = self._draw.pixel_to_micro(area.center_x, area.center_y)
+        self._draw.offset_pixel = [area.center_x, area.center_y]
         with area.canvas:
-            self._draw.axis(area, [area.center_x, area.center_y], None, 2)
+            self._draw.axis(area, [0, 0], None, 2)
             Color(rgba=clhex("#ff5656ff"))
             self._draw.shape(
                 _shape_=self._shape_edit,
-                _pos_micro_=[cx, cy],
+                _pos_micro_=[0, 0],
             )
         data = self._id_to_data(self._shape_edit.id)
         if self._shape_id_changed:
