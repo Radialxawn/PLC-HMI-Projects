@@ -1,0 +1,82 @@
+#:import hex kivy.utils.get_color_from_hex
+<ScreenCNC>:
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 60
+            spacing: 5
+            padding: 5
+            Button:
+                text: "THOÁT"
+                size_hint_x: None
+                width: 120
+                on_press: root.manager.current = 'home'
+            Widget:
+            Button:
+                id: cnc_run
+                text: "CHẠY THỬ"
+                size_hint_x: None
+                width: 160
+                on_press: root._cnc_run(True)
+                on_release: root._cnc_run(False)
+            Spinner:
+                id: cnc_id_selector
+                size_hint_x: None
+                width: 90
+                on_text: root._on_cnc_id_selector(self)
+        BoxLayout:
+            orientation: 'horizontal'
+            padding: 5
+            spacing: 5
+            BoxLayout:
+                id: cnc_property
+                orientation: 'vertical'
+                spacing: 5
+                size_hint_x: None
+            StencilView:
+                id: area_top
+                canvas.before:
+                    Color:
+                        rgba: clhex('#ffffff')
+                    Rectangle:
+                        pos: self.x, self.y
+                        size: self.width, self.height
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 60
+            spacing: 5
+            padding: 5
+            Button:
+                id: cnc_0
+                size_hint_x: None
+                width: 90
+                on_press: root._cnc_download(self)
+            Button:
+                id: cnc_1
+                size_hint_x: None
+                width: 90
+                on_press: root._cnc_download(self)
+            Button:
+                id: cnc_2
+                size_hint_x: None
+                width: 90
+                on_press: root._cnc_download(self)
+            Button:
+                id: cnc_3
+                size_hint_x: None
+                width: 90
+                on_press: root._cnc_download(self)
+            Button:
+                id: cnc_4
+                size_hint_x: None
+                width: 90
+                on_press: root._cnc_download(self)
+            Button:
+                id: cnc_5
+                size_hint_x: None
+                width: 90
+                on_press: root._cnc_download(self)
+            Widget:

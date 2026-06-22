@@ -1,4 +1,4 @@
-#:import hex kivy.utils.get_color_from_hex
+#:import clhex kivy.utils.get_color_from_hex
 <ScreenHome>:
     BoxLayout:
         orientation: 'vertical'
@@ -72,7 +72,7 @@
                 id: area_top
                 canvas.before:
                     Color:
-                        rgba: hex('#ffffff')
+                        rgba: clhex('#ffffff')
                     Rectangle:
                         pos: self.x, self.y
                         size: self.width, self.height
@@ -80,7 +80,7 @@
                 id: area_front
                 canvas.before:
                     Color:
-                        rgba: hex('#ffffff')
+                        rgba: clhex('#ffffff')
                     Rectangle:
                         pos: self.x, self.y
                         size: self.width, self.height
@@ -109,35 +109,10 @@
             spacing: 5
             padding: 5
             Button:
-                id: cnc_0
+                text: "CNC"
                 size_hint_x: None
-                width: 90
-                on_press: root._cnc_download(self)
-            Button:
-                id: cnc_1
-                size_hint_x: None
-                width: 90
-                on_press: root._cnc_download(self)
-            Button:
-                id: cnc_2
-                size_hint_x: None
-                width: 90
-                on_press: root._cnc_download(self)
-            Button:
-                id: cnc_3
-                size_hint_x: None
-                width: 90
-                on_press: root._cnc_download(self)
-            Button:
-                id: cnc_4
-                size_hint_x: None
-                width: 90
-                on_press: root._cnc_download(self)
-            Button:
-                id: cnc_5
-                size_hint_x: None
-                width: 90
-                on_press: root._cnc_download(self)
+                width: 120
+                on_press: root.manager.current = 'cnc'
             Widget:
             Button:
                 text: "IN/OUT"

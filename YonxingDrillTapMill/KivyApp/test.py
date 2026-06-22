@@ -4,6 +4,7 @@ from pathlib import Path
 from core.data import Data
 from data.face import Face
 from core.gcode import GCode
+import matplotlib.pyplot as plt
 
 def testa():
     data = Data(
@@ -38,11 +39,27 @@ def ab(*params):
 def testd():
     path = Path(r'C:/Users/Admin/Desktop/CNC/test.cnc')
     gcode = GCode().read(path)
-    for line in gcode.lines:
+    print('raw:')
+    for line in gcode.raw:
         print(line)
-    print(len(gcode.combine))
-
-    print(GCode.image_get(path))
+    print('parsed:')
+    gcode.parse()
+    for line in gcode.parsed:
+        print(line)
+    points = []
+    try:
+        points = gcode.linear(0.1)
+    except:
+        print('Error')
+        return
+    xs, ys = [], []
+    for point in points:
+        print(point)
+        xs.append(point[0])
+        ys.append(point[1])
+    plt.plot(xs, ys)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.show()
 
 parameters = sys.argv[1:]
 if len(parameters) > 0:

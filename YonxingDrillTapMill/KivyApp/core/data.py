@@ -6,6 +6,8 @@ from pathlib import Path
 from kivy.clock import Clock
 from asyncua.sync import Client
 import xml.etree.ElementTree as ET
+from kivy.core.image import Image as CoreImage
+from core.helper import Helper
 from core.gcode import GCode
 
 class DataBlock(object):
@@ -288,6 +290,21 @@ class Data(object):
     # DATA DOWNLOAD #
     #################
 
+    def _download_cnc_remove(self, _path_, _index_):
+        path = _path_.with_name(f'cnc_{_index_}').with_suffix('.png')
+        path.unlink(missing_ok=True)
+
+    def _download_cnc_generate(self, _path_, _index_):
+        path = _path_.with_name(f'cnc_{_index_}').with_suffix('.png')
+        print('generate cnc for', path)
+    
+    @staticmethod
+    def download_cnc_get(_index_):
+        path = Helper.path_get('CNC') / f'cnc_{_index_}.png'
+        if not path.exists():
+            return None
+        return CoreImage(path)
+
     def _download_get_bridge_names(self):
         return [n for n in self._name__block if n[:3] == 'fst']
 
@@ -317,7 +334,7 @@ class Data(object):
         self._get_all_stop()
         dl['state'] = 1
         dl['cancel'] = False
-        dl['gcode'].image_remove()
+        self._download_cnc_remove(dl['gcode'].path, dl['index'])
         self._download_process_clock = Clock.schedule_interval(self._download_process, 0.001)
 
     def _download_process(self, _):
@@ -364,7 +381,7 @@ class Data(object):
                 delattr(self, '_download_process_clock')
                 dl['state'] = 0
                 dl['progress'](101)
-                dl['gcode'].image_generate()
+                self._download_cnc_generate(dl['gcode'].path, dl['index'])
                 self._get_all_start()
     
     def download_cancel(self):

@@ -1,12 +1,13 @@
 from kivy.app import App
 from kivy.uix.popup import Popup
+from core.helper import Helper
 from pathlib import Path
 
 class PopupFile(Popup):
     def set_data(self, _folder_, _filter_, _select_, _deletable_):
         self._select_ = _select_
         self._deletable_ = _deletable_
-        self.ids.chooser.rootpath = str(PopupFile.path_get(_folder_))
+        self.ids.chooser.rootpath = str(Helper.path_get(_folder_))
         self.ids.chooser.filters = _filter_
         self.ids.warn.opacity = 0.0
         self.ids.ok.disabled = True
@@ -19,14 +20,6 @@ class PopupFile(Popup):
     def _widget_remove(self, _instance_):
         if _instance_.parent:
             _instance_.parent.remove_widget(_instance_)
-
-    @staticmethod
-    def path_get(_folder_):
-        folder = f'Desktop/{_folder_}'
-        rootpath = Path.home() / folder
-        if not rootpath.exists():
-            rootpath.mkdir(parents=True, exist_ok=True)
-        return rootpath
 
     def _select(self, *args):
         paths = args[1]

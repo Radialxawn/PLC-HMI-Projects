@@ -14,10 +14,10 @@ from kivy.app import App
 from core.data import Data
 from kivy.clock import Clock
 from kivy.lang import Builder
-from kivy.uix.popup import Popup
 from core.launcher import Launcher
 from kivy.core.window import Window
 from screen.screen_io import ScreenIO
+from screen.screen_cnc import ScreenCNC
 from screen.screen_home import ScreenHome
 from screen.screen_setting import ScreenSetting
 from kivy.uix.screenmanager import ScreenManager, FadeTransition
@@ -30,6 +30,7 @@ from popup.popup_error import PopupError
 Builder.load_file('style.kv')
 Builder.load_file('screen/screen_load.kv')
 Builder.load_file('screen/screen_home.kv')
+Builder.load_file('screen/screen_cnc.kv')
 Builder.load_file('screen/screen_io.kv')
 Builder.load_file('screen/screen_setting.kv')
 Builder.load_file('screen/screen_setting_axis.kv')
@@ -59,6 +60,7 @@ class Main(App):
         sm = ScreenManager(transition=FadeTransition(duration=0.3))
         sm.add_widget(ScreenLoad(name='load'))
         sm.add_widget(ScreenHome(name='home'))
+        sm.add_widget(ScreenCNC(name='cnc'))
         sm.add_widget(ScreenIO(name='io'))
         sm.add_widget(ScreenSetting(name='setting'))
         sm.add_widget(ScreenSettingAxis(name='setting_axis'))

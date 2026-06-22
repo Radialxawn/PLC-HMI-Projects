@@ -1,21 +1,18 @@
-import re
 import json
-from asyncua import ua
 from kivy.app import App
 from pathlib import Path
 from kivy.clock import Clock
 from kivy.graphics import Color
-from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
 from popup.popup_progress import PopupProgress
 from kivy.core.image import Image as CoreImage
+from kivy.graphics import Rectangle
 from popup.popup_file import PopupFile
 from popup.popup_face import PopupFace
-from kivy.graphics import Rectangle
-from kivy.uix.popup import Popup
 from data.face import Face
 from core.draw import Draw
 from core.ui import UI
+from core.helper import Helper
 from types import SimpleNamespace
 from kivy.utils import get_color_from_hex as clhex
 
@@ -26,10 +23,6 @@ class ScreenHome(Screen):
             button = self.ids[f'face_{i}']
             button.text = f'MẶT {i+1}'
             button.face_index = i
-        for i in range(6):
-            button = self.ids[f'cnc_{i}']
-            button.text = f'CNC {i+1}'
-            button.cnc_index = i
         self._draw = Draw(1e-3, [0.1e-3, 5e-3])
         self.ids.profile_name.input_filter = UI.filter_file_name
         self._face_index = -1
@@ -134,7 +127,7 @@ class ScreenHome(Screen):
         profile_name = self.ids.profile_name.text.strip()
         if profile_name == '':
             return
-        directory = PopupFile.path_get('PROFILE')
+        directory = Helper.path_get('PROFILE')
         files = [f for f in directory.glob('*.profile')]
         message = 'LƯU TỆP MỚI?'
         for file in files:
@@ -150,7 +143,7 @@ class ScreenHome(Screen):
         profile_name = self.ids.profile_name.text.strip()
         if profile_name == '':
             return
-        path = Path(PopupFile.path_get('PROFILE'), profile_name)
+        path = Path(Helper.path_get('PROFILE'), profile_name)
         save_data = {}
         for index in self._index__face:
             face = self._index__face[index]
@@ -262,41 +255,6 @@ class ScreenHome(Screen):
                     Clock.unschedule(self._profile_download_progress_clock)
                     delattr(self, '_profile_download_progress_clock')
                 app.data.block_active(self._name__hash)
-
-    def _cnc_download(self, _instance_):
-        self._download_cnc_index = _instance_.cnc_index
-        popup = PopupFile(
-            title='CHỌN TỆP CNC',
-        ).set_data(
-            _folder_='CNC',
-            _filter_=['*.cnc'],
-            _select_=lambda p: self._cnc_download_confirm(p, _instance_.cnc_index),
-            _deletable_=False
-        )
-        popup.open()
-    
-    def _cnc_download_confirm(self, _source_path_, _cnc_index_):
-        app = App.get_running_app()
-        app.m_show_popup_confirm(
-            _message_=f'TẢI TỆP [{_source_path_.stem}] XUỐNG PLC [CNC {_cnc_index_+1}]?',
-            _confirm_=lambda : self._cnc_download_start(_source_path_)
-        )
-    
-    def _cnc_download_start(self, _source_path_):
-        app = App.get_running_app()
-        popup = PopupProgress().set_data(
-            _cancel_=app.data.download_cancel
-        )
-        popup.open()
-        self._popup_progress = popup
-        app.data.download_start(
-            _source_path_=_source_path_,
-            _destination_index_=self._download_cnc_index,
-            _progress_=self._cnc_download_progress
-        )
-    
-    def _cnc_download_progress(self, _value_):
-        self._popup_progress.content.progress(_value_)
     
     #############
     # FACE EDIT #

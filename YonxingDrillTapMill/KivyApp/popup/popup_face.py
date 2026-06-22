@@ -1,12 +1,8 @@
-import re
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.label import Label
 from popup.popup_shape import PopupShape
-from kivy.uix.screenmanager import Screen
-from kivy.graphics import Color, Rectangle
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.popup import Popup
 from core.mouse import Mouse
