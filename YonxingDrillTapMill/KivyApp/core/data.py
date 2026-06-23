@@ -5,10 +5,8 @@ from asyncua import ua
 from pathlib import Path
 from kivy.clock import Clock
 from asyncua.sync import Client
+from types import SimpleNamespace
 import xml.etree.ElementTree as ET
-from kivy.core.image import Image as CoreImage
-from core.helper import Helper
-from core.gcode import GCode
 
 class DataBlock(object):
     stype__uatype = {
@@ -49,6 +47,8 @@ class DataBlock(object):
         return ua.Variant(_value_, self.type)
 
 class Data(object):
+    DOWNLOAD_CHUNK_SIZE = 4095
+
     def __init__(self, _address_ip_, _address_port_, _xml_path_windows_, _tag_head_):
         self._address_ip_ = _address_ip_
         self._address_port_ = _address_port_
@@ -289,108 +289,77 @@ class Data(object):
     #################
     # DATA DOWNLOAD #
     #################
-
-    def _download_cnc_remove(self, _path_, _index_):
-        path = _path_.with_name(f'cnc_{_index_}').with_suffix('.png')
-        path.unlink(missing_ok=True)
-
-    def _download_cnc_generate(self, _path_, _index_):
-        path = _path_.with_name(f'cnc_{_index_}').with_suffix('.png')
-        print('generate cnc for', path)
-    
-    @staticmethod
-    def download_cnc_get(_index_):
-        path = Helper.path_get('CNC') / f'cnc_{_index_}.png'
-        if not path.exists():
-            return None
-        return CoreImage(path)
-
     def _download_get_bridge_names(self):
         return [n for n in self._name__block if n[:3] == 'fst']
 
-    def download_start(self, _source_path_, _destination_index_, _progress_):
+    def download_start(self, _index_, _chunks_, _progress_):
         if hasattr(self, '_download_process_clock'):
             print('File downloading')
-            return
-        if not _source_path_.is_file():
-            print('File does not exist: %s' % (_source_path_))
-            return
-        if not hasattr(self, '_dl'):
-            self._dl = {
-                'chunk_index': 0,
-                'progress': _progress_,
-            }
-        dl = self._dl
-        dl['index'] = _destination_index_
-        dl['gcode'] = GCode().read(_source_path_)
-        dl['chunks'] = dl['gcode'].chunks(4095)
-        if len(dl['chunks']) == 0:
-            print('File empty')
             return
         if self._connect_state != 100:
             print('Not connected')
             return
-        dl['bridge_names'] = self._download_get_bridge_names()
+        self._dl = SimpleNamespace(
+            index=_index_,
+            chunks=_chunks_,
+            progress=_progress_,
+            bridge_names=self._download_get_bridge_names(),
+            chunk_index=0,
+            cancel=False,
+            state=1
+        )
         self._get_all_stop()
-        dl['state'] = 1
-        dl['cancel'] = False
-        self._download_cnc_remove(dl['gcode'].path, dl['index'])
         self._download_process_clock = Clock.schedule_interval(self._download_process, 0.001)
 
     def _download_process(self, _):
         dl = self._dl
-        line_count = len(dl['chunks'])
-        self.gets(dl['bridge_names'])
-        if dl['cancel']:
-            dl['state'] = 100
-        match dl['state']:
+        line_count = len(dl.chunks)
+        self.gets(dl.bridge_names)
+        if dl.cancel:
+            dl.state = 100
+        match dl.state:
             case 1:
                 if self.get('fst.state') == 10:
-                    self.set('fst.index', dl['index'])
-                    dl['chunk_index'] = 0
-                    dl['state'] += 1
+                    self.set('fst.index', dl.index)
+                    dl.chunk_index = 0
+                    dl.state += 1
             case 2:
-                if self.get('fst.index') == dl['index']:
-                    dl['state'] += 1
+                if self.get('fst.index') == dl.index:
+                    dl.state += 1
             case 3:
                 self.set('fst.begin', True)
-                dl['state'] = 11
+                dl.state = 11
             ##########
             case 11:
                 if self.get('fst.state') == 21:
-                    if dl['chunk_index'] >= line_count:
-                        dl['state'] = 99
+                    if dl.chunk_index >= line_count:
+                        dl.state = 99
                     else:
-                        self.set('fst.line', dl['chunks'][dl['chunk_index']])
-                        dl['state'] += 1
+                        self.set('fst.line', dl.chunks[dl.chunk_index])
+                        dl.state += 1
             case 12:
                 if self.get('fst.ldone') == True:
-                    dl['chunk_index'] += 1
-                    dl['state'] += 1
+                    dl.chunk_index += 1
+                    dl.state += 1
             case 13:
                 if self.get('fst.state') == 30:
-                    dl['progress'](dl['chunk_index'] * 100 / line_count)
+                    dl.progress(dl.chunk_index * 100 / line_count)
                     self.set('fst.lnext', True)
-                    dl['state'] = 11
+                    dl.state = 11
             ##########
             case 99:
                 if self.get('fst.state') == 10:
-                    dl['state'] += 1
+                    dl.state += 1
             case 100:
                 Clock.unschedule(self._download_process_clock)
                 delattr(self, '_download_process_clock')
-                dl['state'] = 0
-                dl['progress'](101)
-                self._download_cnc_generate(dl['gcode'].path, dl['index'])
+                dl.state = 0
+                if dl.cancel:
+                    dl.progress(-1)
+                else:
+                    dl.progress(101)
                 self._get_all_start()
     
     def download_cancel(self):
-        self._dl['cancel'] = True
-
-    def stop(self):
-        if hasattr(self, '_download_index_clock'):
-            Clock.unschedule(self._download_index_clock)
-            delattr(self, '_download_index_clock')
-        if hasattr(self, '_download_line_clock'):
-            Clock.unschedule(self._download_line_clock)
-            delattr(self, '_download_line_clock')
+        if hasattr(self, '_dl'):
+            self._dl.cancel = True

@@ -1,6 +1,7 @@
 from kivy.graphics import Color, Line, Rectangle, Ellipse, RoundedRectangle
 from kivy.utils import get_color_from_hex as clhex
 from kivy.core.image import Image as CoreImage
+from core.helper import Helper
 from data.shape import Shape
 
 class Draw(object):
@@ -54,7 +55,6 @@ class Draw(object):
             Rectangle(pos=[pos[0]+_max_x_pixel_, pos[1]-_area_.size[1]*0.5], size=[_width_, _area_.size[1]])
 
     def shape(self, _shape_, _pos_micro_):
-        sid = _shape_.id
         ppm = self._pixel_per_micro
         sa = _shape_.va * ppm
         sb = _shape_.vb * ppm
@@ -62,7 +62,7 @@ class Draw(object):
         sd = _shape_.vd * ppm
         se = _shape_.ve * ppm
         px, py = self.micro_to_pixel(_pos_micro_[0], _pos_micro_[1])
-        match sid:
+        match _shape_.id:
             case 1: # drill
                 texture = CoreImage('texture/drill.png').texture
                 sa = Shape.shape_name__data['drill']['view_micro'] * ppm
@@ -93,11 +93,15 @@ class Draw(object):
             case 11: # lockbf
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Rectangle(pos=[px-sd*0.5, py-sc*0.5+(sc-sb)*0.5], size=[sd, sc])
-        scid = -1
-        if sid > 11:
-            scid = sid - 11 - 1
+        scid = Shape.get_custom_id(_shape_.id)
         if scid >= 0:
-            Line(rectangle=(px-sa*0.5, py-sa*0.5, sa, sa), width=2)
+            image, pixel_per_mm = Helper.cnc_preview_image_get(_index_=scid, _image_=True)
+            sa = Shape.shape_name__data['custom_0']['view_micro'] * ppm
+            if image != None:
+                if pixel_per_mm != None:
+                    sa = (image.width * 1e3 / pixel_per_mm) * ppm
+                Rectangle(texture=image.texture, pos=(px-sa*0.5, py-sa*0.5), size=(sa, sa))
+            Line(rectangle=(px-sa*0.5, py-sa*0.5, sa, sa), width=1)
     
     def face(self, _face_, _position_, _color_):
         px, py = _position_[0], _position_[1]

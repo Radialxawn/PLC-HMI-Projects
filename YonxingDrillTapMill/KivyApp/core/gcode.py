@@ -1,6 +1,6 @@
 import re
 import math
-from pathlib import Path
+from types import SimpleNamespace
 
 class GCode(object):
     read_pattern = re.compile(r'(?<=[^\s])(?=[A-Z])', re.IGNORECASE)
@@ -9,25 +9,32 @@ class GCode(object):
     def __init__(self):
         self.path = None
         self.raw = []
+        self.clean = []
         self.combine = ''
         self.parsed = []
+        self.checked = SimpleNamespace(
+            points=[],
+            bound_min=[0, 0, 0],
+            bound_max=[0, 0, 0],
+        )
 
     @staticmethod
-    def _clean(line: str) -> str:
-        line = re.sub(r'\(.*?\)', '', line)
-        line = line.split(';')[0]
-        return re.sub(r'\s+', '', line)
+    def _clean(_line_: str) -> str:
+        _line_ = re.sub(r'\(.*?\)', '', _line_)
+        _line_ = _line_.split(';')[0]
+        return re.sub(r'\s+', '', _line_)
 
     def read(self, _path_):
         self.path = _path_
         with self.path.open(mode='r') as file:
-            for line in file:
-                l = re.sub(GCode.read_pattern, ' ', GCode._clean(line).upper())
-                if len(l) > 0:
-                    self.raw.append(l)
-        imax = len(self.raw) - 1
-        for i, line in enumerate(self.raw):
-            self.combine += f'N%d %s%s' % (i, line, '\r\n' if i < imax else '')
+            for lraw in file:
+                lclean = re.sub(GCode.read_pattern, ' ', GCode._clean(lraw).upper())
+                if len(lclean) > 0:
+                    self.raw.append(lraw)
+                    self.clean.append(lclean)
+        imax = len(self.clean) - 1
+        for i, lclean in enumerate(self.clean):
+            self.combine += f'N%d %s%s' % (i, lclean, '\r\n' if i < imax else '')
         return self
 
     def chunks(self, _size_):
@@ -39,19 +46,19 @@ class GCode(object):
     
     def parse(self):
         self.parsed = []
-        for line in self.raw:
-            matches = re.findall(GCode.parse_pattern, line)
-            l = {}
+        for i, lclean in enumerate(self.clean):
+            matches = re.findall(GCode.parse_pattern, lclean)
+            lparsed = {'raw': self.raw[i]}
             for letter, value in matches:
                 if value:
-                    l[letter.lower()] = float(value) if '.' in value else int(value)
+                    lparsed[letter.lower()] = float(value) if '.' in value else int(value)
                 else:
-                    l[letter.lower()] = True
-            self.parsed.append(l)
+                    lparsed[letter.lower()] = True
+            self.parsed.append(lparsed)
 
-    def linear(self, _tolerance_):
+    def check(self, _tolerance_):
         cx, cy, cz = 0, 0, 0
-        points = [[cx, cy, cz]]
+        self.checked.points = [[cx, cy, cz]]
         for line in self.parsed:
             if 'g' in line:
                 gc = line['g']
@@ -59,7 +66,7 @@ class GCode(object):
                     x = line['x'] if 'x' in line else cx
                     y = line['y'] if 'y' in line else cy
                     z = line['z'] if 'z' in line else cz
-                    points.append([x, y, z])
+                    self.checked.points.append([x, y, z])
                     cx, cy, cz = x, y, z
                 elif gc == 2 or gc == 3:
                     x = line['x'] if 'x' in line else cx
@@ -68,20 +75,34 @@ class GCode(object):
                     i = line['i'] if 'i' in line else 0
                     j = line['j'] if 'j' in line else 0
                     r = line['r'] if 'r' in line else None
-                    arc_points = GCode._linear_arc(gc, cx, cy, cz, x, y, z, i, j, r, _tolerance_)
-                    points.extend(arc_points)
+                    arc_points = []
+                    try:
+                        arc_points = GCode._check_arc(gc, cx, cy, cz, x, y, z, i, j, r, _tolerance_)
+                    except:
+                        raise Exception('LỖI DÒNG: %s' % (line['raw']))
+                    self.checked.points.extend(arc_points)
                     cx, cy, cz = arc_points[-1]
                 elif gc == 90:
                     continue
                 else:
-                    raise Exception(f'G{gc} Not supported')
-        return points
+                    raise Exception(f'KHÔNG HỖ TRỢ G{gc}')
+        xmin, xmax, ymin, ymax, zmin, zmax = 1e16, -1e16, 1e16, -1e16, 1e16, -1e16
+        for point in self.checked.points:
+            x, y, z = point
+            xmin = min(xmin, x)
+            xmax = max(xmax, x)
+            ymin = min(ymin, y)
+            ymax = max(ymax, y)
+            zmin = min(zmin, z)
+            zmax = max(zmax, z)
+        self.checked.bound_min = [xmin, ymin, zmin]
+        self.checked.bound_max = [xmax, ymax, zmax]
     
     @staticmethod
-    def _linear_arc(_type_, _sx_, _sy_, _sz_, _ex_, _ey_, _ez_, _i_, _j_, _r_, _tolerance_):
+    def _check_arc(_type_, _sx_, _sy_, _sz_, _ex_, _ey_, _ez_, _i_, _j_, _r_, _tolerance_):
         points = [[_sx_, _sy_, _sz_]]
         if _r_ != None:
-            _i_, _j_ = GCode._r_to_ij(_sx_, _sy_, _ex_, _ey_, _r_, _type_ == 2, _r_ < 0)
+            _i_, _j_ = GCode._arc_r_to_ij(_sx_, _sy_, _ex_, _ey_, _r_, _type_ == 2, _r_ < 0)
         cx = _sx_ + _i_
         cy = _sy_ + _j_
         rs = math.hypot(_sx_ - cx, _sy_ - cy)
@@ -110,18 +131,16 @@ class GCode(object):
                 y = _ey_
             else:
                 x = cx + radius * math.cos(current_angle)
-                y = cy + radius * math.sin(current_angle)                
+                y = cy + radius * math.sin(current_angle)
             points.append([round(x, 4), round(y, 4), _ez_])
         #
         return points
 
     @staticmethod
-    def _r_to_ij(_sx_, _sy_, _ex_, _ey_, _r_, _cw_, _large_=False):
+    def _arc_r_to_ij(_sx_, _sy_, _ex_, _ey_, _r_, _cw_, _large_=False):
         dx = _ex_ - _sx_
         dy = _ey_ - _sy_
         d = math.sqrt(dx**2 + dy**2)
-        if _r_ < d / 2:
-            raise ValueError('Radius is too small to reach the end point.')
         h = math.sqrt(_r_**2 - (d / 2)**2)
         mx = (_sx_ + _ex_) / 2
         my = (_sy_ + _ey_) / 2

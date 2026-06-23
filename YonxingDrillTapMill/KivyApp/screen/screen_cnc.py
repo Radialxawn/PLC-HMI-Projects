@@ -1,15 +1,16 @@
-import math
 from kivy.app import App
 from core.draw import Draw
 from kivy.clock import Clock
+from core.ui import UITextInputInteger
 from kivy.uix.screenmanager import Screen
 from popup.popup_progress import PopupProgress
 from popup.popup_file import PopupFile
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
+from core.data import Data
 from core.mouse import Mouse
-from core.ui import UITextInputInteger
-from kivy.graphics import Color, Line, Rectangle, Ellipse, RoundedRectangle
+from core.helper import Helper
+from kivy.graphics import Color, Line, Rectangle
 from kivy.utils import get_color_from_hex as clhex
 
 class ScreenCNC(Screen):
@@ -21,6 +22,7 @@ class ScreenCNC(Screen):
         self._cnc_id = -1
         self._cnc_id_selector_active = False
         self._line_points = []
+        self.ids.cnc_error.opacity = 0
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
     
     def on_pre_enter(self, *args):
@@ -56,7 +58,8 @@ class ScreenCNC(Screen):
         name__data = {
             'hmi.cnc_feed': {'label': 'TỐC ĐỘ (mm/min)', 'factor': 1},
         }
-        self.ids.cnc_property.width = 180
+        self.ids.left.width = 180
+        self.ids.cnc_preview.height = 180
         for name in name__data:
             data = name__data[name]
             label = Label(
@@ -66,7 +69,7 @@ class ScreenCNC(Screen):
                 halign='left',
                 valign='center',
                 height=40,
-                width=180
+                width=self.ids.left.width
             )
             label.bind(size=label.setter('text_size'))
             input = UITextInputInteger(
@@ -120,20 +123,33 @@ class ScreenCNC(Screen):
         if work_state == None:
             work_state = 0
         self.ids.cnc_run.background_color = clhex("#6AA145") if work_state > 500 else clhex("#5F5F5F")
+        self.ids.cnc_run.disabled = work_state < 100
         self.ids.cnc_error.opacity = 1 if app.data.get('hmi.view_cnc_error') else 0
         cnc_id = app.data.get('hmi.cnc_id')
         if cnc_id != self._cnc_id:
             self._cnc_id = cnc_id
             for i in range(6):
                 color = clhex("#6AA145") if cnc_id == i else clhex("#5F5F5F")
-                self.ids[f'cnc_{i}'].background_color = color
+                cnc_button = self.ids[f'cnc_{i}']
+                cnc_button.background_color = color
+                cnc_button.disabled = work_state > 100
+            self._redraw_preview()
         if work_state == 510:
             self._line_update()
     
     def _update_canvas(self, *args):
-        self._redraw(True)
+        self._redraw_path(True)
+        self._redraw_preview()
     
-    def _redraw(self, _canvas_):
+    def _redraw_preview(self):
+        image, _ = Helper.cnc_preview_image_get(_index_=self._cnc_id, _image_=True)
+        prv = self.ids.cnc_preview
+        prv.canvas.clear()
+        with prv.canvas:
+            if image != None:
+                Rectangle(texture=image.texture, pos=prv.pos, size=prv.size)
+    
+    def _redraw_path(self, _canvas_):
         area = self.ids.area
         area.canvas.clear()
         if _canvas_:
@@ -160,7 +176,7 @@ class ScreenCNC(Screen):
                     self._mouse.drag_begin[1] = touch.pos[1]
                     self._mouse.drag_offset = self._draw.offset_pixel
             if changed:
-                self._redraw(False)
+                self._redraw_path(False)
         else:
             return super().on_touch_down(touch)
 
@@ -171,7 +187,7 @@ class ScreenCNC(Screen):
                     dxp = touch.pos[0] - self._mouse.drag_begin[0] + self._mouse.drag_offset[0]
                     dyp = touch.pos[1] - self._mouse.drag_begin[1] + self._mouse.drag_offset[1]
                     self._draw.offset_pixel = [dxp, dyp]
-                    self._redraw(False)
+                    self._redraw_path(False)
             return True
         return super().on_touch_down(touch)
 
@@ -206,7 +222,6 @@ class ScreenCNC(Screen):
         app.data.set('hmi.cnc_id', self._name__index[_instance_.text])
 
     def _cnc_download(self, _instance_):
-        self._download_cnc_index = _instance_.cnc_index
         popup = PopupFile(
             title='CHỌN TỆP CNC',
         ).set_data(
@@ -219,12 +234,22 @@ class ScreenCNC(Screen):
     
     def _cnc_download_confirm(self, _source_path_, _cnc_index_):
         app = App.get_running_app()
+        try:
+            self._download_cnc_gcode = Helper.gcode_read(_source_path_)
+        except Exception as error:
+            app.m_show_popup_error(
+                _message_=str(error),
+                _acknowledge_=None)
+            return
+        Helper.cnc_preview_image_remove(_cnc_index_)
+        self._download_cnc_index = _cnc_index_
+        self._download_cnc_chunks = self._download_cnc_gcode.chunks(Data.DOWNLOAD_CHUNK_SIZE)
         app.m_show_popup_confirm(
             _message_=f'TẢI TỆP [{_source_path_.stem}] XUỐNG PLC [CNC {_cnc_index_+1}]?',
-            _confirm_=lambda : self._cnc_download_start(_source_path_)
+            _confirm_=self._cnc_download_start
         )
     
-    def _cnc_download_start(self, _source_path_):
+    def _cnc_download_start(self):
         app = App.get_running_app()
         popup = PopupProgress().set_data(
             _cancel_=app.data.download_cancel
@@ -232,13 +257,19 @@ class ScreenCNC(Screen):
         popup.open()
         self._popup_progress = popup
         app.data.download_start(
-            _source_path_=_source_path_,
-            _destination_index_=self._download_cnc_index,
+            _index_=self._download_cnc_index,
+            _chunks_=self._download_cnc_chunks,
             _progress_=self._cnc_download_progress
         )
     
     def _cnc_download_progress(self, _value_):
         self._popup_progress.progress(_value_)
+        match _value_:
+            case 101:
+                Helper.cnc_preview_image_generate(
+                    _gcode_=self._download_cnc_gcode,
+                    _index_=self._download_cnc_index,
+                )
     
     def _cnc_run(self, _value_):
         self._line_points = []

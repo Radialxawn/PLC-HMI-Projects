@@ -1,3 +1,5 @@
+from core.helper import Helper
+
 class Shape(object):
     property__data = {
         'x':  {'label': ' X', 'factor': -1e-3},
@@ -33,7 +35,10 @@ class Shape(object):
         'lockaf':   {'id': 9,  'label': 'KHOÁ 1B', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
         'lockb':    {'id': 10, 'label': 'KHOÁ 2A', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
         'lockbf':   {'id': 11, 'label': 'KHOÁ 2B', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
-        'custom_0': {'id': 12, 'label': 'CNC 1',   'property__data': {'x': None, 'y': None,}},
+        'custom_0': {'id': 12, 'label': 'CNC 1',   'property__data': {'x': None, 'y': None,
+            },
+            'view_micro': 100_000
+        },
         'custom_1': {'id': 13, 'label': 'CNC 2',   'property__data': {'x': None, 'y': None,}},
         'custom_2': {'id': 14, 'label': 'CNC 3',   'property__data': {'x': None, 'y': None,}},
         'custom_3': {'id': 15, 'label': 'CNC 4',   'property__data': {'x': None, 'y': None,}},
@@ -100,6 +105,11 @@ class Shape(object):
                 self.vb = int(min(self.va, self.vb))
             case 11: # lockbf
                 self.vb = int(min(self.va, self.vb))
+        scid = Shape.get_custom_id(self.id)
+        if scid >= 0:
+            image, _ = Helper.cnc_preview_image_get(_index_=scid, _image_=False)
+            if image == None:
+                self.id = 0
 
     def contain(self, _lx_, _ly_, _r_):
         dx = _lx_ - self.x
@@ -145,7 +155,8 @@ class Shape(object):
                 inside_capsule = Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vb*0.5)
                 inside_rect = Shape._inside_local_rect_r(dx, dy-ky, self.vd, self.vc, 0)
                 return inside_capsule or inside_rect
-        return (dx*dx + dy*dy) < _r_*_r_
+        sa = Shape.shape_name__data['custom_0']['view_micro']
+        return Shape._inside_local_rect_r(dx, dy, sa, sa, 0)
 
     @staticmethod
     def _inside_local_circle(_px_, _py_, _r_):
@@ -164,3 +175,12 @@ class Shape(object):
         tx = dx - inner_w
         ty = dy - inner_h
         return (tx * tx + ty * ty) <= (_r_ * _r_)
+
+    @staticmethod
+    def get_custom_id(_id_):
+        base_i_max = 11
+        if _id_ > base_i_max:
+            _id_ -= base_i_max + 1
+            return _id_
+        return -1
+        

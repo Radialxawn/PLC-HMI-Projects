@@ -59,7 +59,7 @@ class UITextInputInteger(TextInput):
             self.text = ''
     
     def v_value_get(self):
-        return int(self._v_value / self._v_factor)
+        return round(self._v_value / self._v_factor)
 
     def insert_text(self, _substring_, from_undo=False):
         filtered = re.sub(self._v_pattern, '', _substring_)

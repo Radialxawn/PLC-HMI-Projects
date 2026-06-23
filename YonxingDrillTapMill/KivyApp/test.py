@@ -3,8 +3,8 @@ import sys
 from pathlib import Path
 from core.data import Data
 from data.face import Face
-from core.gcode import GCode
-import matplotlib.pyplot as plt
+from core.helper import Helper
+import matplotlib.pyplot as pyplot
 
 def testa():
     data = Data(
@@ -36,33 +36,24 @@ def ab(*params):
     for param in params:
         print(param)
 
-def testd():
-    path = Path(r'C:/Users/Admin/Desktop/CNC/test.cnc')
-    gcode = GCode().read(path)
-    print('raw:')
-    for line in gcode.raw:
-        print(line)
-    print('parsed:')
-    gcode.parse()
-    for line in gcode.parsed:
-        print(line)
-    points = []
+def testd(_name_, _index_):
+    path = Helper.path_get('CNC') / f'{_name_}.cnc'
+    gcode = None
     try:
-        points = gcode.linear(0.1)
-    except:
-        print('Error')
+        gcode = Helper.gcode_read(path)
+    except Exception as error:
+        print(error)
         return
-    xs, ys = [], []
-    for point in points:
-        print(point)
-        xs.append(point[0])
-        ys.append(point[1])
-    plt.plot(xs, ys)
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.show()
+    Helper.cnc_preview_image_generate(
+        _gcode_=gcode,
+        _index_=_index_,
+    )
+    image, pixel_per_mm = Helper.cnc_preview_image_get(_index_)
+    print(image, 'pixel_per_mm', pixel_per_mm)
 
 parameters = sys.argv[1:]
-if len(parameters) > 0:
+parameter_count = len(parameters)
+if parameter_count > 0:
     match parameters[0]:
         case 'a':
             testa()
@@ -71,4 +62,7 @@ if len(parameters) > 0:
         case 'c':
             testc()
         case 'd':
-            testd()
+            if parameter_count > 2 and int(parameters[2]) in range(6):
+                testd(parameters[1], parameters[2])
+            else:
+                print('No name and index')

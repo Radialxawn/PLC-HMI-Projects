@@ -114,6 +114,7 @@ class ScreenHome(Screen):
             for index in self._index__face:
                 face = self._index__face[index]
                 face.from_json(save_data[str(index)])
+                face.limit()
         except:
             app = App.get_running_app()
             app.m_show_popup_error(

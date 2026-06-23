@@ -24,7 +24,7 @@
                 id: cnc_run
                 text: "CHẠY THỬ"
                 size_hint_x: None
-                width: 160
+                width: 120
                 on_press: root._cnc_run(True)
                 on_release: root._cnc_run(False)
             Spinner:
@@ -37,10 +37,23 @@
             padding: 5
             spacing: 5
             BoxLayout:
-                id: cnc_property
+                id: left
                 orientation: 'vertical'
                 spacing: 5
                 size_hint_x: None
+                BoxLayout:
+                    id: cnc_property
+                    orientation: 'vertical'
+                    spacing: 5
+                Widget:
+                    id: cnc_preview
+                    size_hint_y: None
+                    canvas.before:
+                        Color:
+                            rgba: clhex('#ffffff')
+                        Rectangle:
+                            pos: self.x, self.y
+                            size: self.width, self.height
             StencilView:
                 id: area
                 canvas.before:
