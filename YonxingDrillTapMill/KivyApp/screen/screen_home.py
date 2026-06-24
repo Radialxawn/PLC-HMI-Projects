@@ -49,6 +49,7 @@ class ScreenHome(Screen):
                 'hmi.view_axis_tmp_micro[2]',
                 'hmi.view_tool_offset_micro[0]',
                 'hmi.view_tool_offset_micro[1]',
+                'hmi.cnc_speed_factor_micro',
             }
             for i in range(app.machine.problem_count):
                 self._name__hash.add(f'hmi.view_problem[{i}]')
@@ -57,6 +58,7 @@ class ScreenHome(Screen):
                 data = ScreenSettingAxis.axis_name__data[name]
                 self._name__hash.add('hmi.view_axis_overload[%d]' % (data['index']))
             self._index__face, self._index__face_cog = self._generate()
+            self.ids.slider.bind(value=self._slider_value_change)
             self.ids.area_top.bind(pos=self._update_canvas_area_top, size=self._update_canvas_area_top)
             self.ids.area_front.bind(pos=self._update_canvas_area_front, size=self._update_canvas_area_front)
     
@@ -68,6 +70,10 @@ class ScreenHome(Screen):
             index__face[i] = Face(i, _z_count_=3, _shape_count_=10)
             index__face_cog[i] = None
         return index__face, index__face_cog
+
+    def _slider_value_change(self, _instance_, _value_):
+        app = App.get_running_app()
+        app.data.set('hmi.cnc_speed_factor_micro', _value_)
     
     def on_enter(self, *args):
         app = App.get_running_app()
@@ -91,6 +97,9 @@ class ScreenHome(Screen):
             for i in range(len(app.machine.index__face)):
                 color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
                 self.ids[f'face_{i}'].background_color = color
+        cnc_speed_factor_micro = app.data.get('hmi.cnc_speed_factor_micro')
+        if cnc_speed_factor_micro != None and cnc_speed_factor_micro != self.ids.slider.value:
+            self.ids.slider.value = cnc_speed_factor_micro
         self._problem_check()
     
     def _problem_check(self):
