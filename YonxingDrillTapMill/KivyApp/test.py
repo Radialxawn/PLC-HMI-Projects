@@ -5,6 +5,9 @@ from core.data import Data
 from data.face import Face
 from core.helper import Helper
 import matplotlib.pyplot as pyplot
+from screen.screen_load import ScreenLoad
+
+machine = ScreenLoad.config_machine_load()
 
 def testa():
     data = Data(
@@ -48,7 +51,7 @@ def testd(_name_, _index_):
         _gcode_=gcode,
         _index_=_index_,
     )
-    image, pixel_per_mm = Helper.cnc_preview_image_get(_index_)
+    image, pixel_per_mm = Helper.cnc_preview_image_get(_index_=_index_, _image_=True)
     print(image, 'pixel_per_mm', pixel_per_mm)
 
 parameters = sys.argv[1:]
@@ -62,7 +65,7 @@ if parameter_count > 0:
         case 'c':
             testc()
         case 'd':
-            if parameter_count > 2 and int(parameters[2]) in range(6):
+            if parameter_count > 2 and int(parameters[2]) in range(machine.shape_custom_count):
                 testd(parameters[1], parameters[2])
             else:
                 print('No name and index')

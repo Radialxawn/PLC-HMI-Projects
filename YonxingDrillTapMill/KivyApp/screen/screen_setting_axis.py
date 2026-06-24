@@ -10,20 +10,20 @@ from core.ui import UITextInputInteger
 from kivy.uix.label import Label
 
 class ScreenSettingAxis(Screen):
-    axis_name__index = {
-        'R-x':     0,
-        'RM-V-y':  2,
-        'RM-V-z':  1,
-        'RM-H-y':  3,
-        'RM-H-z':  4,
-        'L-x':     5,
-        'LDT-V-y': 7,
-        'LD-V-z':  6,
-        'LD-L-z':  10,
-        'LT-V-z':  8,
-        'LT-V-a':  9,
-        'LT-L-z':  11,
-        'LT-L-a':  12,
+    axis_name__data = {
+        'R-x':     {'index': 0,  'label': 'PHẢI: X'},
+        'RM-V-y':  {'index': 2,  'label': 'PHẢI: Y ĐỨNG'},
+        'RM-V-z':  {'index': 1,  'label': 'PHẢI: Z ĐỨNG'},
+        'RM-H-y':  {'index': 3,  'label': 'PHẢI: Y NGANG'},
+        'RM-H-z':  {'index': 4,  'label': 'PHẢI: Z NGANG'},
+        'L-x':     {'index': 5,  'label': 'TRÁI: X'},
+        'LDT-V-y': {'index': 7,  'label': 'TRÁI: Y'},
+        'LD-V-z':  {'index': 6,  'label': 'TRÁI: KHOAN Z ĐỨNG'},
+        'LD-L-z':  {'index': 10, 'label': 'TRÁI: KHOAN Z NGHIÊNG'},
+        'LT-V-z':  {'index': 8,  'label': 'TRÁI: TARO Z ĐỨNG'},
+        'LT-V-a':  {'index': 9,  'label': 'TRÁI: TARO XOAY ĐỨNG'},
+        'LT-L-z':  {'index': 11, 'label': 'TRÁI: TARO Z NGHIÊNG'},
+        'LT-L-a':  {'index': 12, 'label': 'TRÁI: TARO XOAY NGHIÊNG'},
     }
 
     property__data = {
@@ -122,9 +122,10 @@ class ScreenSettingAxis(Screen):
         axis_name_array = []
         axis_index_array = []
         label__data, name__input, name__value = {}, {}, {}
-        for name in ScreenSettingAxis.axis_name__index:
+        for name in ScreenSettingAxis.axis_name__data:
+            data = ScreenSettingAxis.axis_name__data[name]
             axis_name_array.append(name)
-            axis_index_array.append(ScreenSettingAxis.axis_name__index[name])
+            axis_index_array.append(data['index'])
         property_array = []
         for property in ScreenSettingAxis.property__data:
             property_array.append(property)
@@ -185,16 +186,16 @@ class ScreenSettingAxis(Screen):
         app = App.get_running_app()
         value = _instance_.state == 'down'
         app.data.set(_instance_.name, value)
-        app.m_save_need_check()
+        app.helper.save_need_check()
         
     def _on_text_input_validate(self, _instance_, _value_):
         app = App.get_running_app()
         app.data.set(_instance_.v_key, _value_)
-        app.m_save_need_check()
+        app.helper.save_need_check()
     
     def _on_home_recorded_reset(self):
         app = App.get_running_app()
-        app.m_show_popup_confirm(
+        app.helper.show_popup_confirm(
             _message_='RESET GỐC ENCODER?',
             _confirm_=self._on_home_recorded_reset_confirm
         )
@@ -202,7 +203,7 @@ class ScreenSettingAxis(Screen):
     def _on_home_recorded_reset_confirm(self):
         app = App.get_running_app()
         app.data.set('hmi.cf.home_encoder_value_recorded', False)
-        app.m_save_need_check()
+        app.helper.save_need_check()
     
     def _config_axis_path(self):
         return Path(Path(__file__).resolve().parent.parent, 'config/axis.json')
@@ -222,11 +223,11 @@ class ScreenSettingAxis(Screen):
             if value == None:
                 continue
             app.data.set(name, value)
-        app.m_save_need_check()
+        app.helper.save_need_check()
 
     def _config_axis_load(self):
         app = App.get_running_app()
-        app.m_show_popup_confirm(
+        app.helper.show_popup_confirm(
             _message_='LẤY DỮ LIỆU TRÊN HMI?',
             _confirm_=self._config_axis_load_confirm
         )
@@ -245,7 +246,7 @@ class ScreenSettingAxis(Screen):
 
     def _config_axis_save(self):
         app = App.get_running_app()
-        app.m_show_popup_confirm(
+        app.helper.show_popup_confirm(
             _message_='LƯU DỮ LIỆU VÀO HMI?',
             _confirm_=self._config_axis_save_confirm
         )

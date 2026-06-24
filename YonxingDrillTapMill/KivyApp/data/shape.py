@@ -1,3 +1,4 @@
+from kivy.app import App
 from core.helper import Helper
 
 class Shape(object):
@@ -44,6 +45,8 @@ class Shape(object):
         'custom_3': {'id': 15, 'label': 'CNC 4',   'property__data': {'x': None, 'y': None,}},
         'custom_4': {'id': 16, 'label': 'CNC 5',   'property__data': {'x': None, 'y': None,}},
         'custom_5': {'id': 17, 'label': 'CNC 6',   'property__data': {'x': None, 'y': None,}},
+        'custom_6': {'id': 18, 'label': 'CNC 7',   'property__data': {'x': None, 'y': None,}},
+        'custom_7': {'id': 19, 'label': 'CNC 8',   'property__data': {'x': None, 'y': None,}},
     }
 
     def __init__(self):

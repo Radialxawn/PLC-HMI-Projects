@@ -160,15 +160,19 @@ class Data(object):
                     elms.append(e)
                 self._create_generate('%s.%s' % (_node_, sname), elms, _utype__elms_, _ids_, _types_)
     
-    def _get_all_start(self):
+    def get_all_start(self):
+        if hasattr(self, '_get_all_clock'):
+            return
+        print('Data get all start')
         self._get_all_done = True
         self._get_all_index = 0
         self._get_all_clock = Clock.schedule_interval(self._get_all, self._get_all_interval)
     
-    def _get_all_stop(self):
+    def get_all_stop(self):
         if hasattr(self, '_get_all_clock'):
             Clock.unschedule(self._get_all_clock)
             delattr(self, '_get_all_clock')
+            print('Data get all stop')
 
     def _get_all(self, _dt_):
         if not self._get_all_done:
@@ -188,13 +192,13 @@ class Data(object):
         self.gets(names)
         self._get_all_done = True
     
-    def get(self, _name_):
+    def get(self, _name_): # get local data
         if self._connect_state == 100:
             block = self._name__block[_name_]
             return block.value
         return None
     
-    def gets(self, _names_):
+    def gets(self, _names_): # get ua nodes
         if self._connect_state == 100:
             nodes = []
             for name in _names_:
@@ -207,12 +211,12 @@ class Data(object):
                 block.node = node
                 block.value = values[i]
 
-    def set(self, _name_, _value_):
+    def set(self, _name_, _value_): # set ua node
         if self._connect_state == 100:
             block = self._name__block[_name_]
             block.node.set_value(block.get_ua_value(_value_))
     
-    def sets(self, _name__value_):
+    def sets(self, _name__value_): # set ua nodes
         if self._connect_state == 100:
             nodes = []
             values = []
@@ -273,13 +277,13 @@ class Data(object):
         self._connect_state = 100
         self._get_all_interval = _interval_
         self._get_all_step = _step_
-        self._get_all_start()
+        self.get_all_start()
         print('Connected')
 
     def disconnect(self):
         if self._connect_state != 100:
             return
-        self._get_all_stop()
+        self.get_all_stop()
         self._connect_state = 90
         if self.can_connect():
             self._client.disconnect()
@@ -308,7 +312,7 @@ class Data(object):
             cancel=False,
             state=1
         )
-        self._get_all_stop()
+        self.get_all_stop()
         self._download_process_clock = Clock.schedule_interval(self._download_process, 0.001)
 
     def _download_process(self, _):
@@ -358,7 +362,7 @@ class Data(object):
                     dl.progress(-1)
                 else:
                     dl.progress(101)
-                self._get_all_start()
+                self.get_all_start()
     
     def download_cancel(self):
         if hasattr(self, '_dl'):

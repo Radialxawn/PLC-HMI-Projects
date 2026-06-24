@@ -24,7 +24,7 @@
                 text: "TRỤC"
                 size_hint_x: None
                 width: 120
-                on_press: app.m_show_popup_login('7412369', 'setting_axis')
+                on_press: app.helper.show_popup_login('7412369', 'setting_axis')
         BoxLayout:
             orientation: 'horizontal'
             spacing: 5
@@ -55,13 +55,13 @@
                 text: 'LƯU'
                 size_hint_x: None
                 width: 120
-                on_press: app.m_save_accept()
+                on_press: app.helper.save_accept()
             Button:
                 id: hmi.cfsh.decline
                 text: 'KHÔNG'
                 size_hint_x: None
                 width: 120
-                on_press: app.m_save_decline()
+                on_press: app.helper.save_decline()
             Widget:
             Button:
                 id: face_0
@@ -99,4 +99,4 @@
                 text: 'HOME'
                 size_hint_x: None
                 width: 90
-                on_press: app.m_home()
+                on_press: app.helper.home()

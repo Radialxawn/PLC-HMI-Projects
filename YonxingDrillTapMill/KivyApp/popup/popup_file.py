@@ -45,7 +45,7 @@ class PopupFile(Popup):
 
     def _delete(self):
         app = App.get_running_app()
-        app.m_show_popup_confirm(
+        app.helper.show_popup_confirm(
             _message_=f'XOÁ TỆP [{self._select_path.stem}]?',
             _confirm_=self._delete_confirm
         )

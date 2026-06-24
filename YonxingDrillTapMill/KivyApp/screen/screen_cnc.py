@@ -42,10 +42,11 @@ class ScreenCNC(Screen):
             self._name__index, self._name__input, self._name__value = self._generate()
     
     def _generate(self):
+        app = App.get_running_app()
         cnc_id_selector = self.ids.cnc_id_selector
         name__index = {}
         values = []
-        for i in range(6):
+        for i in range(app.machine.shape_custom_count):
             button = self.ids[f'cnc_{i}']
             button.text = f'CNC {i+1}'
             button.cnc_index = i
@@ -128,7 +129,7 @@ class ScreenCNC(Screen):
         cnc_id = app.data.get('hmi.cnc_id')
         if cnc_id != self._cnc_id:
             self._cnc_id = cnc_id
-            for i in range(6):
+            for i in range(app.machine.shape_custom_count):
                 color = clhex("#6AA145") if cnc_id == i else clhex("#5F5F5F")
                 cnc_button = self.ids[f'cnc_{i}']
                 cnc_button.background_color = color
@@ -237,14 +238,14 @@ class ScreenCNC(Screen):
         try:
             self._download_cnc_gcode = Helper.gcode_read(_source_path_)
         except Exception as error:
-            app.m_show_popup_error(
+            app.helper.show_popup_error(
                 _message_=str(error),
                 _acknowledge_=None)
             return
         Helper.cnc_preview_image_remove(_cnc_index_)
         self._download_cnc_index = _cnc_index_
         self._download_cnc_chunks = self._download_cnc_gcode.chunks(Data.DOWNLOAD_CHUNK_SIZE)
-        app.m_show_popup_confirm(
+        app.helper.show_popup_confirm(
             _message_=f'TẢI TỆP [{_source_path_.stem}] XUỐNG PLC [CNC {_cnc_index_+1}]?',
             _confirm_=self._cnc_download_start
         )
@@ -270,6 +271,7 @@ class ScreenCNC(Screen):
                     _gcode_=self._download_cnc_gcode,
                     _index_=self._download_cnc_index,
                 )
+                self._redraw_preview()
     
     def _cnc_run(self, _value_):
         self._line_points = []

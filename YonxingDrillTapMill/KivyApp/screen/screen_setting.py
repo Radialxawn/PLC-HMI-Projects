@@ -48,16 +48,17 @@ class ScreenSetting(Screen):
 
     def __init__(self, **kvargs):
         super(ScreenSetting, self).__init__(**kvargs)
-        for i in range(6):
-            button = self.ids[f'face_{i}']
-            button.text = f'MẶT {i+1}'
-            button.face_index = i
         self._face_index = -1
         self._first_load = True
     
     def on_pre_enter(self, *args):
         if self._first_load:
             self._first_load = False
+            app = App.get_running_app()
+            for i in range(len(app.machine.index__face)):
+                button = self.ids[f'face_{i}']
+                button.text = f'MẶT {i+1}'
+                button.face_index = i
             self._name__hash = {
                 'hmi.cfsh.need',
                 'hmi.cfsh.need_check',
@@ -126,7 +127,7 @@ class ScreenSetting(Screen):
     def _on_text_input_validate(self, _instance_, _value_):
         app = App.get_running_app()
         app.data.set(_instance_.v_key, _value_)
-        app.m_save_need_check()
+        app.helper.save_need_check()
 
     def _value_update(self, _dt_):
         app = App.get_running_app()
@@ -151,7 +152,7 @@ class ScreenSetting(Screen):
         face_index = app.data.get('hmi.face_index')
         if face_index != None and face_index != self._face_index:
             self._face_index = face_index
-            for i in range(6):
+            for i in range(len(app.machine.index__face)):
                 color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
                 self.ids[f'face_{i}'].background_color = color
             for i in range(2):

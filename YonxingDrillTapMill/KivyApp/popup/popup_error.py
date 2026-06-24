@@ -1,10 +1,11 @@
 from kivy.uix.popup import Popup
 
 class PopupError(Popup):
-    def set_data(self, _acknowledge_):
+    def set_data(self, _acknowledge_, _dismiss_):
         self._acknowledge_ = _acknowledge_
         self.ids.acknowledge.opacity = 0 if _acknowledge_ == None else 1
         self.ids.acknowledge.disabled = _acknowledge_ == None
+        self._dismiss_ = _dismiss_
         return self
 
     def _acknowledge(self):
@@ -13,3 +14,7 @@ class PopupError(Popup):
 
     def _exit(self):
         self.dismiss()
+    
+    def on_dismiss(self):
+        self._dismiss_()
+        return super().on_dismiss()

@@ -22,10 +22,8 @@ from screen.screen_home import ScreenHome
 from screen.screen_setting import ScreenSetting
 from kivy.uix.screenmanager import ScreenManager, FadeTransition
 from screen.screen_setting_axis import ScreenSettingAxis
-from popup.popup_confirm import PopupConfirm
 from screen.screen_load import ScreenLoad
-from popup.popup_login import PopupLogin
-from popup.popup_error import PopupError
+from core.helper import Helper
 
 Builder.load_file('style.kv')
 Builder.load_file('screen/screen_load.kv')
@@ -57,6 +55,7 @@ class Main(App):
             _xml_path_windows_=r'D:/Github/PLC-HMI-Projects/YonxingDrillTapMill/MC500/MC500.Device.Application.xml',
             _tag_head_='ns=4;s=|var|LS'
         )
+        self.helper = Helper()
         sm = ScreenManager(transition=FadeTransition(duration=0.3))
         sm.add_widget(ScreenLoad(name='load'))
         sm.add_widget(ScreenHome(name='home'))
@@ -89,39 +88,6 @@ class Main(App):
         else:
             if self.data.connect_state() == 100:
                 self.data.disconnect()
-
-    def m_save_accept(self):
-        self.data.set('hmi.cfsh.accept', True)
-    
-    def m_save_decline(self):
-        self.data.set('hmi.cfsh.decline', True)
-    
-    def m_save_need_check(self):
-        self.data.set('hmi.cfsh.need_check', True)
-    
-    def m_home(self):
-        self.data.set('hmi.home', True)
-    
-    def m_show_popup_confirm(self, _message_, _confirm_):
-        popup = PopupConfirm().set_data(
-            _confirm_=_confirm_
-        )
-        popup.ids['message'].text = _message_
-        popup.open()
-    
-    def m_show_popup_login(self, _password_, _screen_):
-        popup = PopupLogin().set_data(
-            _password_=_password_,  
-            _screen_=_screen_
-        )
-        popup.open()
-    
-    def m_show_popup_error(self, _message_, _acknowledge_):
-        popup = PopupError().set_data(
-            _acknowledge_=_acknowledge_
-        )
-        popup.ids.message.text = _message_
-        popup.open()
 
 if __name__ == '__main__':
     Main().run()
