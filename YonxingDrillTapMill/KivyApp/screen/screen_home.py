@@ -222,7 +222,7 @@ class ScreenHome(Screen):
             match=[False] * len(chunks),
         )
         app.data.get_all_stop()
-        self._profile_download_progress_clock = Clock.schedule_interval(self._profile_download_progress, 0.05)
+        self._profile_download_progress_clock = Clock.schedule_interval(self._profile_download_progress, 0.01)
 
     def _profile_download_cancel(self):
         self._profile_download_data.state = 11

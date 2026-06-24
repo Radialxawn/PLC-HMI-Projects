@@ -28,9 +28,9 @@ class Helper(object):
         app = App.get_running_app()
         app.data.set('hmi.cfsh.need_check', True)
     
-    def home(self):
+    def home(self, _value_):
         app = App.get_running_app()
-        app.data.set('hmi.home', True)
+        app.data.set('hmi.home', _value_)
     
     def _popup_is_active(self, _name_: str):
         return self._name__popup[_name_] != None

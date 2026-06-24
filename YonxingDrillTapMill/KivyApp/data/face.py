@@ -6,7 +6,7 @@ class Face(object):
         'oy':            {'label': ' GỐC Y',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[1]'},
         'oz':            {'label': ' GỐC Z',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[2]'},
         'tool_diameter': {'label': ' ĐƯỜNG KÍNH DAO',  'factor': 1e-3},
-        'tool_offset':   {'label': ' DAO LỆCH CHUẨN',  'factor': 1e-3,  'name_view': 'hmi.view_tool_offset_micro[{}]'},
+        'tool_offset':   {'label': ' DAO LỆCH CHUẨN',  'factor': -1e-3,  'name_view': 'hmi.view_tool_offset_micro[{}]'},
         'depth':         {'label': ' ĐỘ SÂU MẶC ĐỊNH', 'factor': 1e-3},
         'feed':          {'label': ' TỐC ĐỘ (mm/min)', 'factor': 1},
     }

@@ -21,12 +21,12 @@ class PopupFace(Popup):
         self._delete_ = _delete_
         self._draw = Draw(1e-3, [0.5e-3, 10e-3])
         self._mouse = Mouse()
-        self._name__input_view, self._name__value = self._generate()
+        self._property__input, self._name__input_view, self._name__value = self._generate()
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
         return self
 
     def _generate(self):
-        name__input_view, name__value = {}, {}
+        property__input, name__input_view, name__value = {}, {}, {}
         self.ids.face_property.add_widget(Widget())
         self.ids.face_property.width = 380
         for property in Face.property__data:
@@ -56,6 +56,7 @@ class PopupFace(Popup):
             )
             input.v_value_set(self._face_edit[property])
             input.disabled = property in self._rule_['property_exclude']
+            property__input[property] = input
             box.add_widget(input)
             if 'name_view' in data and not input.disabled:
                 input_view = UITextInputInteger(
@@ -71,6 +72,7 @@ class PopupFace(Popup):
                 box.add_widget(input_view)
                 name__input_view[input_view.v_key] = input_view
                 name__value[input_view.v_key] = None
+                input.v_name_view = input_view.v_key
             self.ids.face_property.add_widget(box)
         self.ids.face_property.add_widget(Widget())
         for i in range(len(self._face_edit.z)):
@@ -116,7 +118,7 @@ class PopupFace(Popup):
             box.add_widget(zsinput)
             self.ids.face_property.add_widget(box)
         self.ids.face_property.add_widget(Widget())
-        return name__input_view, name__value
+        return property__input, name__input_view, name__value
 
     def on_open(self, *args):
         if not hasattr(self, '_value_update_clock'):
@@ -127,13 +129,24 @@ class PopupFace(Popup):
             Clock.unschedule(self._value_update_clock)
             delattr(self, '_value_update_clock')
     
+    def _face_to_org(self, _value_):
+        app = App.get_running_app()
+        app.data.set('hmi.face_to_org', _value_)
+    
     def _face_run(self, _value_):
         app = App.get_running_app()
         app.data.set('hmi.face_run', _value_)
     
-    def _face_to_org(self, _value_):
+    def _face_org_set(self):
         app = App.get_running_app()
-        app.data.set('hmi.face_to_org', _value_)
+        for property in ['ox', 'oy', 'oz', 'tool_offset']:
+            input = self._property__input[property]
+            if hasattr(input, 'v_name_view') and not input.disabled:
+                input_view = self._name__input_view[input.v_name_view]
+                value = app.data.get(input_view.v_key)
+                if value != None:
+                    input.v_value_set(value)
+                    self._on_text_input_validate(input, input.v_value_get())
 
     def _value_update(self, _dt_):
         app = App.get_running_app()
