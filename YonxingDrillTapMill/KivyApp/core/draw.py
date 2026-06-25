@@ -3,6 +3,7 @@ from kivy.utils import get_color_from_hex as clhex
 from kivy.core.image import Image as CoreImage
 from core.helper import Helper
 from data.shape import Shape
+import numpy as np
 
 class Draw(object):
     def __init__(self, _ppm_, _ppm_range_):
@@ -27,12 +28,17 @@ class Draw(object):
         self._offset_pixel[0] = _value_[0]
         self._offset_pixel[1] = _value_[1]
     
-    def pixel_to_micro(self, _x_, _y_):
-        return _x_ / self._pixel_per_micro, _y_ / self._pixel_per_micro
+    def pixel_to_micro(self, *_params_):
+        result = list(_params_)
+        for i, v in enumerate(result):
+            result[i] = v / self._pixel_per_micro
+        return result
 
-    def micro_to_pixel(self, _x_, _y_):
-        ppm = self._pixel_per_micro
-        return ppm * _x_ + self._offset_pixel[0], ppm * _y_ + self._offset_pixel[1]
+    def micro_to_pixel(self, *_params_):
+        result = list(_params_)
+        for i, v in enumerate(result):
+            result[i] = v * self._pixel_per_micro
+        return result
     
     def touch_pos_to_center_of_widget(self, _widget_, _touch_pos_):
         wgpos = _widget_.pos
@@ -55,63 +61,72 @@ class Draw(object):
             Rectangle(pos=[pos[0]+_max_x_pixel_, pos[1]-_area_.size[1]*0.5], size=[_width_, _area_.size[1]])
 
     def shape(self, _shape_, _pos_micro_):
-        ppm = self._pixel_per_micro
-        sa = _shape_.va * ppm
-        sb = _shape_.vb * ppm
-        sc = _shape_.vc * ppm
-        sd = _shape_.vd * ppm
-        se = _shape_.ve * ppm
+        sa, sb, sc, sd, se = self.micro_to_pixel(_shape_.va, _shape_.vb, _shape_.vc, _shape_.vd, _shape_.ve)
         px, py = self.micro_to_pixel(_pos_micro_[0], _pos_micro_[1])
+        poff = self.offset_pixel 
+        px += poff[0]
+        py += poff[1]
         match _shape_.id:
             case 1: # drill
                 texture = CoreImage('texture/drill.png').texture
-                sa = Shape.shape_name__data['drill']['view_micro'] * ppm
+                sa, = self.micro_to_pixel(Shape.shape_name__data['drill']['view_micro'])
                 Rectangle(texture=texture, pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
             case 2: # tap
                 texture = CoreImage('texture/tap.png').texture
-                sa = Shape.shape_name__data['tap']['view_micro'] * ppm
+                sa, = self.micro_to_pixel(Shape.shape_name__data['tap']['view_micro'])
                 Rectangle(texture=texture, pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
             case 3: # circle
-                Ellipse(pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
-            case 4: # rect
-                Rectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb])
-            case 5: # capsule
-                RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
-            case 6: # rectr
-                RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sc])
-            case 7: # ellipse
+                sa -= 4
+                sb -= 4
+                Line(ellipse=(px-sa*0.5, py-sb*0.5, sa, sb), width=2)
+            case 4: # circles
                 Ellipse(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb])
-            case 8: # locka
+            case 5: # rect
+                sa -= 4
+                sb -= 4
+                sc -= 2
+                Line(rounded_rectangle=(px-sa*0.5, py-sb*0.5, sa, sb, sc), width=2)
+            case 6: # rects
+                RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sc])
+            case 7: # locka
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Ellipse(pos=[px+(sa-2*sc)*0.5, py-sc*0.5], size=[sc, sc])
-            case 9: # lockaf
+            case 8: # lockaf
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Ellipse(pos=[px-sa*0.5, py-sc*0.5], size=[sc, sc])
-            case 10: # lockb
+            case 9: # lockb
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Rectangle(pos=[px-sd*0.5, py-sc*0.5-(sc-sb)*0.5], size=[sd, sc])
-            case 11: # lockbf
+            case 10: # lockbf
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Rectangle(pos=[px-sd*0.5, py-sc*0.5+(sc-sb)*0.5], size=[sd, sc])
         scid = Shape.get_custom_id(_shape_.id)
         if scid >= 0:
             image, pixel_per_mm = Helper.cnc_preview_image_get(_index_=scid, _image_=True)
-            sa = Shape.shape_name__data['custom_0']['view_micro'] * ppm
+            sa, = self.micro_to_pixel(Shape.shape_name__data['custom_0']['view_micro'])
             if image != None:
                 if pixel_per_mm != None:
-                    sa = (image.width * 1e3 / pixel_per_mm) * ppm
+                    sa, = self.micro_to_pixel(image.width * 1e3 / pixel_per_mm)
                 Rectangle(texture=image.texture, pos=(px-sa*0.5, py-sa*0.5), size=(sa, sa))
             Line(rectangle=(px-sa*0.5, py-sa*0.5, sa, sa), width=1)
     
     def face(self, _face_, _position_, _color_):
         px, py = _position_[0], _position_[1]
         Color(rgba=clhex("#000000ff"))
-        pxp, pyp = self.micro_to_pixel(px, py)
-        Rectangle(pos=[pxp, pyp], size=[50, 1])
-        Rectangle(pos=[pxp, pyp], size=[1, 50])
-        for i, iz in enumerate(_face_.z):
-            _, izp = self.micro_to_pixel(0, py - iz)
-            Rectangle(pos=[pxp, izp], size=[50, 1])
+        pxp, pyp, wp = self.micro_to_pixel(px, py, 50_000)
+        poff = self.offset_pixel
+        pxp += poff[0]
+        pyp += poff[1]
+        zpl = 0
+        for z, zs in zip(_face_.z, _face_.zs):
+            zp, zsp = self.micro_to_pixel(z, zs)
+            if zsp > 0:
+                for i in np.arange(zpl, zp, zsp):
+                    Rectangle(pos=[pxp-wp, pyp-i], size=[wp, 1])
+                Rectangle(pos=[pxp-wp, pyp-zp], size=[wp, 1])
+            else:
+                Rectangle(pos=[pxp-wp, pyp-zp], size=[wp, 1])
+            zpl = zp
         Color(rgba=_color_)
         for shape in _face_.shape:
             self.shape(shape, [px + shape.x,  py + shape.y])

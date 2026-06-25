@@ -327,12 +327,8 @@ class ScreenHome(Screen):
     def _profile_draw(self, _area_, _area_padding_x_, _face_indexs_, _colors_):
         app = App.get_running_app()
         active_width_pixel = _area_.size[0] - _area_padding_x_ * 2
-        x_max_micro = 0
-        for fi in _face_indexs_:
-            face = self._index__face[fi]
-            machine_face = app.machine.index__face[str(fi)]
-            x_max_micro = max(x_max_micro, machine_face['x'])
-        self._draw.pixel_per_micro = active_width_pixel / x_max_micro
+        self._draw.pixel_per_micro = active_width_pixel / app.machine.x_max_micro
+        index__center = {}
         _area_.canvas.clear()
         with _area_.canvas:
             self._draw.axis(_area_, [_area_padding_x_, _area_.center_y], active_width_pixel, 2)
@@ -344,16 +340,19 @@ class ScreenHome(Screen):
                 y += machine_face['y']
                 x += face.ox
                 y += face.oy
+                index__center[fi] = [x, y]
                 self._draw.face(_face_=face, _position_=[x, y], _color_=_colors_[i])
         #
         cog_texture = CoreImage('texture/cog.png').texture
+        cog_r = 8
         with _area_.canvas.after:
             for fi in _face_indexs_:
                 if self._index__face_cog[fi] != None:
                     _area_.canvas.after.remove(self._index__face_cog[fi])
+                fc = index__center[fi]
+                cxp, cyp = self._draw.micro_to_pixel(fc[0], fc[1])
                 Color(1, 1, 1, 1)
-                center = [_area_.center_x - 8, _area_.center_y - 8]
-                cog = Rectangle(texture=cog_texture, pos=center, size=(16, 16))
+                cog = Rectangle(texture=cog_texture, pos=[cxp-cog_r, cyp-cog_r], size=(cog_r*2, cog_r*2))
                 self._index__face_cog[fi] = cog
 
     def _face_select(self, _instance_):

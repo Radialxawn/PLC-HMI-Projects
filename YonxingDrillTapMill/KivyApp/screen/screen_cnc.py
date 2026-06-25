@@ -10,6 +10,7 @@ from kivy.uix.label import Label
 from core.data import Data
 from core.mouse import Mouse
 from core.helper import Helper
+from kivy.core.image import Image as CoreImage
 from kivy.graphics import Color, Line, Rectangle
 from kivy.utils import get_color_from_hex as clhex
 
@@ -22,6 +23,7 @@ class ScreenCNC(Screen):
         self._cnc_id = -1
         self._cnc_id_selector_active = False
         self._line_points = []
+        self._cog = None
         self.ids.cnc_error.opacity = 0
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
     
@@ -135,8 +137,7 @@ class ScreenCNC(Screen):
                 cnc_button.background_color = color
                 cnc_button.disabled = work_state > 100
             self._redraw_preview()
-        if work_state == 510:
-            self._line_update()
+        self._line_update()
     
     def _update_canvas(self, *args):
         self._redraw_path(True)
@@ -159,6 +160,9 @@ class ScreenCNC(Screen):
             self._draw.axis(area, [0, 0], None, 2)
             Color(rgba=clhex("#41bc41"))
             self._line = Line(points=self._line_points_to_pixel(), width=2)
+            Color(1, 1, 1, 1)
+            cog_texture = CoreImage('texture/cog.png').texture
+            self._cog = Rectangle(texture=cog_texture, pos=[0, 0], size=(16, 16))
 
     def on_touch_down(self, touch):
         _, _, inside = self._draw.touch_pos_to_center_of_widget(self.ids.area, touch.pos)
@@ -202,18 +206,28 @@ class ScreenCNC(Screen):
             add = True
         else:
             lx, ly = self._line_points[-1]
-            add = x != lx or y != ly
+            add = x != None and y != None and (x != lx or y != ly)
         if add:
             self._line_points.append([x, y])
         if count > 1500:
             self._line_points.pop(0)
-        self._line.points = self._line_points_to_pixel()
+        if add and self._cog != None:
+            xp, yp = self._draw.micro_to_pixel(x, y)
+            s = self._cog.size
+            poff = self._draw.offset_pixel
+            self._cog.pos = [xp + poff[0] - s[0]*0.5, yp + poff[1] - s[1]*0.5]
+            self._line.points = self._line_points_to_pixel()
+
+    def _clear(self):
+        self._line_points = []
+        self._line.points = self._line_points
     
     def _line_points_to_pixel(self):
         points = []
+        poff = self._draw.offset_pixel
         for point in self._line_points:
             xp, yp = self._draw.micro_to_pixel(point[0], point[1])
-            points.append([xp, yp])
+            points.append([xp + poff[0], yp + poff[1]])
         return points
     
     def _on_cnc_id_selector(self, _instance_):
@@ -242,7 +256,6 @@ class ScreenCNC(Screen):
                 _message_=str(error),
                 _acknowledge_=None)
             return
-        Helper.cnc_preview_image_remove(_cnc_index_)
         self._download_cnc_index = _cnc_index_
         self._download_cnc_chunks = self._download_cnc_gcode.chunks(Data.DOWNLOAD_CHUNK_SIZE)
         app.helper.show_popup_confirm(
@@ -252,6 +265,7 @@ class ScreenCNC(Screen):
     
     def _cnc_download_start(self):
         app = App.get_running_app()
+        Helper.cnc_preview_image_remove(self._download_cnc_index)
         popup = PopupProgress().set_data(
             _cancel_=app.data.download_cancel
         )

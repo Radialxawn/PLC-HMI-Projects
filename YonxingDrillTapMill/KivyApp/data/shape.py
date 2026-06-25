@@ -27,26 +27,26 @@ class Shape(object):
             },
             'view_micro': 100_000
         },
-        'circle':   {'id': 3,  'label': 'TRÒN',    'property__data': {'x': None, 'y': None, 'va': None}},
-        'rect':     {'id': 4,  'label': 'HỘP',     'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
-        'capsule':  {'id': 5,  'label': 'NANG',    'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
-        'rectr':    {'id': 6,  'label': 'HỘP BO',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
-        'ellipse':  {'id': 7,  'label': 'BẦU DỤC', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
-        'locka':    {'id': 8,  'label': 'KHOÁ 1A', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
-        'lockaf':   {'id': 9,  'label': 'KHOÁ 1B', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
-        'lockb':    {'id': 10, 'label': 'KHOÁ 2A', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
-        'lockbf':   {'id': 11, 'label': 'KHOÁ 2B', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
-        'custom_0': {'id': 12, 'label': 'CNC 1',   'property__data': {'x': None, 'y': None,
+        'circle':   {'id': 3,  'label': 'TRÒN',     'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
+        'circles':  {'id': 4,  'label': 'TRÒN ĐẶC', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
+        'rect':     {'id': 5,  'label': 'HỘP',      'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
+        'rects':    {'id': 6,  'label': 'HỘP ĐẶC',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
+        'locka':    {'id': 7,  'label': 'KHOÁ 1A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
+        'lockaf':   {'id': 8,  'label': 'KHOÁ 1B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
+        'lockb':    {'id': 9,  'label': 'KHOÁ 2A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
+        'lockbf':   {'id': 10, 'label': 'KHOÁ 2B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
+        # custom
+        'custom_0': {'id': 11, 'label': 'CNC 1',   'property__data': {'x': None, 'y': None,
             },
             'view_micro': 100_000
         },
-        'custom_1': {'id': 13, 'label': 'CNC 2',   'property__data': {'x': None, 'y': None,}},
-        'custom_2': {'id': 14, 'label': 'CNC 3',   'property__data': {'x': None, 'y': None,}},
-        'custom_3': {'id': 15, 'label': 'CNC 4',   'property__data': {'x': None, 'y': None,}},
-        'custom_4': {'id': 16, 'label': 'CNC 5',   'property__data': {'x': None, 'y': None,}},
-        'custom_5': {'id': 17, 'label': 'CNC 6',   'property__data': {'x': None, 'y': None,}},
-        'custom_6': {'id': 18, 'label': 'CNC 7',   'property__data': {'x': None, 'y': None,}},
-        'custom_7': {'id': 19, 'label': 'CNC 8',   'property__data': {'x': None, 'y': None,}},
+        'custom_1': {'id': 12, 'label': 'CNC 2',   'property__data': {'x': None, 'y': None,}},
+        'custom_2': {'id': 13, 'label': 'CNC 3',   'property__data': {'x': None, 'y': None,}},
+        'custom_3': {'id': 14, 'label': 'CNC 4',   'property__data': {'x': None, 'y': None,}},
+        'custom_4': {'id': 15, 'label': 'CNC 5',   'property__data': {'x': None, 'y': None,}},
+        'custom_5': {'id': 16, 'label': 'CNC 6',   'property__data': {'x': None, 'y': None,}},
+        'custom_6': {'id': 17, 'label': 'CNC 7',   'property__data': {'x': None, 'y': None,}},
+        'custom_7': {'id': 18, 'label': 'CNC 8',   'property__data': {'x': None, 'y': None,}},
     }
 
     def __init__(self):
@@ -94,7 +94,7 @@ class Shape(object):
         self.vb = max(2_000, self.vb)
         self.vc = max(2_000, self.vc)
         self.vd = max(2_000, self.vd)
-        self.ve = max(2_000, self.ve)
+        self.ve = max(0, self.ve)
         match self.id:
             case 5: # capsule
                 self.vb = int(min(self.va, self.vb))
@@ -127,12 +127,12 @@ class Shape(object):
                 sa = Shape.shape_name__data['tap']['view_micro']
                 return Shape._inside_local_circle(dx, dy, sa*0.5)
             case 3: # circle
-                return Shape._inside_local_circle(dx, dy, self.va*0.5)
-            case 4: # rect
-                return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, 0)
-            case 5: # capsule
-                return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vb*0.5)
-            case 6: # rectr
+                return Shape._inside_local_ellipse(dx, dy, self.va, self.vb)
+            case 4: # circlef
+                return Shape._inside_local_ellipse(dx, dy, self.va, self.vb)
+            case 5: # rect
+                return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vc)
+            case 6: # rectf
                 return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vc)
             case 7: # ellipse
                 if self.va == 0 or self.vb == 0:
@@ -162,13 +162,21 @@ class Shape(object):
         return Shape._inside_local_rect_r(dx, dy, sa, sa, 0)
 
     @staticmethod
-    def _inside_local_circle(_px_, _py_, _r_):
-        return  (_px_ * _px_ + _py_ * _py_) < (_r_ * _r_)
+    def _inside_local_circle(_dx_, _dy_, _r_):
+        return  (_dx_ * _dx_ + _dy_ * _dy_) < (_r_ * _r_)
 
     @staticmethod
-    def _inside_local_rect_r(_px_, _py_, _w_, _h_, _r_):
+    def _inside_local_ellipse(_dx_, _dy_, _a_, _b_):
+        if _a_ == 0 or _b_ == 0:
+            return False
+        a = _a_ * 0.5
+        b = _b_ * 0.5
+        return _dx_*_dx_/(a*a) + _dy_*_dy_/(b*b) <= 1.0
+
+    @staticmethod
+    def _inside_local_rect_r(_dx_, _dy_, _w_, _h_, _r_):
         hw, hh = _w_ * 0.5, _h_ * 0.5
-        dx, dy = abs(_px_), abs(_py_)
+        dx, dy = abs(_dx_), abs(_dy_)
         if dx > hw or dy > hh:
             return False
         inner_w = hw - _r_
@@ -181,7 +189,7 @@ class Shape(object):
 
     @staticmethod
     def get_custom_id(_id_):
-        base_i_max = 11
+        base_i_max = 10
         if _id_ > base_i_max:
             _id_ -= base_i_max + 1
             return _id_

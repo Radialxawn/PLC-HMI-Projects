@@ -22,7 +22,12 @@ class ScreenLoad(Screen):
         if not path.exists():
             raise Exception('No machine config')
         with path.open(mode='r') as file:
-            return SimpleNamespace(**json.load(file))
+            machine = json.load(file)
+            x_max_micro = 0
+            for face in machine['index__face'].values():
+                x_max_micro = max(x_max_micro, face['x'])
+            machine['x_max_micro'] = x_max_micro
+            return SimpleNamespace(**machine)
 
     def _perform_heavy_task(self):
         app = App.get_running_app()

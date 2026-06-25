@@ -62,13 +62,13 @@ class GCode(object):
         for line in self.parsed:
             if 'g' in line:
                 gc = line['g']
-                if gc == 0 or gc == 1:
+                if gc in [0, 1]:
                     x = line['x'] if 'x' in line else cx
                     y = line['y'] if 'y' in line else cy
                     z = line['z'] if 'z' in line else cz
                     self.checked.points.append([x, y, z])
                     cx, cy, cz = x, y, z
-                elif gc == 2 or gc == 3:
+                elif gc [2, 3]:
                     x = line['x'] if 'x' in line else cx
                     y = line['y'] if 'y' in line else cy
                     z = line['z'] if 'z' in line else cz
@@ -82,7 +82,7 @@ class GCode(object):
                         raise Exception('LỖI DÒNG: %s' % (line['raw']))
                     self.checked.points.extend(arc_points)
                     cx, cy, cz = arc_points[-1]
-                elif gc == 90:
+                elif gc in [90]:
                     continue
                 else:
                     raise Exception(f'KHÔNG HỖ TRỢ G{gc}')

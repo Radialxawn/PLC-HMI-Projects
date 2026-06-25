@@ -95,7 +95,7 @@ class Face(object):
         for i, v in enumerate(self.z):
             self.z[i] = max(0, v)
         for i, v in enumerate(self.zs):
-            self.zs[i] = max(0, v)
+            self.zs[i] = min(self.z[i], v)
         self.tool_diameter = max(0, self.tool_diameter)
         self.depth = max(0, self.depth)
         self.feed = max(1, self.feed)
