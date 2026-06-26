@@ -22,6 +22,8 @@ class ScreenHome(Screen):
         super(ScreenHome, self).__init__(**kvargs)
         self._draw = Draw(1e-3, [0.1e-3, 5e-3])
         self.ids.profile_name.input_filter = UI.filter_file_name
+        self.ids.slider._ignore = False
+        self.ids.slider._value_last = 0
         self._face_index = -1
         self._first_load = True
     
@@ -49,7 +51,6 @@ class ScreenHome(Screen):
                 'hmi.view_axis_tmp_micro[2]',
                 'hmi.view_tool_offset_micro[0]',
                 'hmi.view_tool_offset_micro[1]',
-                'hmi.cnc_speed_factor_micro',
             }
             for i in range(app.machine.problem_count):
                 self._name__hash.add(f'hmi.view_problem[{i}]')
@@ -70,16 +71,12 @@ class ScreenHome(Screen):
             index__face[i] = Face(i, _z_count_=3, _shape_count_=10)
             index__face_cog[i] = None
         return index__face, index__face_cog
-
-    def _slider_value_change(self, _instance_, _value_):
-        app = App.get_running_app()
-        app.data.set('hmi.cnc_speed_factor_micro', _value_)
     
     def on_enter(self, *args):
         app = App.get_running_app()
         app.data.block_active(self._name__hash)
         if not hasattr(self, '_value_update_clock'):
-            self._value_update_clock = Clock.schedule_interval(self._value_update, 0.1)
+            self._value_update_clock = Clock.schedule_interval(self._value_update, 0.05)
 
     def on_leave(self, *args):
         if hasattr(self, '_value_update_clock'):
@@ -97,10 +94,25 @@ class ScreenHome(Screen):
             for i in range(len(app.machine.index__face)):
                 color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
                 self.ids[f'face_{i}'].background_color = color
+        self._slider_value_update()
+        self._problem_check()
+
+    def _slider_value_update(self):
+        app = App.get_running_app()
+        app.data.gets(['hmi.cnc_speed_factor_micro'])
         cnc_speed_factor_micro = app.data.get('hmi.cnc_speed_factor_micro')
         if cnc_speed_factor_micro != None and cnc_speed_factor_micro != self.ids.slider.value:
+            self.ids.slider._ignore = True
             self.ids.slider.value = cnc_speed_factor_micro
-        self._problem_check()
+            self.ids.slider._ignore = False
+    
+    def _slider_value_change(self, _instance_, _value_):
+        if _instance_._ignore:
+            return
+        if _value_ != _instance_._value_last:
+            app = App.get_running_app()
+            app.data.set('hmi.cnc_speed_factor_micro', _value_)
+            _instance_._value_last = _value_
     
     def _problem_check(self):
         app = App.get_running_app()

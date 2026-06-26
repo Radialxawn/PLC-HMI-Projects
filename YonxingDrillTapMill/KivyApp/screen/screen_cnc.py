@@ -1,3 +1,4 @@
+import numpy as np
 from kivy.app import App
 from core.draw import Draw
 from kivy.clock import Clock
@@ -11,6 +12,7 @@ from core.data import Data
 from core.mouse import Mouse
 from core.helper import Helper
 from kivy.core.image import Image as CoreImage
+from kivy.core.text import Label as CoreLabel
 from kivy.graphics import Color, Line, Rectangle
 from kivy.utils import get_color_from_hex as clhex
 
@@ -151,7 +153,7 @@ class ScreenCNC(Screen):
         with prv.canvas:
             if image != None:
                 Rectangle(texture=image.texture, pos=prv.pos, size=prv.size)
-    
+
     def _redraw_path(self, _canvas_):
         area = self.ids.area
         area.canvas.clear()
@@ -162,11 +164,36 @@ class ScreenCNC(Screen):
             Color(rgba=clhex("#41bc41"))
             self._line = Line(points=self._line_points_to_pixel(), width=2)
             Color(rgba=clhex("#4145bc"))
-            self._depth = Rectangle(pos=[area.pos[0]+5, area.center_y], size=[30, 1])
-            self._depth_z = 0
-            Color(1, 1, 1, 1)
+            self._draw_depth(area)
+            Color(rgba=clhex("#ffffff"))
+            xp, yp = self._draw.micro_to_pixel_offset(0, 0)
             cog_texture = CoreImage('texture/cog.png').texture
-            self._cog = Rectangle(texture=cog_texture, pos=[0, 0], size=(16, 16))
+            self._cog = Rectangle(texture=cog_texture, pos=[xp-8, yp-8], size=(16, 16))
+    
+    def _draw_depth(self, _area_):
+        cx, cy = _area_.center_x, _area_.center_y
+        sx, sy = _area_.pos[0] + 5, _area_.pos[1] + 5
+        self._depth = Rectangle(pos=[sx, cy-1], size=[30, 2])
+        self._depth_z = 0
+        #
+        l = _area_.height - 10
+        lh = l * 0.5
+        lh_micro, = self._draw.pixel_to_micro(lh)
+        Rectangle(pos=[sx+35, sy], size=[2, l])
+        #
+        draw_sub = self._draw.pixel_per_micro > 3e-3
+        for i, y in enumerate(np.arange(0, -lh_micro, -10_000)):
+            xp, yp = self._draw.micro_to_pixel(5_000, y)
+            sxi = sx + 35
+            yp += cy - 1
+            Rectangle(pos=[sxi, yp], size=[xp, 2])
+            if draw_sub:
+                for j in range(1_000, 10_000, 1_000):
+                    Rectangle(pos=[sxi, yp-j*self._draw.pixel_per_micro+0.5], size=[xp*0.5, 1])
+            label = CoreLabel(text=f'{i*10:03}', font_size=12)
+            label.refresh()
+            texture = label.texture
+            Rectangle(texture=texture, pos=(sxi+xp+5, yp-texture.size[1]*0.5), size=texture.size)
 
     def on_touch_down(self, touch):
         _, _, inside = self._draw.touch_pos_to_center_of_widget(self.ids.area, touch.pos)
@@ -208,6 +235,7 @@ class ScreenCNC(Screen):
         add = False
         if count == 0:
             add = True
+            x, y = 0, 0
         else:
             lx, ly = self._line_points[-1]
             add = x != None and y != None and (x != lx or y != ly)
@@ -216,15 +244,13 @@ class ScreenCNC(Screen):
         if count > 1500:
             self._line_points.pop(0)
         if add and self._cog != None:
-            xp, yp = self._draw.micro_to_pixel(x, y)
+            xp, yp = self._draw.micro_to_pixel_offset(x, y)
             s = self._cog.size
-            poff = self._draw.offset_pixel
-            self._cog.pos = [xp + poff[0] - s[0]*0.5, yp + poff[1] - s[1]*0.5]
+            self._cog.pos = [xp - s[0]*0.5, yp - s[1]*0.5]
             self._line.points = self._line_points_to_pixel()
         z = app.data.get('hmi.view_cnc_micro[2]')
         if z != None and self._depth != None and self._depth_z != z:
             zp, = self._draw.micro_to_pixel(z)
-            poff = self._draw.offset_pixel
             s, p = list(self._depth.size), list(self._depth.pos)
             s[1] = abs(zp) + 2
             self._depth.size = s

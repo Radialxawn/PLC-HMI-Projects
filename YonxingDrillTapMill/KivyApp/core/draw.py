@@ -39,6 +39,9 @@ class Draw(object):
         for i, v in enumerate(result):
             result[i] = v * self._pixel_per_micro
         return result
+
+    def micro_to_pixel_offset(self, _x_, _y_):
+        return _x_ * self._pixel_per_micro + self._offset_pixel[0], _y_ * self._pixel_per_micro + self._offset_pixel[1]
     
     def touch_pos_to_center_of_widget(self, _widget_, _touch_pos_):
         wgpos = _widget_.pos
