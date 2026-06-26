@@ -60,7 +60,8 @@ class Draw(object):
             Color(rgba=clhex("#000000ff"))
             Rectangle(pos=[pos[0]+_max_x_pixel_, pos[1]-_area_.size[1]*0.5], size=[_width_, _area_.size[1]])
 
-    def shape(self, _shape_, _pos_micro_):
+    def shape(self, _shape_, _pos_micro_, _color_):
+        Color(rgba=_color_)
         sa, sb, sc, sd, se = self.micro_to_pixel(_shape_.va, _shape_.vb, _shape_.vc, _shape_.vd, _shape_.ve)
         px, py = self.micro_to_pixel(_pos_micro_[0], _pos_micro_[1])
         poff = self.offset_pixel 
@@ -76,28 +77,73 @@ class Draw(object):
                 sa, = self.micro_to_pixel(Shape.shape_name__data['tap']['view_micro'])
                 Rectangle(texture=texture, pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
             case 3: # circle
+                Ellipse(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb])
+                Color(1, 1, 1, 1)
                 sa -= 4
                 sb -= 4
-                Line(ellipse=(px-sa*0.5, py-sb*0.5, sa, sb), width=2)
+                Ellipse(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb])
             case 4: # circles
                 Ellipse(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb])
+                Color(0, 0, 0, 1)
+                abh = max(sa, sb)
+                se = max(1, se*2)
+                for i in np.arange(se, abh, se):
+                    sai = i * sa / abh
+                    sbi = i * sb / abh
+                    Line(ellipse=(px-sai*0.5, py-sbi*0.5, sai, sbi), width=1)
             case 5: # rect
+                RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sc])
+                Color(1, 1, 1, 1)
                 sa -= 4
                 sb -= 4
                 sc -= 2
-                Line(rounded_rectangle=(px-sa*0.5, py-sb*0.5, sa, sb, sc), width=2)
+                RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sc])
             case 6: # rects
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sc])
+                Color(0, 0, 0, 1)
+                abh = max(sa, sb)
+                se = max(1, se*2)
+                for i in np.arange(se, abh, se):
+                    sai = i * sa / abh
+                    sbi = i * sb / abh
+                    sci = sc * sai / sa
+                    Line(rounded_rectangle=(px-sai*0.5, py-sbi*0.5, sai, sbi, sci), width=1)
             case 7: # locka
+                RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
+                Ellipse(pos=[px+(sa-2*sc)*0.5, py-sc*0.5], size=[sc, sc])
+                Color(1, 1, 1, 1)
+                sa -= 4
+                sb -= 4
+                sc -= 4
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Ellipse(pos=[px+(sa-2*sc)*0.5, py-sc*0.5], size=[sc, sc])
             case 8: # lockaf
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Ellipse(pos=[px-sa*0.5, py-sc*0.5], size=[sc, sc])
+                Color(1, 1, 1, 1)
+                sa -= 4
+                sb -= 4
+                sc -= 4
+                RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
+                Ellipse(pos=[px-sa*0.5, py-sc*0.5], size=[sc, sc])
             case 9: # lockb
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Rectangle(pos=[px-sd*0.5, py-sc*0.5-(sc-sb)*0.5], size=[sd, sc])
+                Color(1, 1, 1, 1)
+                sa -= 4
+                sb -= 4
+                sc -= 4
+                sd -= 4
+                RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
+                Rectangle(pos=[px-sd*0.5, py-sc*0.5-(sc-sb)*0.5], size=[sd, sc])
             case 10: # lockbf
+                RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
+                Rectangle(pos=[px-sd*0.5, py-sc*0.5+(sc-sb)*0.5], size=[sd, sc])
+                Color(1, 1, 1, 1)
+                sa -= 4
+                sb -= 4
+                sc -= 4
+                sd -= 4
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Rectangle(pos=[px-sd*0.5, py-sc*0.5+(sc-sb)*0.5], size=[sd, sc])
         scid = Shape.get_custom_id(_shape_.id)
@@ -110,8 +156,8 @@ class Draw(object):
                 Rectangle(texture=image.texture, pos=(px-sa*0.5, py-sa*0.5), size=(sa, sa))
             Line(rectangle=(px-sa*0.5, py-sa*0.5, sa, sa), width=1)
     
-    def face(self, _face_, _position_, _color_):
-        px, py = _position_[0], _position_[1]
+    def face(self, _face_, _pos_micro_, _color_):
+        px, py = _pos_micro_[0], _pos_micro_[1]
         Color(rgba=clhex("#000000ff"))
         pxp, pyp, wp = self.micro_to_pixel(px, py, 50_000)
         poff = self.offset_pixel
@@ -127,6 +173,5 @@ class Draw(object):
             else:
                 Rectangle(pos=[pxp-wp, pyp-zp], size=[wp, 1])
             zpl = zp
-        Color(rgba=_color_)
         for shape in _face_.shape:
-            self.shape(shape, [px + shape.x,  py + shape.y])
+            self.shape(shape, [px + shape.x,  py + shape.y], _color_=_color_)

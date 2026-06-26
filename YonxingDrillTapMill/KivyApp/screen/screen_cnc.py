@@ -24,6 +24,7 @@ class ScreenCNC(Screen):
         self._cnc_id_selector_active = False
         self._line_points = []
         self._cog = None
+        self._depth = None
         self.ids.cnc_error.opacity = 0
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
     
@@ -160,6 +161,9 @@ class ScreenCNC(Screen):
             self._draw.axis(area, [0, 0], None, 2)
             Color(rgba=clhex("#41bc41"))
             self._line = Line(points=self._line_points_to_pixel(), width=2)
+            Color(rgba=clhex("#4145bc"))
+            self._depth = Rectangle(pos=[area.pos[0]+5, area.center_y], size=[30, 1])
+            self._depth_z = 0
             Color(1, 1, 1, 1)
             cog_texture = CoreImage('texture/cog.png').texture
             self._cog = Rectangle(texture=cog_texture, pos=[0, 0], size=(16, 16))
@@ -217,6 +221,16 @@ class ScreenCNC(Screen):
             poff = self._draw.offset_pixel
             self._cog.pos = [xp + poff[0] - s[0]*0.5, yp + poff[1] - s[1]*0.5]
             self._line.points = self._line_points_to_pixel()
+        z = app.data.get('hmi.view_cnc_micro[2]')
+        if z != None and self._depth != None and self._depth_z != z:
+            zp, = self._draw.micro_to_pixel(z)
+            poff = self._draw.offset_pixel
+            s, p = list(self._depth.size), list(self._depth.pos)
+            s[1] = abs(zp) + 2
+            self._depth.size = s
+            p[1] = self.ids.area.center_y + zp - 1
+            self._depth.pos = p
+            self._depth_z = z
 
     def _clear(self):
         self._line_points = []

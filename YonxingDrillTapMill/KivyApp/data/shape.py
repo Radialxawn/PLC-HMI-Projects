@@ -28,9 +28,9 @@ class Shape(object):
             'view_micro': 100_000
         },
         'circle':   {'id': 3,  'label': 'TRÒN',     'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
-        'circles':  {'id': 4,  'label': 'TRÒN ĐẶC', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
+        'circles':  {'id': 4,  'label': 'TRÒN ĐẶC', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 've': 'BƯỚC'}},
         'rect':     {'id': 5,  'label': 'HỘP',      'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
-        'rects':    {'id': 6,  'label': 'HỘP ĐẶC',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
+        'rects':    {'id': 6,  'label': 'HỘP ĐẶC',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 've': 'BƯỚC'}},
         'locka':    {'id': 7,  'label': 'KHOÁ 1A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
         'lockaf':   {'id': 8,  'label': 'KHOÁ 1B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
         'lockb':    {'id': 9,  'label': 'KHOÁ 2A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
@@ -90,16 +90,28 @@ class Shape(object):
             kv[k] = _value_[k]
     
     def limit(self):
-        self.va = max(2_000, self.va)
-        self.vb = max(2_000, self.vb)
-        self.vc = max(2_000, self.vc)
-        self.vd = max(2_000, self.vd)
+        self.va = max(1_000, self.va)
+        self.vb = max(1_000, self.vb)
+        self.vc = max(0, self.vc)
+        self.vd = max(0, self.vd)
         self.ve = max(0, self.ve)
         match self.id:
-            case 5: # capsule
-                self.vb = int(min(self.va, self.vb))
-            case 6: # rectr
+            case 3: # circle
+                if self.va < self.vb:
+                    self.va = int(max(self.vb*0.25, self.va))
+                elif self.vb < self.va:
+                    self.vb = int(max(self.va*0.25, self.vb))
+            case 4: # circles
+                if self.va < self.vb:
+                    self.va = int(max(self.vb*0.25, self.va))
+                elif self.vb < self.va:
+                    self.vb = int(max(self.va*0.25, self.vb))
+                self.ve = min(self.ve, max(self.va, self.vb)*0.5)
+            case 5: # rect
                 self.vc = int(min(self.va*0.5, self.vb*0.5, self.vc))
+            case 6: # rects
+                self.vc = int(min(self.va*0.5, self.vb*0.5, self.vc))
+                self.ve = min(self.ve, max(self.va, self.vb)*0.5)
             case 8: # locka
                 self.vb = int(min(self.va, self.vb))
             case 9: # lockaf

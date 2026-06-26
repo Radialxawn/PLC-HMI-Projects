@@ -28,7 +28,7 @@ class PopupShape(Popup):
         return self
 
     def _generate(self):
-        key__input = {}
+        property__input = {}
         shape_id_selector = self.ids.shape_id_selector
         #
         rule = self._rule_
@@ -71,15 +71,23 @@ class PopupShape(Popup):
             input.v_label = label
             box.add_widget(label)
             box.add_widget(input)
-            key__input[property] = input
+            property__input[property] = input
             self.ids.shape_property.add_widget(box)
         self.ids.shape_property.add_widget(Widget())
-        return key__input
+        return property__input
 
     def _on_text_input_validate(self, _instance_, _value_):
         if _value_ != self._shape_edit[_instance_.v_key]:
             self._shape_edit[_instance_.v_key] = _value_
+            self._shape_edit_limit()
             self._update_canvas()
+    
+    def _shape_edit_limit(self):
+        self._shape_edit.limit()
+        for property in Shape.property__data:
+            if Shape.property__data[property] == None:
+                continue
+            self._property__input[property].v_value_set(self._shape_edit[property])
 
     def _on_shape_id_selector(self, _instance_):
         if self._ignore_shape_id_selector:
@@ -94,10 +102,10 @@ class PopupShape(Popup):
         self._draw.offset_pixel = [area.center_x, area.center_y]
         with area.canvas:
             self._draw.axis(area, [0, 0], None, 2)
-            Color(rgba=clhex("#ff5656ff"))
             self._draw.shape(
                 _shape_=self._shape_edit,
                 _pos_micro_=[0, 0],
+                _color_=clhex("#ff5656ff")
             )
         data = self._id_to_data(self._shape_edit.id)
         if self._shape_id_changed:

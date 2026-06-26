@@ -341,7 +341,7 @@ class ScreenHome(Screen):
                 x += face.ox
                 y += face.oy
                 index__center[fi] = [x, y]
-                self._draw.face(_face_=face, _position_=[x, y], _color_=_colors_[i])
+                self._draw.face(_face_=face, _pos_micro_=[x, y], _color_=_colors_[i])
         #
         cog_texture = CoreImage('texture/cog.png').texture
         cog_r = 8
