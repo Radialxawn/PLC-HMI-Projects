@@ -1,6 +1,7 @@
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.label import Label
+from kivy.uix.button import Button
 from popup.popup_shape import PopupShape
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
@@ -21,6 +22,8 @@ class PopupFace(Popup):
         self._delete_ = _delete_
         self._draw = Draw(1e-3, [0.5e-3, 10e-3])
         self._mouse = Mouse()
+        self.ids.face_org_set.id = 'all'
+        self._face_org_set_propertys = ['ox', 'oy', 'oz', 'tool_offset']
         self._property__input, self._name__input_view, self._name__value = self._generate()
         self.ids.area.bind(pos=self._update_canvas, size=self._update_canvas)
         return self
@@ -31,20 +34,33 @@ class PopupFace(Popup):
         self.ids.face_property.width = 380
         for property in Face.property__data:
             data = Face.property__data[property]
+            input_disabled = property in self._rule_['property_exclude']
             box = BoxLayout(
                 orientation='horizontal',
                 size_hint_y=None,
+                spacing=5,
                 height=35,
             )
-            label = Label(
-                text=data['label'],
-                size_hint_x=None,
-                halign='left',
-                valign='center',
-                width=180
-            )
-            label.bind(size=label.setter('text_size'))
-            box.add_widget(label)
+            if property in self._face_org_set_propertys:
+                button = Button(
+                    text=data['label'],
+                    size_hint_x=None,
+                    width=180,
+                    on_press=self._face_org_set
+                )
+                button.id = property
+                button.disabled = input_disabled
+                box.add_widget(button)
+            else:
+                label = Label(
+                    text=data['label'],
+                    size_hint_x=None,
+                    halign='left',
+                    valign='center',
+                    width=180
+                )
+                label.bind(size=label.setter('text_size'))
+                box.add_widget(label)
             input = UITextInputInteger(
                 halign='center',
                 multiline=False
@@ -55,7 +71,7 @@ class PopupFace(Popup):
                 _focus_=None
             )
             input.v_value_set(self._face_edit[property])
-            input.disabled = property in self._rule_['property_exclude']
+            input.disabled = input_disabled
             property__input[property] = input
             box.add_widget(input)
             if 'name_view' in data and not input.disabled:
@@ -137,11 +153,14 @@ class PopupFace(Popup):
         app = App.get_running_app()
         app.data.set('hmi.face_run', _value_)
     
-    def _face_org_set(self):
+    def _face_org_set(self, _instance_):
         app = App.get_running_app()
-        for property in ['ox', 'oy', 'oz', 'tool_offset']:
+        bid = _instance_.id
+        for property in self._face_org_set_propertys:
             input = self._property__input[property]
-            if hasattr(input, 'v_name_view') and not input.disabled:
+            if not hasattr(input, 'v_name_view') or input.disabled:
+                continue
+            if bid == 'all' or (bid in self._face_org_set_propertys and bid == property):
                 input_view = self._name__input_view[input.v_name_view]
                 value = app.data.get(input_view.v_key)
                 if value != None:
