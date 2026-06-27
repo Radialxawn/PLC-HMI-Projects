@@ -112,13 +112,13 @@ class Shape(object):
             case 6: # rects
                 self.vc = int(min(self.va*0.5, self.vb*0.5, self.vc))
                 self.ve = min(self.ve, max(self.va, self.vb)*0.5)
-            case 8: # locka
+            case 7: # locka
                 self.vb = int(min(self.va, self.vb))
-            case 9: # lockaf
+            case 8: # lockaf
                 self.vb = int(min(self.va, self.vb))
-            case 10: # lockb
+            case 9: # lockb
                 self.vb = int(min(self.va, self.vb))
-            case 11: # lockbf
+            case 10: # lockbf
                 self.vb = int(min(self.va, self.vb))
         scid = Shape.get_custom_id(self.id)
         if scid >= 0:
@@ -130,7 +130,7 @@ class Shape(object):
         dx = _lx_ - self.x
         dy = _ly_ - self.y
         match self.id:
-            case 0: # none
+            case 0:
                 return False
             case 1: # drill
                 sa = Shape.shape_name__data['drill']['view_micro']
@@ -140,32 +140,26 @@ class Shape(object):
                 return Shape._inside_local_circle(dx, dy, sa*0.5)
             case 3: # circle
                 return Shape._inside_local_ellipse(dx, dy, self.va, self.vb)
-            case 4: # circlef
+            case 4: # circles
                 return Shape._inside_local_ellipse(dx, dy, self.va, self.vb)
             case 5: # rect
                 return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vc)
-            case 6: # rectf
+            case 6: # rects
                 return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vc)
-            case 7: # ellipse
-                if self.va == 0 or self.vb == 0:
-                    return False
-                a = self.va * 0.5
-                b = self.vb * 0.5
-                return dx*dx/(a*a) + dy*dy/(b*b) <= 1.0
-            case 8: # locka
+            case 7: # locka
                 inside_capsule = Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vb*0.5)
                 inside_circle = Shape._inside_local_circle(dx-(self.va-self.vc)*0.5, dy, self.vc*0.5)
                 return inside_capsule or inside_circle
-            case 9: # lockaf
+            case 8: # lockaf
                 inside_capsule = Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vb*0.5)
                 inside_circle = Shape._inside_local_circle(dx+(self.va-self.vc)*0.5, dy, self.vc*0.5)
                 return inside_capsule or inside_circle
-            case 10: # lockb
+            case 9: # lockb
                 ky = (self.vc - self.vb) * 0.5
                 inside_capsule = Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vb*0.5)
                 inside_rect = Shape._inside_local_rect_r(dx, dy+ky, self.vd, self.vc, 0)
                 return inside_capsule or inside_rect
-            case 11: # lockbf
+            case 10: # lockbf
                 ky = (self.vc - self.vb) * 0.5
                 inside_capsule = Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vb*0.5)
                 inside_rect = Shape._inside_local_rect_r(dx, dy-ky, self.vd, self.vc, 0)

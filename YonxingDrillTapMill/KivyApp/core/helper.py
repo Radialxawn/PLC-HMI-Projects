@@ -91,6 +91,7 @@ class Helper(object):
             raise Exception('KHÔNG TỒN TẠI TỆP [%s]' % (_source_path_.stem))
         gcode = GCode().read(_source_path_)
         gcode.parse()
+        gcode.combine()
         gcode.check(0.1)
         return gcode
     
@@ -108,8 +109,10 @@ class Helper(object):
         image = Image.open(path)
         try:
             pixel_per_mm = float(image.text.get('pixel_per_mm'))
+            CoreImage(str(path)).remove_from_cache()
             return CoreImage(str(path)), pixel_per_mm
         except:
+            CoreImage(str(path)).remove_from_cache()
             return CoreImage(str(path)), None
         finally:
             image.close()

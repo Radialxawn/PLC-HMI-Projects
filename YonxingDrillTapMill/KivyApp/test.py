@@ -54,6 +54,21 @@ def testd(_name_, _index_):
     image, pixel_per_mm = Helper.cnc_preview_image_get(_index_=_index_, _image_=True)
     print(image, 'pixel_per_mm', pixel_per_mm)
 
+def teste():
+    path = Path('D:/Download')
+    first = []
+    for i in range(8):
+        pf = path / f'custom_{i}.cnc'
+        j = 0
+        with pf.open(mode='r') as file:
+            for l in file:
+                if i == 0:
+                    first.append(l)
+                else:
+                    if first[j] != l:
+                        raise Exception('Test failed')
+                j += 1
+
 parameters = sys.argv[1:]
 parameter_count = len(parameters)
 if parameter_count > 0:
@@ -69,3 +84,5 @@ if parameter_count > 0:
                 testd(parameters[1], parameters[2])
             else:
                 print('No name and index')
+        case 'e':
+            teste()

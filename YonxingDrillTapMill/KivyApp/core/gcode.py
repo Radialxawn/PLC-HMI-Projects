@@ -10,7 +10,7 @@ class GCode(object):
         self.path = None
         self.raw = []
         self.clean = []
-        self.combine = ''
+        self.combined = ''
         self.parsed = []
         self.checked = SimpleNamespace(
             points=[],
@@ -32,15 +32,12 @@ class GCode(object):
                 if len(lclean) > 0:
                     self.raw.append(lraw)
                     self.clean.append(lclean)
-        imax = len(self.clean) - 1
-        for i, lclean in enumerate(self.clean):
-            self.combine += f'N%d %s%s' % (i, lclean, '\r\n' if i < imax else '')
         return self
 
     def chunks(self, _size_):
         chunks = []
-        for i in range(0, len(self.combine), _size_):
-            chunk = self.combine[i : i + _size_]
+        for i in range(0, len(self.combined), _size_):
+            chunk = self.combined[i : i + _size_]
             chunks.append(chunk)
         return chunks
     
@@ -48,13 +45,31 @@ class GCode(object):
         self.parsed = []
         for i, lclean in enumerate(self.clean):
             matches = re.findall(GCode.parse_pattern, lclean)
-            lparsed = {'raw': self.raw[i]}
+            lparsed = {
+                'raw': self.raw[i],
+                'clean': self.clean[i],
+                'ok': False,
+            }
             for letter, value in matches:
-                if value:
-                    lparsed[letter.lower()] = float(value) if '.' in value else int(value)
-                else:
-                    lparsed[letter.lower()] = True
-            self.parsed.append(lparsed)
+                lt = letter.lower()
+                vl = float(value) if '.' in value else int(value)
+                lparsed[lt] = vl
+                if lt == 'g':
+                    if vl in [0, 1, 2, 3]:
+                        lparsed['ok'] = True
+                    elif vl in [91]:
+                        raise Exception(f'KHÔNG HỖ TRỢ G{vl}')
+                if lt == 'f':
+                    lparsed['ok'] = True
+            if lparsed['ok']:
+                self.parsed.append(lparsed)
+    
+    def combine(self):
+        imax = len(self.parsed) - 1
+        for i, parsed in enumerate(self.parsed):
+            lclean = parsed['clean']
+            l = f'N%d %s%s' % (i, lclean, '\r\n' if i < imax else '')
+            self.combined += l
 
     def check(self, _tolerance_):
         cx, cy, cz = 0, 0, 0
@@ -68,7 +83,7 @@ class GCode(object):
                     z = line['z'] if 'z' in line else cz
                     self.checked.points.append([x, y, z])
                     cx, cy, cz = x, y, z
-                elif gc [2, 3]:
+                elif gc in [2, 3]:
                     x = line['x'] if 'x' in line else cx
                     y = line['y'] if 'y' in line else cy
                     z = line['z'] if 'z' in line else cz

@@ -313,21 +313,25 @@ class Data(object):
             state=1
         )
         self.get_all_stop()
+        self.gets(self._dl.bridge_names)
         self._download_process_clock = Clock.schedule_interval(self._download_process, 0.001)
 
     def _download_process(self, _):
         dl = self._dl
         line_count = len(dl.chunks)
-        self.gets(dl.bridge_names)
+        for name in dl.bridge_names:
+            self.block(name).value = None
         if dl.cancel:
             dl.state = 100
         match dl.state:
             case 1:
+                self.gets(['fst.state'])
                 if self.get('fst.state') == 10:
                     self.set('fst.index', dl.index)
                     dl.chunk_index = 0
                     dl.state += 1
             case 2:
+                self.gets(['fst.index'])
                 if self.get('fst.index') == dl.index:
                     dl.state += 1
             case 3:
@@ -335,23 +339,29 @@ class Data(object):
                 dl.state = 11
             ##########
             case 11:
+                self.gets(['fst.state'])
                 if self.get('fst.state') == 21:
                     if dl.chunk_index >= line_count:
                         dl.state = 99
                     else:
+                        self.block('fst.line').value = None
                         self.set('fst.line', dl.chunks[dl.chunk_index])
                         dl.state += 1
             case 12:
-                if self.get('fst.ldone') == True:
-                    dl.chunk_index += 1
+                self.gets(['fst.line'])
+                if self.get('fst.line') == dl.chunks[dl.chunk_index]:
+                    self.set('fst.lbegin', True)
                     dl.state += 1
             case 13:
+                self.gets(['fst.state'])
                 if self.get('fst.state') == 30:
+                    dl.chunk_index += 1
                     dl.progress(dl.chunk_index * 100 / line_count)
                     self.set('fst.lnext', True)
                     dl.state = 11
             ##########
             case 99:
+                self.gets(['fst.state'])
                 if self.get('fst.state') == 10:
                     dl.state += 1
             case 100:
