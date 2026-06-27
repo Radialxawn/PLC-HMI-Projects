@@ -17,7 +17,7 @@
    "hmi.cf.gear_dir[2]": false,
    "hmi.cf.home_torque_mNm[2]": 797,
    "hmi.cf.home_encoder_value[2]": 18184,
-   "hmi.cf.max_micro[2]": 120000,
+   "hmi.cf.max_micro[2]": 155000,
    "hmi.cf.overload_hold_torque_factor[2]": 902,
    "hmi.cf.overload_hold_torque_time_msec[2]": 1002,
    "hmi.cf.overload_instant_torque_factor[2]": 2902,
