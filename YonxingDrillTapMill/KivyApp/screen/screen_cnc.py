@@ -22,8 +22,9 @@ class ScreenCNC(Screen):
         self._draw = Draw(2e-3, [1e-3, 10e-3])
         self._mouse = Mouse()
         self._first_load = True
-        self._cnc_id = -1
         self._cnc_id_selector_active = False
+        self._cnc_id = None
+        self._work_state = None
         self._line_points = []
         self._cog = None
         self._depth = None
@@ -100,6 +101,8 @@ class ScreenCNC(Screen):
         self._cnc_id_selector_active = True
         app = App.get_running_app()
         app.data.block_active(self._name__hash)
+        self._cnc_id = None
+        self._work_state = None
         if not hasattr(self, '_value_update_clock'):
             self._value_update_clock = Clock.schedule_interval(self._value_update, 0.05)
 
@@ -126,20 +129,20 @@ class ScreenCNC(Screen):
             self._name__value[name] = block.value
             input.v_value_set(block.value)
         work_state = app.data.get('hmi.view_state[1]')
-        if work_state == None:
-            work_state = 0
-        self.ids.cnc_run.background_color = clhex("#6AA145") if work_state > 500 else clhex("#5F5F5F")
-        self.ids.cnc_run.disabled = work_state < 100
-        self.ids.cnc_error.opacity = 1 if app.data.get('hmi.view_cnc_error') else 0
+        if work_state != None and self._work_state != work_state:
+            self._work_state = work_state
+            self.ids.cnc_run.background_color = clhex("#6AA145") if work_state > 500 else clhex("#5F5F5F")
+            self.ids.cnc_run.disabled = work_state < 100
+            for i in range(app.machine.shape_custom_count):
+                self.ids[f'cnc_{i}'].disabled = work_state > 100
         cnc_id = app.data.get('hmi.cnc_id')
         if cnc_id != self._cnc_id:
             self._cnc_id = cnc_id
             for i in range(app.machine.shape_custom_count):
                 color = clhex("#6AA145") if cnc_id == i else clhex("#5F5F5F")
-                cnc_button = self.ids[f'cnc_{i}']
-                cnc_button.background_color = color
-                cnc_button.disabled = work_state > 100
+                self.ids[f'cnc_{i}'].background_color = color
             self._redraw_preview()
+        self.ids.cnc_error.opacity = 1 if app.data.get('hmi.view_cnc_error') else 0
         self._line_update()
     
     def _update_canvas(self, *args):

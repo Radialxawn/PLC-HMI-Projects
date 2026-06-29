@@ -1,3 +1,4 @@
-LET #f : LREAL := $VB$/60.0N0 F#f
+LET #f : LREAL := $VB$/60.0
+N0 F#f
 N1 G1 Z-$VA$
 N2 G0 Z0

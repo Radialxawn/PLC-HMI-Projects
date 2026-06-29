@@ -7,6 +7,8 @@ from popup.popup_error import PopupError
 from kivy.core.image import Image as CoreImage
 from popup.popup_confirm import PopupConfirm
 from popup.popup_login import PopupLogin
+import numpy as np
+import cv2
 
 class Helper(object):
     def __init__(self, **kvargs):
@@ -129,8 +131,8 @@ class Helper(object):
             abs(_gcode_.checked.bound_max[1])+tool_diameter*2,
         )*2)
         depth_factor = 256 / max(1, abs(_gcode_.checked.bound_min[2]))
-        image = Image.new('RGBA', (image_size, image_size), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(image)
+        image = np.zeros((image_size, image_size, 4), dtype=np.uint8)
+        image_tmp = image.copy()
         lx, ly, lz = size_half, size_half, 0
         lw = round(max(1, tool_diameter * pixel_per_mm))
         for point in _gcode_.checked.points:
@@ -138,12 +140,17 @@ class Helper(object):
             x = round(size_half + x * pixel_per_mm)
             y = round(size_half - y * pixel_per_mm)
             z = round(max(-255, min(z * depth_factor, 0)))
-            draw.line((lx, ly, x, y), fill=(abs(z), 0, 0, 255), width=lw)
+            image_tmp[:] = 0
+            cv2.line(image_tmp, (lx, ly), (x, y), (0, 0, abs(z), 255), lw)
+            image = cv2.max(image, image_tmp)
             lx, ly, lz = x, y, z
+        image[:, :, 2] = 255 - image[:, :, 2] # invert R channel, cv2 use BGRA order, B = 0, G = 1, R = 2, A = 3
         path = Helper.cnc_preview_path_get(_index_)
+        cv2.imwrite(path, image)
+        image_source = Image.open(path)
         metadata = PngInfo()
         metadata.add_text('pixel_per_mm', f'{pixel_per_mm:.8f}')
-        image.save(path, pnginfo=metadata)
+        image_source.save(path, pnginfo=metadata)
     
     @staticmethod
     def cnc_preview_image_remove(_index_: int):

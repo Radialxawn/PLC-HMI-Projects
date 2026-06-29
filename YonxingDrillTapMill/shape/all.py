@@ -1,12 +1,13 @@
 shape = {
 	'drill': [
-		'LET #f : LREAL := $VB$/60.0'
+		'LET #f : LREAL := $VB$/60.0',
 		'N0 F#f',
 		'N1 G1 Z-$VA$',
 		'N2 G0 Z0',
 	],
 	'tap': [
-		'LET #f : LREAL := $VB$/60.0'
+		'LET #rps : LREAL := $VB$/60.0',
+		'LET #f : LREAL := MIN{#rps*$VP$, $VMZ$}',
 		'N0 F#f',
 		'N1 G1 Z-$VA$',
 		'N2 G1 Z0',
@@ -21,8 +22,8 @@ shape = {
 		'LET #r : LREAL := MAX{0.001, {#c*0.5/PI}-{$VT$*0.5}}',
 		'LET #w : LREAL := MAX{0.001, $VA$-$VT$}',
 		'LET #h : LREAL := MAX{0.001, $VB$-$VT$}',
-		'G36 O$VI$ D{0.5*#w/#r}',
-		'G36 O$VJ$ D{0.5*#h/#r}',
+		'G36 O$VSX$ D{0.5*#w/#r}',
+		'G36 O$VSY$ D{0.5*#h/#r}',
 		#
 		'G0 X-#r',
 		'G1 Z$VZ$',
@@ -44,8 +45,8 @@ shape = {
 		'LET #whh : LREAL := MAX{#w, #h}*0.5',
 		'LET #sc : LREAL := FLOOR{#whh/MAX{0.001, MIN{$VE$, #whh}}}',
 		'LET #si : LREAL := #sc+1',
-		'N0 G36 O$VI$ D{0.5*#w/#r}',
-		'N1 G36 O$VJ$ D{0.5*#h/#r}',
+		'N0 G36 O$VSX$ D{0.5*#w/#r}',
+		'N1 G36 O$VSY$ D{0.5*#h/#r}',
 		'N2 G1 Z$VZ$',
 		#
 		'N10 G1 X{{#si-1-#sc}*$VE$*#r/#whh}',

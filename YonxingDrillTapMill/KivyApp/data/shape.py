@@ -23,7 +23,7 @@ class Shape(object):
         },
         'tap':      {'id': 2,  'label': 'TARO',    'property__data': {'x': None, 'y': None,
                 'va': ' Z',
-                'vb': ' F'
+                'vb': ' RPM'
             },
             'view_micro': 100_000
         },
