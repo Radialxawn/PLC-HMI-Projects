@@ -131,7 +131,7 @@ class Helper(object):
             abs(_gcode_.checked.bound_max[1])+tool_diameter*2,
         )*2)
         depth_factor = 256 / max(1, abs(_gcode_.checked.bound_min[2]))
-        image = np.zeros((image_size, image_size, 4), dtype=np.uint8)
+        image = np.zeros((image_size, image_size, 2), dtype=np.uint8)
         image_tmp = image.copy()
         lx, ly, lz = size_half, size_half, 0
         lw = round(max(1, tool_diameter * pixel_per_mm))
@@ -141,12 +141,15 @@ class Helper(object):
             y = round(size_half - y * pixel_per_mm)
             z = round(max(-255, min(z * depth_factor, 0)))
             image_tmp[:] = 0
-            cv2.line(image_tmp, (lx, ly), (x, y), (0, 0, abs(z), 255), lw)
+            cv2.line(image_tmp, (lx, ly), (x, y), (abs(z), 255), lw)
             image = cv2.max(image, image_tmp)
             lx, ly, lz = x, y, z
-        image[:, :, 2] = 255 - image[:, :, 2] # invert R channel, cv2 use BGRA order, B = 0, G = 1, R = 2, A = 3
+        image[:, :, 0] = 255 - image[:, :, 0] # invert the first channel
+        image_final = np.zeros((image_size, image_size, 4), dtype=np.uint8)
+        image_final[:, :, 2] = image[:, :, 0] # copy first channel to red channel, cv2 use BGRA instead of RGBA
+        image_final[:, :, 3] = image[:, :, 1] # copy second channel to alpha channel
         path = Helper.cnc_preview_path_get(_index_)
-        cv2.imwrite(path, image)
+        cv2.imwrite(path, image_final)
         image_source = Image.open(path)
         metadata = PngInfo()
         metadata.add_text('pixel_per_mm', f'{pixel_per_mm:.8f}')
