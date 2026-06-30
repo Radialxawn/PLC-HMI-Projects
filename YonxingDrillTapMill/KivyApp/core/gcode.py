@@ -47,21 +47,27 @@ class GCode(object):
             matches = re.findall(GCode.parse_pattern, lclean)
             lparsed = {
                 'raw': self.raw[i],
-                'clean': self.clean[i],
                 'ok': False,
             }
+            feedmin, feedsec = '', ''
             for letter, value in matches:
                 lt = letter.lower()
                 vl = float(value) if '.' in value else int(value)
-                lparsed[lt] = vl
                 if lt == 'g':
                     if vl in [0, 1, 2, 3]:
                         lparsed['ok'] = True
                     elif vl in [91]:
                         raise Exception(f'KHÔNG HỖ TRỢ G{vl}')
                 if lt == 'f':
+                    vl /= 60
+                    feedmin = f'{letter}{value}'
+                    feedsec = f'{letter}{vl:g}'
                     lparsed['ok'] = True
+                lparsed[lt] = vl
             if lparsed['ok']:
+                if feedmin != '':
+                    lclean = lclean.replace(feedmin, feedsec)
+                lparsed['clean'] = lclean
                 self.parsed.append(lparsed)
     
     def combine(self):

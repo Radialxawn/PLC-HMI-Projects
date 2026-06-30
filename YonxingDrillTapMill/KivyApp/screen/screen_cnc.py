@@ -193,7 +193,7 @@ class ScreenCNC(Screen):
             if draw_sub:
                 for j in range(1_000, 10_000, 1_000):
                     Rectangle(pos=[sxi, yp-j*self._draw.pixel_per_micro+0.5], size=[xp*0.5, 1])
-            label = CoreLabel(text=f'{i*10:03}', font_size=12)
+            label = CoreLabel(text=f'- {i*10:03}', font_size=12)
             label.refresh()
             texture = label.texture
             Rectangle(texture=texture, pos=(sxi+xp+5, yp-texture.size[1]*0.5), size=texture.size)
@@ -257,7 +257,9 @@ class ScreenCNC(Screen):
             s, p = list(self._depth.size), list(self._depth.pos)
             s[1] = abs(zp) + 2
             self._depth.size = s
-            p[1] = self.ids.area.center_y + zp - 1
+            p[1] = self.ids.area.center_y - 1
+            if zp < 0:
+                p[1] += zp
             self._depth.pos = p
             self._depth_z = z
 
