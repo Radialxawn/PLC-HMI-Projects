@@ -25,6 +25,8 @@ class ScreenHome(Screen):
         self.ids.slider._ignore = False
         self.ids.slider._value_last = 0
         self._face_index = -1
+        self._cycle_count = -1
+        self._cycle_time_msec = -1
         self._first_load = True
     
     def on_pre_enter(self, *args):
@@ -51,6 +53,8 @@ class ScreenHome(Screen):
                 'hmi.view_axis_tmp_micro[2]',
                 'hmi.view_tool_offset_micro[0]',
                 'hmi.view_tool_offset_micro[1]',
+                'hmi.view_cycle_count',
+                'hmi.view_cycle_time_msec',
             }
             for i in range(app.machine.problem_count):
                 self._name__hash.add(f'hmi.view_problem[{i}]')
@@ -94,6 +98,19 @@ class ScreenHome(Screen):
             for i in range(len(app.machine.index__face)):
                 color = clhex("#6AA145") if face_index == i else clhex("#5F5F5F")
                 self.ids[f'face_{i}'].background_color = color
+        cycle_count = app.data.get('hmi.view_cycle_count')
+        cycle_time_msec = app.data.get('hmi.view_cycle_time_msec')
+        if cycle_count == None:
+            cycle_count = 0
+        if cycle_time_msec == None:
+            cycle_time_msec = 0
+        if cycle_count != self._cycle_count or cycle_time_msec != self._cycle_time_msec:
+            self._cycle_count = cycle_count
+            self._cycle_time_msec = cycle_time_msec
+            csec, cmsec = divmod(cycle_time_msec, 1e3)
+            cmin, csec = divmod(csec, 60)
+            chour, cmin = divmod(cmin, 60)
+            self.ids.cycle.text = f'CHU KÌ {cycle_count:05.0f} : [{chour:02.0f}:{cmin:02.0f}:{csec:02.0f}]'
         self._slider_value_update()
         self._problem_check()
 
