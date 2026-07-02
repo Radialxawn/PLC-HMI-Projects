@@ -70,8 +70,8 @@ shape = {
 		'LET #r : LREAL := MAX{0.001, {#c*0.5/PI}-{$VT$*0.5}}',
 		'LET #w : LREAL := MAX{0.001, $VA$-$VT$}',
 		'LET #h : LREAL := MAX{0.001, $VB$-$VT$}',
-		'G36 O$VI$ D{0.5*#w/#r}',
-		'G36 O$VJ$ D{0.5*#h/#r}',
+		'G36 O$VSX$ D{0.5*#w/#r}',
+		'G36 O$VSY$ D{0.5*#h/#r}',
 		#
 		'G0 X-#r',
 		'G1 Z$VZ$',
