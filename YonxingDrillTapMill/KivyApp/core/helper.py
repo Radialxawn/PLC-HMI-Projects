@@ -77,7 +77,6 @@ class Helper(object):
             _dismiss_=lambda: self._popup_dismiss(name),
             _message_=_message_,
         )
-        popup.ids.message.text = _message_
         popup.open()
         self._popup_activate(name, popup)
 
