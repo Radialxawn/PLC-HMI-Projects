@@ -140,7 +140,7 @@ class ScreenSetting(Screen):
         if _instance_.v_type == 'rws':
             _instance_.v_value_set(_instance_.v_value_last)
             app.helper.show_popup_confirm(
-                _message_='NHẬP MẬT KHẨU',
+                _message_='MẬT KHẨU',
                 _confirm_=lambda: self._on_text_input_validate_confirm(_instance_, _value_),
                 _password_='9632147',
             )

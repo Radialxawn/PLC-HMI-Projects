@@ -299,7 +299,8 @@ class ScreenCNC(Screen):
         except Exception as error:
             app.helper.show_popup_error(
                 _message_=str(error),
-                _acknowledge_=None)
+                _acknowledge_=None,
+            )
             return
         self._download_cnc_index = _cnc_index_
         self._download_cnc_chunks = self._download_cnc_gcode.chunks(Data.DOWNLOAD_CHUNK_SIZE)

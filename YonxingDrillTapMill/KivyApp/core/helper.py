@@ -50,9 +50,9 @@ class Helper(object):
         popup = PopupConfirm().set_data(
             _confirm_=_confirm_,
             _dismiss_=lambda: self._popup_dismiss(name),
+            _message_=_message_,
             _password_=_password_,
         )
-        popup.ids['message'].text = _message_
         popup.open()
         self._popup_activate(name, popup)
 
@@ -63,7 +63,7 @@ class Helper(object):
         popup = PopupLogin().set_data(
             _password_=_password_,  
             _screen_=_screen_,
-            _dismiss_=lambda: self._popup_dismiss(name)
+            _dismiss_=lambda: self._popup_dismiss(name),
         )
         popup.open()
         self._popup_activate(name, popup)
@@ -74,7 +74,8 @@ class Helper(object):
             return
         popup = PopupError().set_data(
             _acknowledge_=_acknowledge_,
-            _dismiss_=lambda: self._popup_dismiss(name)
+            _dismiss_=lambda: self._popup_dismiss(name),
+            _message_=_message_,
         )
         popup.ids.message.text = _message_
         popup.open()

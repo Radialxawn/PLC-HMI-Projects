@@ -185,7 +185,8 @@ class ScreenHome(Screen):
             app = App.get_running_app()
             app.helper.show_popup_error(
                 _message_='TỆP BỊ LỖI',
-                _acknowledge_=None)
+                _acknowledge_=None,
+            )
             return
         self.ids.profile_name.text = _path_.stem
         self._face_apply()
