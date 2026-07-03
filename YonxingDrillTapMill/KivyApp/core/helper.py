@@ -43,13 +43,14 @@ class Helper(object):
     def _popup_dismiss(self, _name_: str):
         self._name__popup[_name_] = None
 
-    def show_popup_confirm(self, _message_, _confirm_):
+    def show_popup_confirm(self, _message_, _confirm_, _password_=None):
         name = 'confirm'
         if self._popup_is_active(name):
             return
         popup = PopupConfirm().set_data(
             _confirm_=_confirm_,
-            _dismiss_=lambda: self._popup_dismiss(name)
+            _dismiss_=lambda: self._popup_dismiss(name),
+            _password_=_password_,
         )
         popup.ids['message'].text = _message_
         popup.open()

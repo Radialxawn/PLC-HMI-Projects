@@ -18,14 +18,14 @@ class ScreenSetting(Screen):
         'hmi.cf.tap_micro_per_rev[0]': {'label': 'BƯỚC REN TARO ĐỨNG',      'type': 'rw', 'factor': 1e-3},
         'hmi.cf.tap_micro_per_rev[1]': {'label': 'BƯỚC REN TARO NGHIÊNG',   'type': 'rw', 'factor': 1e-3},
         '2': 0,
-        'hmi.cf.tool_z_ox_micro[0]':   {'label': 'X CẢM BIẾN DAO ĐỨNG',     'type': 'rw', 'factor': -1e-3},
-        'hmi.cf.tool_z_oy_micro[0]':   {'label': 'Y CẢM BIẾN DAO ĐỨNG',     'type': 'rw', 'factor': -1e-3},
-        'hmi.cf.tool_z_base_micro[0]': {'label': 'Z DAO ĐỨNG CHUẨN',        'type': 'rw', 'factor': -1e-3},
+        'hmi.cf.tool_z_ox_micro[0]':   {'label': 'X CẢM BIẾN DAO ĐỨNG',     'type': 'rws', 'factor': -1e-3},
+        'hmi.cf.tool_z_oy_micro[0]':   {'label': 'Y CẢM BIẾN DAO ĐỨNG',     'type': 'rws', 'factor': -1e-3},
+        'hmi.cf.tool_z_base_micro[0]': {'label': 'Z DAO ĐỨNG CHUẨN',        'type': 'rws', 'factor': -1e-3},
         'hmi.cf.tool_z_micro[0]':      {'label': 'Z DAO ĐỨNG',              'type': 'ro', 'factor': -1e-3},
         '3': 0,
-        'hmi.cf.tool_z_ox_micro[1]':   {'label': 'X CẢM BIẾN DAO NGANG',    'type': 'rw', 'factor': -1e-3},
-        'hmi.cf.tool_z_oy_micro[1]':   {'label': 'Y CẢM BIẾN DAO NGANG',    'type': 'rw', 'factor': -1e-3},
-        'hmi.cf.tool_z_base_micro[1]': {'label': 'Z DAO NGANG CHUẨN',       'type': 'rw', 'factor': -1e-3},
+        'hmi.cf.tool_z_ox_micro[1]':   {'label': 'X CẢM BIẾN DAO NGANG',    'type': 'rws', 'factor': -1e-3},
+        'hmi.cf.tool_z_oy_micro[1]':   {'label': 'Y CẢM BIẾN DAO NGANG',    'type': 'rws', 'factor': -1e-3},
+        'hmi.cf.tool_z_base_micro[1]': {'label': 'Z DAO NGANG CHUẨN',       'type': 'rws', 'factor': -1e-3},
         'hmi.cf.tool_z_micro[1]':      {'label': 'Z DAO NGANG',             'type': 'ro', 'factor': -1e-3},
         '4': 0,
         'right': None,
@@ -102,9 +102,10 @@ class ScreenSetting(Screen):
                 _key_=name,
                 _factor_=data['factor'],
                 _validate_=self._on_text_input_validate,
-                _focus_=None
+                _focus_=self._on_text_input_focus,
             )
-            input.disabled = data['type'] == 'ro'
+            input.v_type = data['type']
+            input.disabled = input.v_type == 'ro'
             input.v_label = label
             name__input[name] = input
             name__value[name] = None
@@ -124,10 +125,28 @@ class ScreenSetting(Screen):
             Clock.unschedule(self._value_update_clock)
             delattr(self, '_value_update_clock')
 
-    def _on_text_input_validate(self, _instance_, _value_):
+    def _on_text_input_validate_confirm(self, _instance_, _value_):
         app = App.get_running_app()
+        _instance_.v_value_set(_value_)
         app.data.set(_instance_.v_key, _value_)
         app.helper.save_need_check()
+
+    def _on_text_input_focus(self, _instance_, _value_):
+        if _value_:
+            _instance_.v_value_last = _instance_.v_value_get()
+
+    def _on_text_input_validate(self, _instance_, _value_):
+        app = App.get_running_app()
+        if _instance_.v_type == 'rws':
+            _instance_.v_value_set(_instance_.v_value_last)
+            app.helper.show_popup_confirm(
+                _message_='NHẬP MẬT KHẨU',
+                _confirm_=lambda: self._on_text_input_validate_confirm(_instance_, _value_),
+                _password_='9632147',
+            )
+        else:
+            app.data.set(_instance_.v_key, _value_)
+            app.helper.save_need_check()
 
     def _value_update(self, _dt_):
         app = App.get_running_app()
