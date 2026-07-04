@@ -372,6 +372,9 @@ class ScreenHome(Screen):
                 y += face.oy
                 index__center[fi] = [x, y]
                 self._draw.face(_face_=face, _pos_micro_=[x, y], _color_=_colors_[i])
+                cxp, cyp = self._draw.micro_to_pixel(x, y)
+                Color(rgba=clhex("#000000ff"))
+                Rectangle(pos=[cxp-0.5, cyp-_area_.height*0.5], size=[1, _area_.height*2])
         #
         cog_texture = CoreImage('texture/cog.png').texture
         cog_r = 8
@@ -381,7 +384,7 @@ class ScreenHome(Screen):
                     _area_.canvas.after.remove(self._index__face_cog[fi])
                 fc = index__center[fi]
                 cxp, cyp = self._draw.micro_to_pixel(fc[0], fc[1])
-                Color(1, 1, 1, 1)
+                Color(rgba=clhex("#ffffffff"))
                 cog = Rectangle(texture=cog_texture, pos=[cxp-cog_r, cyp-cog_r], size=(cog_r*2, cog_r*2))
                 self._index__face_cog[fi] = cog
 
