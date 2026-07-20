@@ -194,16 +194,21 @@ for (k of ['Main', 'Cover', 'Spin', 'Water']) {
 var delay = 128;
 for (k of ['Cover']) {
    plc.tag_add(`${k}Pos`, INT, D, Auto);
-   plc.tag_add(`${k}Unlock`, BOOL, M, Auto);
-   plc.tag_add(`${k}UnlockO`, BOOL, Y, 5);
-   for ([a, v] of Object.entries({'N':[11, 6], 'P':[-1, 7]})) {
+   for (a of ['Unlock']) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
+      plc.tag_add(`${k}${a}O`, BOOL, Y, 5);
+      for (b of ['N', 'P']) {
+         plc.tag_add(`${k}${a}${b}`, BOOL, M, Auto);
+         plc.tag_add(`${k}${a}${b}Timer`, BOOL, TC, Auto);
+         plc.tag_add(`${k}${a}${b}TimerDelay`, INT, D, delay++);
+      }
+   }
+   for ([a, v] of Object.entries({'N':[11, 6], 'P':[-1, 7]})) {
       if (v[0] != -1) {
          plc.tag_add(`${k}${a}I`, BOOL, X, v[0]);
       }
       plc.tag_add(`${k}${a}O`, BOOL, Y, v[1]);
-   }
-   for (a of ['N', 'P', 'Unlock']) {
+      plc.tag_add(`${k}${a}`, BOOL, M, Auto);
       plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
       plc.tag_add(`${k}${a}TimerDelay`, INT, D, delay++);
    }
@@ -214,8 +219,11 @@ for (k of ['Spin']) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
       plc.tag_add(`${k}${a}LO`, BOOL, Y, 3);
       plc.tag_add(`${k}${a}RO`, BOOL, Y, 4);
-      plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
-      plc.tag_add(`${k}${a}TimerDelay`, INT, D, delay++);
+      for (b of ['N', 'P']) {
+         plc.tag_add(`${k}${a}${b}`, BOOL, M, Auto);
+         plc.tag_add(`${k}${a}${b}Timer`, BOOL, TC, Auto);
+         plc.tag_add(`${k}${a}${b}TimerDelay`, INT, D, delay++);
+      }
    }
    for ([a, v] of Object.entries({'P':[10, 0]})) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
