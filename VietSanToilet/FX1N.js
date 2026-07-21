@@ -231,6 +231,14 @@ for (k of ['Spin']) {
       plc.tag_add(`${k}${a}I`, BOOL, X, v[0]);
       plc.tag_add(`${k}${a}O`, BOOL, Y, v[1]);
    }
+   for (a of ['Block']) {
+      plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
+      plc.tag_add(`${k}${a}TimerDelay`, INT, D, delay++);
+   }
+   for (a of ['Fail']) {
+      plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
+      plc.tag_add(`${k}${a}TimerDelay`, INT, D, delay++);
+   }
 }
 for (k of ['Water']) {
    plc.tag_add(`${k}PumpPos`, INT, D, Auto);
@@ -251,6 +259,10 @@ for (k of ['Water']) {
       plc.tag_add(`${k}Stage${i}Timer`, BOOL, TC, Auto);
       plc.tag_add(`${k}Stage${i}TimerDelay`, INT, D, delay++);
    }
+}
+for (k of ['Problem']) {
+   plc.tag_add(`${k}Exist`, BOOL, M, Auto);
+   plc.tag_add(`${k}Index`, INT, D, Auto);
 }
 /////GENERATE
 
