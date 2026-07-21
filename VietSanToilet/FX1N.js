@@ -215,16 +215,17 @@ for (k of ['Cover']) {
 }
 for (k of ['Spin']) {
    plc.tag_add(`${k}Pos`, INT, D, Auto);
-   for (a of ['Unlock']) {
+   for (a of ['Unlock', 'Block']) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
-      plc.tag_add(`${k}${a}LO`, BOOL, Y, 3);
-      plc.tag_add(`${k}${a}RO`, BOOL, Y, 4);
       for (b of ['N', 'P']) {
          plc.tag_add(`${k}${a}${b}`, BOOL, M, Auto);
          plc.tag_add(`${k}${a}${b}Timer`, BOOL, TC, Auto);
          plc.tag_add(`${k}${a}${b}TimerDelay`, INT, D, delay++);
       }
    }
+   plc.tag_add(`${k}UnlockLO`, BOOL, Y, 3);
+   plc.tag_add(`${k}UnlockRO`, BOOL, Y, 4);
+   plc.tag_add(`${k}BlockO`, BOOL, Y, 16);
    for ([a, v] of Object.entries({'P':[10, 0]})) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
       plc.tag_add(`${k}${a}I`, BOOL, X, v[0]);
