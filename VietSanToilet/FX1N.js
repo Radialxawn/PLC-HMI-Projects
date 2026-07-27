@@ -1,14 +1,34 @@
 const { match } = require('node:assert');
 const fs = require('node:fs');
+const { exec } = require('child_process');
 
 function print(data) {
    console.log(data);
 }
 
+function copy_to_clipboard(text) {
+   const platform = process.platform;
+   if (platform === 'win32') {
+      const proc = exec('clip');
+      proc.stdin.write(text);
+      proc.stdin.end();
+   } else if (platform === 'darwin') {
+      const proc = exec('pbcopy');
+      proc.stdin.write(text);
+      proc.stdin.end();
+   } else if (platform === 'linux') {
+      const proc = exec('xclip -selection clipboard');
+      proc.stdin.write(text);
+      proc.stdin.end();
+   } else {
+      console.error('Unsupported operating system');
+   }
+}
+
 const PLC = 'PLC', M = 'M', D = 'D', Self = 'Self', LB = 'LB', LW = 'LW', RW = 'RW', $M = '$M', $ = '$';
 const BOOL = 'BOOL', INT = 'INT', DINT = 'DINT', X = 'X', Y = 'Y', TC = 'TC';
 const XAxis = 'XX', YAxis = 'YY', ZAxis = 'ZZ', AAxis = 'AA';
-const Auto = -1, NoUse = -2;
+const Auto = -1, NoUse = -2, Internal = -3;
 
 class ARRAY {
    type = '';
@@ -68,7 +88,7 @@ class Controller {
       }
    }
 
-   tag_add(_name_, _type_, _device_name_, _device_index_) {
+   tag_add(_name_, _type_, _device_name_, _device_index_, _flag_='') {
       if (_device_index_ == NoUse) {
          return;
       }
@@ -96,7 +116,7 @@ class Controller {
                   this._tag_check(_device_name_, _device_index_ + i);
                }
             }
-            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
+            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_, flag: _flag_ };
             this.csv += `"VAR_GLOBAL"	"${_name_}"	"${_type_}"	""	"${_device_name_}${_device_index_}"	""	""	""	""	""	""\n`;
             return this.tags[_name_];
          case ControllerType.Weintek:
@@ -114,7 +134,7 @@ class Controller {
                      return 'Undesignated'
                   }
                }
-               this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
+               this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_, flag: _flag_ };
                this.csv += `${_name_},PLC,${_device_name_},${_device_index_},,${device_type(_type_)}\n`;
                this._tag_check(_device_name_, _device_index_);
             }
@@ -126,7 +146,7 @@ class Controller {
                }
                return 'BIT';
             }
-            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
+            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_, flag: _flag_ };
             if (_type_ == Self) {
                this.csv += `${_name_},${device_type(_device_name_)},${_device_name_}${_device_index_},\n`;
             } else {
@@ -279,19 +299,38 @@ for (k of ['Clean']) {
       plc.tag_add(`${k}${a}O`, BOOL, Y, v);
    }
    stage = 5
-   plc.tag_add(`${k}StageTimer`, new ARRAY(BOOL, stage), TC, Auto);
-   plc.tag_add(`${k}StageTimerDelay`, new ARRAY(INT, stage), D, delay++);
+   plc.tag_add(`${k}SprayTimer`, new ARRAY(BOOL, stage), TC, Auto);
+   plc.tag_add(`${k}SprayTimerDelay`, new ARRAY(INT, stage), D, delay++);
+   delay += stage - 1;
+   plc.tag_add(`${k}SoakTimer`, new ARRAY(BOOL, stage), TC, Auto);
+   plc.tag_add(`${k}SoakTimerDelay`, new ARRAY(INT, stage), D, delay++);
+   delay += stage - 1;
 }
 for (k of ['Problem']) {
    plc.tag_add(`${k}Exist`, BOOL, M, Auto);
+   plc.tag_add(`${k}ExistO`, BOOL, Y, 17);
    plc.tag_add(`${k}Index`, INT, D, Auto);
+}
+for (k of ['Safe']) {
+   plc.tag_add(`${k}DoorSensorI`, BOOL, X, 16);
+   plc.tag_add(`${k}HumanSensorI`, BOOL, X, 17);
+}
+for (k of ['Time']) {
+   for ([a, v] of Object.entries({'Sec':8013, 'Min':8014, 'Hour':8015, 'Day':8016, 'Month':8017, 'Year':8018, 'OfWeek':8019})) {
+      plc.tag_add(`${k}${a}In`, INT, D, v, Internal);
+      plc.tag_add(`${k}${a}`, INT, D, Auto);
+   }
+}
+for (k of ['Process']) {
+   plc.tag_add(`${k}CloseCount`, INT, D, delay++);
+   plc.tag_add(`${k}CloseCountTarget`, INT, D, delay++);
 }
 /////GENERATE
 
 if (plc.error == '') {
    plc.save();
    for (const [k, v] of Object.entries(plc.tags)) {
-      if (v.device_name != TC) {
+      if (v.device_name != TC && v.flag != Internal) {
          hmi.tag_add(v.name, v.type, v.device_name, v.device_index);
       }
    }
@@ -304,3 +343,40 @@ if (plc.error == '') {
 } else {
    print(plc.error);
 }
+
+i = 0, state = 500, text = '';
+text += `(*start*)\n`;
+text += `SET(M${state+=1}, fTmp);\n`;
+text += `SET(fTmp, CleanSpreader);\n`;
+text += `SET(fTmp, CleanStateNext);\n`;
+text += `RST(fTmp, fTmp);\n`;
+for (k of [[1, 0], [1, 1], [1, 2], [1, 0], [2, 0]]) {
+   text += `(*${i}*)\n`;
+   text += `(*spray*)\n`;
+   text += `SET(M${state+=1}, fTmp);\n`;
+   text += `MOV(fTmp, ${k[0]}, CleanPumpPos);\n`;
+   text += `MOV(fTmp, ${k[1]}, CleanType);\n`;
+   text += `SET(fTmp, CleanStateNext);\n`;
+   text += `RST(fTmp, fTmp);\n`;
+   text += `(*spray done -> soak*)\n`;
+   text += `OUT_T(M${state+=1}, CleanSprayTimer[${i}], CleanSprayTimerDelay[${i}]);\n`;
+   text += `SET(M${state} AND CleanSprayTimer[${i}], fTmp);\n`;
+   text += `RST(fTmp, CleanPumpPos);\n`;
+   text += `SET(fTmp, CleanStateNext);\n`;
+   text += `RST(fTmp, fTmp);\n`;
+   text += `(*soak done*)\n`;
+   text += `OUT_T(M${state+=1}, CleanSoakTimer[${i}], CleanSoakTimerDelay[${i}]);\n`;
+   text += `SET(M${state} AND CleanSoakTimer[${i}], fTmp);\n`;
+   text += `SET(fTmp, CleanStateNext);\n`;
+   text += `RST(fTmp, fTmp);\n`;
+   i++;
+}
+text += `(*done*)\n`;
+text += `SET(M${state+=1}, fTmp);\n`;
+text += `RST(fTmp, CleanPumpPos);\n`;
+text += `RST(fTmp, CleanType);\n`;
+text += `RST(fTmp, CleanSpreader);\n`;
+text += `RST(fTmp, CleanState);\n`;
+text += `RST(fTmp, fTmp);\n`;
+copy_to_clipboard(text);
+print('Text copied to clipboard!');
