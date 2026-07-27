@@ -21,7 +21,7 @@ class ARRAY {
 }
 
 const ControllerType = Object.freeze({
-   FX3U: 'FX3U',
+   FX: 'FX',
    Weintek: 'Weintek',
    Delta: 'Delta'
 });
@@ -40,7 +40,7 @@ class Controller {
       var is_plc = false;
       var project_name = __dirname.split('\\').pop();
       switch (_type_) {
-         case ControllerType.FX3U:
+         case ControllerType.FX:
             is_plc = true;
             this.csv += `${project_name}\n`;
 			   this.csv += `"Class"	"Label Name"	"Data Type"	"Constant"	"Device"	"Address"	"Comment"	"Remark"	"Relation with System Label"	"System Label Name"	"Attribute"\n`;
@@ -79,7 +79,7 @@ class Controller {
          this.error += `${this.type} already has ${_name_}\n`;
       }
       switch (this.type) {
-         case ControllerType.FX3U:
+         case ControllerType.FX:
             let count = 1;
             if (_type_ instanceof ARRAY) {
                if (_type_.type == DINT) {
@@ -100,18 +100,24 @@ class Controller {
             this.csv += `"VAR_GLOBAL"	"${_name_}"	"${_type_}"	""	"${_device_name_}${_device_index_}"	""	""	""	""	""	""\n`;
             return this.tags[_name_];
          case ControllerType.Weintek:
-            var device_type = function (_device_type_) {
-               if (_device_type_ == 'INT') {
-                  return '16-bit Unsigned'
-               } else if (_device_type_ == 'DINT') {
-                  return '32-bit Unsigned'
-               } else {
-                  return 'Undesignated'
+            if (_type_ instanceof ARRAY) {
+               for (var i = 0; i < _type_.length; i++) {
+                  this.tag_add(`${_name_}${i}`, _type_.type, _device_name_, _device_index_ + i);
                }
+            } else {
+               var device_type = function (_device_type_) {
+                  if (_device_type_ == 'INT') {
+                     return '16-bit Unsigned'
+                  } else if (_device_type_ == 'DINT') {
+                     return '32-bit Unsigned'
+                  } else {
+                     return 'Undesignated'
+                  }
+               }
+               this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
+               this.csv += `${_name_},PLC,${_device_name_},${_device_index_},,${device_type(_type_)}\n`;
+               this._tag_check(_device_name_, _device_index_);
             }
-            this.tags[_name_] = { name: _name_, type: _type_, device_name: _device_name_, device_index: _device_index_ };
-            this.csv += `${_name_},PLC,${_device_name_},${_device_index_},,${device_type(_type_)}\n`;
-            this._tag_check(_device_name_, _device_index_);
             break;
          case ControllerType.Delta:
             var device_type = function (_device_name_) {
@@ -175,11 +181,11 @@ class Controller {
    }
 }
 
-const plc = new Controller('FX3U');
+const plc = new Controller('FX');
 const hmi = new Controller('Weintek');
 
 /////GENERATE
-for ([k, v] of Object.entries({'MainRun':1, 'MainStop':2, 'CoverRun':6, 'SpinRun':5, 'WaterRun':7})) {
+for ([k, v] of Object.entries({'MainRun':1, 'MainStop':2, 'CoverRun':6, 'SpinRun':5, 'FlushRun':15, 'CleanRun':7})) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}I`, BOOL, X, v);
 }
@@ -187,7 +193,7 @@ plc.tag_add(`Mode`, INT, D, Auto);
 for ([k, v] of Object.entries({'ModeManual':3, 'ModeAuto':4})) {
    plc.tag_add(`${k}I`, BOOL, X, v);
 }
-for (k of ['Main', 'Cover', 'Spin', 'Water']) {
+for (k of ['Main', 'Cover', 'Spin', 'Flush', 'Clean']) {
    plc.tag_add(`${k}State`, INT, D, Auto);
    plc.tag_add(`${k}StateNext`, BOOL, M, Auto);
 }
@@ -209,6 +215,10 @@ for (k of ['Cover']) {
       }
       plc.tag_add(`${k}${a}O`, BOOL, Y, v[1]);
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
+      plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
+      plc.tag_add(`${k}${a}TimerDelay`, INT, D, delay++);
+   }
+   for (a of ['Fail']) {
       plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
       plc.tag_add(`${k}${a}TimerDelay`, INT, D, delay++);
    }
@@ -240,10 +250,23 @@ for (k of ['Spin']) {
       plc.tag_add(`${k}${a}TimerDelay`, INT, D, delay++);
    }
 }
-for (k of ['Water']) {
-   plc.tag_add(`${k}PumpPos`, INT, D, Auto);
-   plc.tag_add(`${k}PumpO`, BOOL, Y, 1);
-   plc.tag_add(`${k}PumpDirectionO`, BOOL, Y, 12);
+for (k of ['Flush']) {
+   for ([a, v] of Object.entries({'Engage':10, 'Tank':11})) {
+      plc.tag_add(`${k}${a}`, BOOL, M, Auto);
+      plc.tag_add(`${k}${a}O`, BOOL, Y, v);
+      for (b of ['N', 'P']) {
+         plc.tag_add(`${k}${a}${b}`, BOOL, M, Auto);
+         plc.tag_add(`${k}${a}${b}Timer`, BOOL, TC, Auto);
+         plc.tag_add(`${k}${a}${b}TimerDelay`, INT, D, delay++);
+      }
+   }
+}
+for (k of ['Clean']) {
+   for (a of ['Pump']) {
+      plc.tag_add(`${k}${a}Pos`, INT, D, Auto);
+      plc.tag_add(`${k}${a}O`, BOOL, Y, 1);
+      plc.tag_add(`${k}${a}DirectionO`, BOOL, Y, 12);
+   }
    for ([a, v] of Object.entries({'LowA':12, 'LowB':13, 'LowC':14})) {
       plc.tag_add(`${k}${a}I`, BOOL, X, v);
    }
@@ -251,14 +274,13 @@ for (k of ['Water']) {
    for ([a, v] of Object.entries({'TypeA':13, 'TypeB':14, 'TypeC':15})) {
       plc.tag_add(`${k}${a}O`, BOOL, Y, v);
    }
-   for ([a, v] of Object.entries({'Spreader':2, 'Engage':10, 'Flush':11})) {
+   for ([a, v] of Object.entries({'Spreader':2})) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
       plc.tag_add(`${k}${a}O`, BOOL, Y, v);
    }
-   for (let i = 1; i <= 5; i++) {
-      plc.tag_add(`${k}Stage${i}Timer`, BOOL, TC, Auto);
-      plc.tag_add(`${k}Stage${i}TimerDelay`, INT, D, delay++);
-   }
+   stage = 5
+   plc.tag_add(`${k}StageTimer`, new ARRAY(BOOL, stage), TC, Auto);
+   plc.tag_add(`${k}StageTimerDelay`, new ARRAY(INT, stage), D, delay++);
 }
 for (k of ['Problem']) {
    plc.tag_add(`${k}Exist`, BOOL, M, Auto);
