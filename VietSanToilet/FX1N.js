@@ -310,6 +310,7 @@ for (k of ['Problem']) {
    plc.tag_add(`${k}Exist`, BOOL, M, Auto);
    plc.tag_add(`${k}ExistO`, BOOL, Y, 17);
    plc.tag_add(`${k}Index`, INT, D, Auto);
+   plc.tag_add(`${k}`, new ARRAY(BOOL, 8), M, 600);
 }
 for (k of ['Safe']) {
    plc.tag_add(`${k}DoorSensorI`, BOOL, X, 16);
@@ -324,6 +325,9 @@ for (k of ['Time']) {
 for (k of ['Process']) {
    plc.tag_add(`${k}CloseCount`, INT, D, delay++);
    plc.tag_add(`${k}CloseCountTarget`, INT, D, delay++);
+}
+for (k of ['Decode']) {
+   plc.tag_add(`${k}CleanType`, new ARRAY(BOOL, 2**2), M, Auto, Internal);
 }
 /////GENERATE
 
