@@ -312,19 +312,24 @@ for (k of ['Problem']) {
    plc.tag_add(`${k}Index`, INT, D, Auto);
    plc.tag_add(`${k}`, new ARRAY(BOOL, 8), M, 600);
 }
-for (k of ['Safe']) {
-   plc.tag_add(`${k}DoorSensorI`, BOOL, X, 16);
-   plc.tag_add(`${k}HumanSensorI`, BOOL, X, 17);
-}
 for (k of ['Time']) {
-   for ([a, v] of Object.entries({'Sec':8013, 'Min':8014, 'Hour':8015, 'Day':8016, 'Month':8017, 'Year':8018, 'OfWeek':8019})) {
+   plc.tag_add(`${k}SetEnable`, BOOL, M, Auto);
+   plc.tag_add(`${k}SetTrigger`, BOOL, M, Auto);
+   plc.tag_add(`${k}Buffer`, new ARRAY(INT, 7), D, Auto, Internal);
+   for ([a, v] of Object.entries({'Year':8018, 'Month':8017, 'Day':8016, 'Hour':8015, 'Min':8014, 'Sec':8013, 'OfWeek':8019})) {
       plc.tag_add(`${k}${a}In`, INT, D, v, Internal);
       plc.tag_add(`${k}${a}`, INT, D, Auto);
    }
 }
 for (k of ['Process']) {
-   plc.tag_add(`${k}CloseCount`, INT, D, delay++);
-   plc.tag_add(`${k}CloseCountTarget`, INT, D, delay++);
+   plc.tag_add(`${k}DoorI`, BOOL, X, 16);
+   plc.tag_add(`${k}HumanI`, BOOL, X, 17);
+   plc.tag_add(`${k}HumanCount`, INT, D, delay++);
+   plc.tag_add(`${k}HumanCountTimer`, BOOL, TC, Auto);
+   plc.tag_add(`${k}HumanCountTimerDelay`, INT, D, delay++);
+   plc.tag_add(`${k}FlushCount`, INT, D, delay++);
+   plc.tag_add(`${k}Count`, INT, D, delay++);
+   plc.tag_add(`${k}CountTarget`, INT, D, delay++);
 }
 for (k of ['Decode']) {
    plc.tag_add(`${k}CleanType`, new ARRAY(BOOL, 2**2), M, Auto, Internal);
