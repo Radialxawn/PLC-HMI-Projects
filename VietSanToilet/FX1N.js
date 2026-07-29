@@ -324,6 +324,7 @@ for (k of ['Time']) {
 for (k of ['Process']) {
    plc.tag_add(`${k}DoorI`, BOOL, X, 16);
    plc.tag_add(`${k}HumanI`, BOOL, X, 17);
+   plc.tag_add(`${k}HumanEnterFlushCount`, INT, D, Auto);
    plc.tag_add(`${k}HumanCount`, INT, D, delay++);
    plc.tag_add(`${k}HumanCountTimer`, BOOL, TC, Auto);
    plc.tag_add(`${k}HumanCountTimerDelay`, INT, D, delay++);
@@ -332,6 +333,7 @@ for (k of ['Process']) {
    plc.tag_add(`${k}CountTarget`, INT, D, delay++);
 }
 for (k of ['Decode']) {
+   plc.tag_add(`${k}Mode`, new ARRAY(BOOL, 2**2), M, Auto, Internal);
    plc.tag_add(`${k}CleanType`, new ARRAY(BOOL, 2**2), M, Auto, Internal);
 }
 /////GENERATE
