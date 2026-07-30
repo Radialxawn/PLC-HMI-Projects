@@ -298,7 +298,7 @@ for (k of ['Clean']) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
       plc.tag_add(`${k}${a}O`, BOOL, Y, v);
    }
-   stage = 5
+   stage = 6
    plc.tag_add(`${k}SprayTimer`, new ARRAY(BOOL, stage), TC, Auto);
    plc.tag_add(`${k}SprayTimerDelay`, new ARRAY(INT, stage), D, delay++);
    delay += stage - 1;
@@ -361,7 +361,7 @@ text += `SET(M${state+=1}, fTmp);\n`;
 text += `SET(fTmp, CleanSpreader);\n`;
 text += `SET(fTmp, CleanStateNext);\n`;
 text += `RST(fTmp, fTmp);\n`;
-for (k of [[1, 0], [1, 1], [1, 2], [1, 0], [2, 0]]) {
+for (k of [[1, 0], [1, 1], [1, 0], [1, 2], [1, 0], [2, 0]]) {
    text += `(*${i}*)\n`;
    text += `(*spray*)\n`;
    text += `SET(M${state+=1}, fTmp);\n`;
