@@ -5,10 +5,10 @@ from core.mouse import Mouse
 from kivy.graphics import Color
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.textinput import TextInput
 from core.ui import UITextInputInteger
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
+from core.ui import UIBoolInput
 from data.shape import Shape
 from kivy.utils import get_color_from_hex as clhex
 
@@ -58,15 +58,23 @@ class PopupShape(Popup):
                 width=60
             )
             label.bind(size=label.setter('text_size'))
-            input = UITextInputInteger(
-                halign='center',
-                multiline=False
-            ).data_set(
-                _key_=property,
-                _factor_=data['factor'],
-                _validate_=self._on_text_input_validate,
-                _focus_=None
-            )
+            input = None
+            if 'factor' in data:
+                input = UITextInputInteger(
+                    halign='center',
+                    multiline=False
+                ).data_set(
+                    _key_=property,
+                    _factor_=data['factor'],
+                    _validate_=self._on_text_input_validate,
+                    _focus_=None,
+                )
+            elif 'state_text' in data:
+                input = UIBoolInput().data_set(
+                    _key_=property,
+                    _validate_=self._on_bool_input_validate,
+                    _state_text_=data['state_text'],
+                )
             input.v_value_set(self._shape_edit[property])
             input.v_label = label
             box.add_widget(label)
@@ -75,6 +83,11 @@ class PopupShape(Popup):
             self.ids.shape_property.add_widget(box)
         self.ids.shape_property.add_widget(Widget())
         return property__input
+
+    def _on_bool_input_validate(self, _instance_, _value_):
+        if _value_ != self._shape_edit[_instance_.v_key]:
+            self._shape_edit[_instance_.v_key] = _value_
+            self._update_canvas()
 
     def _on_text_input_validate(self, _instance_, _value_):
         if _value_ != self._shape_edit[_instance_.v_key]:

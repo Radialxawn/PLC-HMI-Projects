@@ -1,5 +1,6 @@
 import re
 from kivy.uix.textinput import TextInput
+from kivy.uix.togglebutton import ToggleButton
 
 class UITextInputInteger(TextInput):
     def data_set(self, _key_, _factor_, _validate_, _focus_) -> TextInput:
@@ -64,6 +65,29 @@ class UITextInputInteger(TextInput):
     def insert_text(self, _substring_, from_undo=False):
         filtered = re.sub(self._v_pattern, '', _substring_)
         return super(UITextInputInteger, self).insert_text(filtered, from_undo=from_undo)
+
+class UIBoolInput(ToggleButton):
+    def data_set(self, _key_, _validate_, _state_text_) -> ToggleButton:
+        self.v_key = _key_
+        self._v_validate = _validate_
+        self._state_text = _state_text_
+        self.bind(on_press=self._v_on_validate)
+        self._v_value = False
+        self.focus = False
+        return self
+
+    def _v_on_validate(self, _instance_):
+        self._v_value = _instance_.state == 'down'
+        if self._v_validate != None:
+            self._v_validate(_instance_, self.v_value_get())
+        self.v_value_set(self._v_value)
+
+    def v_value_set(self, _value_):
+        self.state = 'down' if _value_ else 'normal'
+        self.text = self._state_text[1] if _value_ else self._state_text[0]
+        
+    def v_value_get(self):
+        return self._v_value
 
 class UI():
     @staticmethod

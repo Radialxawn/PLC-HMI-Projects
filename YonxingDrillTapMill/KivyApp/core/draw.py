@@ -168,6 +168,8 @@ class Draw(object):
         pyp += poff[1]
         zpl = 0
         for z, zs in zip(_face_.z, _face_.zs):
+            if z == 0 and zs == 0:
+                continue
             zp, zsp = self.micro_to_pixel(z, zs)
             if zsp > 0:
                 for i in np.arange(zpl, zp, zsp):

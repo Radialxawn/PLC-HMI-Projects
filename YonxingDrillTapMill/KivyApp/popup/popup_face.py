@@ -2,6 +2,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from popup.popup_face_origin import PopupFaceOrigin
 from popup.popup_shape import PopupShape
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
@@ -9,7 +10,6 @@ from kivy.uix.popup import Popup
 from core.mouse import Mouse
 from core.draw import Draw
 from data.face import Face
-from kivy.graphics import Color
 from core.ui import UITextInputInteger
 from kivy.utils import get_color_from_hex as clhex
 
@@ -182,6 +182,11 @@ class PopupFace(Popup):
         app.data.set('hmi.face_run', _value_)
     
     def _face_org_set(self, _instance_):
+        popup = PopupFaceOrigin().set_data(
+            _face_edit_=self._face_edit,  
+        )
+        popup.open()
+        return
         app = App.get_running_app()
         bid = _instance_.id
         for property in self._face_org_set_property__data:

@@ -22,7 +22,8 @@ shape = {
 		'LET #r : LREAL := MAX{0.001, {#c*0.5/PI}-{$VT$*0.5}}',
 		'LET #w : LREAL := MAX{0.001, $VA$-$VT$}',
 		'LET #h : LREAL := MAX{0.001, $VB$-$VT$}',
-		'G36 O$VSX$ D{0.5*#w/#r}',
+		#
+		'G36 O$VSX$ D{0.5*#w*{1-$VMODE$*2}/#r}',
 		'G36 O$VSY$ D{0.5*#h/#r}',
 		#
 		'G0 X-#r',
@@ -45,7 +46,8 @@ shape = {
 		'LET #whh : LREAL := MAX{#w, #h}*0.5',
 		'LET #sc : LREAL := FLOOR{#whh/MAX{0.001, MIN{$VE$, #whh}}}',
 		'LET #si : LREAL := #sc+1',
-		'N0 G36 O$VSX$ D{0.5*#w/#r}',
+		#
+		'N0 G36 O$VSX$ D{0.5*#w*{1-$VMODE$*2}/#r}',
 		'N1 G36 O$VSY$ D{0.5*#h/#r}',
 		'N2 G1 Z$VZ$',
 		#
@@ -64,6 +66,8 @@ shape = {
 		'LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',
 		'LET #b : LREAL := MAX{0.001, {$VB$-$VT$}*0.5}',
 		'LET #r : LREAL := MAX{0.001, $VC$-$VT$*0.5}',
+		#
+		'G36 O$VSX$ D{1-$VMODE$*2}',
 		#
 		'G0 X-#a',
 		'G1 Z$VZ$',
@@ -91,7 +95,8 @@ shape = {
 		'LET #bi : LREAL := 0.0',
 		'LET #ri : LREAL := 0.0',
 		#
-		'N0 G1 Z$VZ$',
+		'N0 G36 O$VSX$ D{1-$VMODE$*2}',
+		'N1 G1 Z$VZ$',
 		#
 		'N10 G36 O#ai D{{#sc-#si+1}*$VE$*#a/#abh}',
 		'N20 G36 O#bi D{{#sc-#si+1}*$VE$*#b/#abh}',
@@ -128,6 +133,8 @@ shape = {
 		'LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',
 		'LET #r : LREAL := MAX{0.001, {$VB$-$VT$}*0.5}',
 		'LET #rc : LREAL := MAX{0.001, {$VC$-$VT$}*0.5}',
+		#
+		'G36 O$VSY$ D{1-$VMODE$*2}',
 		# capsule
 		'G0 X#a',
 		'G1 Z$VZ$',
@@ -147,6 +154,8 @@ shape = {
 		'LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}',
 		'LET #r : LREAL := MAX{0.001, {$VB$-$VT$}*0.5}',
 		'LET #rc : LREAL := MAX{0.001, {$VC$-$VT$}*0.5}',
+		#
+		'G36 O$VSY$ D{$VMODE$*2-1}',
 		# capsule
 		'G0 X-#a',
 		'G1 Z$VZ$',
@@ -167,6 +176,8 @@ shape = {
 		'LET #r : LREAL := MAX{0.001, {$VB$-$VT$}*0.5}',
 		'LET #h : LREAL := MAX{0.001, $VC$-$VB$*0.5-$VT$*0.5}',
 		'LET #w : LREAL := MAX{0.001, {$VD$-$VT$}*0.5}',
+		#
+		'G36 O$VSX$ D{1-$VMODE$*2}',
 		# capsule
 		'G0 X#a',
 		'G1 Z$VZ$',
@@ -190,6 +201,8 @@ shape = {
 		'LET #r : LREAL := MAX{0.001, {$VB$-$VT$}*0.5}',
 		'LET #h : LREAL := MAX{0.001, $VC$-$VB$*0.5-$VT$*0.5}',
 		'LET #w : LREAL := MAX{0.001, {$VD$-$VT$}*0.5}',
+		#
+		'G36 O$VSX$ D{1-$VMODE$*2}',
 		# capsule
 		'G0 X-#a',
 		'G1 Z$VZ$',

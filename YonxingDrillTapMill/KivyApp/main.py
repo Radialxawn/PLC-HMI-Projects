@@ -37,6 +37,7 @@ Builder.load_file('popup/popup_file.kv')
 Builder.load_file('popup/popup_login.kv')
 Builder.load_file('popup/popup_progress.kv')
 Builder.load_file('popup/popup_face.kv')
+Builder.load_file('popup/popup_face_origin.kv')
 Builder.load_file('popup/popup_shape.kv')
 Builder.load_file('popup/popup_error.kv')
 

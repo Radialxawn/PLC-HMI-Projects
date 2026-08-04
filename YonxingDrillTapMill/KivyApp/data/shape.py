@@ -3,14 +3,15 @@ from core.helper import Helper
 
 class Shape(object):
     property__data = {
-        'x':  {'label': ' X', 'factor': -1e-3},
-        'y':  {'label': ' Y', 'factor': -1e-3},
-        '0': None,
-        'va': {'label': ' A', 'factor': 1e-3},
-        'vb': {'label': ' B', 'factor': 1e-3},
-        'vc': {'label': ' C', 'factor': 1e-3},
-        'vd': {'label': ' D', 'factor': 1e-3},
-        've': {'label': ' E', 'factor': 1e-3},
+        'x':     {'label': ' X', 'factor': -1e-3},
+        'y':     {'label': ' Y', 'factor': -1e-3},
+        '0':     None,
+        'va':    {'label': ' A', 'factor': 1e-3},
+        'vb':    {'label': ' B', 'factor': 1e-3},
+        'vc':    {'label': ' C', 'factor': 1e-3},
+        'vd':    {'label': ' D', 'factor': 1e-3},
+        've':    {'label': ' E', 'factor': 1e-3},
+        'vmode': {'label': 'MODE', 'state_text': ['NGHỊCH', 'THUẬN']},
     }
 
     shape_name__data = {
@@ -27,14 +28,14 @@ class Shape(object):
             },
             'view_micro': 100_000
         },
-        'circle':   {'id': 3,  'label': 'TRÒN',     'property__data': {'x': None, 'y': None, 'va': None, 'vb': None}},
-        'circles':  {'id': 4,  'label': 'TRÒN ĐẶC', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 've': 'BƯỚC'}},
-        'rect':     {'id': 5,  'label': 'HỘP',      'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
-        'rects':    {'id': 6,  'label': 'HỘP ĐẶC',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 've': 'BƯỚC'}},
-        'locka':    {'id': 7,  'label': 'KHOÁ 1A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
-        'lockaf':   {'id': 8,  'label': 'KHOÁ 1B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None}},
-        'lockb':    {'id': 9,  'label': 'KHOÁ 2A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
-        'lockbf':   {'id': 10, 'label': 'KHOÁ 2B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None}},
+        'circle':   {'id': 3,  'label': 'TRÒN',     'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vmode': None}},
+        'circles':  {'id': 4,  'label': 'TRÒN ĐẶC', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 've': 'BƯỚC', 'vmode': None}},
+        'rect':     {'id': 5,  'label': 'HỘP',      'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vmode': None}},
+        'rects':    {'id': 6,  'label': 'HỘP ĐẶC',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 've': 'BƯỚC', 'vmode': None}},
+        'locka':    {'id': 7,  'label': 'KHOÁ 1A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vmode': None}},
+        'lockaf':   {'id': 8,  'label': 'KHOÁ 1B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vmode': None}},
+        'lockb':    {'id': 9,  'label': 'KHOÁ 2A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None, 'vmode': None}},
+        'lockbf':   {'id': 10, 'label': 'KHOÁ 2B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None, 'vmode': None}},
         # custom
         'custom_0': {'id': 11, 'label': 'CNC 1',   'property__data': {'x': None, 'y': None,
             },
@@ -58,6 +59,7 @@ class Shape(object):
         self.vc = 0
         self.vd = 0
         self.ve = 0
+        self.vmode = 0
     
     def __getitem__(self, _key_):
         return getattr(self, _key_)

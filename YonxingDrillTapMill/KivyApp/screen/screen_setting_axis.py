@@ -5,9 +5,9 @@ from kivy.app import App
 from pathlib import Path
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
-from kivy.uix.togglebutton import ToggleButton
 from core.ui import UITextInputInteger
 from kivy.uix.label import Label
+from core.ui import UIBoolInput
 
 class ScreenSettingAxis(Screen):
     axis_name__data = {
@@ -105,9 +105,7 @@ class ScreenSettingAxis(Screen):
                 continue
             self._name__value[name] = block.value
             if block.type == ua.VariantType.Boolean:
-                value = block.value == 1
-                input.state = 'down' if value else 'normal'
-                input.text = 'THUẬN' if value else 'NGHỊCH'
+                input.v_value_set(block.value == 1)
             else:
                 input.v_value_set(block.value)
         need = app.data.get('hmi.cfsh.need')
@@ -163,10 +161,11 @@ class ScreenSettingAxis(Screen):
                     data = ScreenSettingAxis.property__data[property]
                     name = 'hmi.cf.%s[%d]' % (property, axis_index_array[i])
                     if app.data.block(name).type == ua.VariantType.Boolean:
-                        input = ToggleButton()
-                        input.focus = False
-                        input.name = name
-                        input.bind(on_press=self._on_toggle_press)
+                        input = UIBoolInput().data_set(
+                            _key_=name,
+                            _validate_=self._on_bool_input_validate,
+                            _state_text_=['NGHỊCH', 'THUẬN'],
+                        )
                     else:
                         input = UITextInputInteger(
                             halign='center',
@@ -175,17 +174,16 @@ class ScreenSettingAxis(Screen):
                             _key_=name,
                             _factor_=data['factor'],
                             _validate_=self._on_text_input_validate,
-                            _focus_=None
+                            _focus_=None,
                         )
                     name__input[name] = input
                     name__value[name] = None
                     grid.add_widget(input)
         return label__data, name__input, name__value
     
-    def _on_toggle_press(self, _instance_):
+    def _on_bool_input_validate(self, _instance_, _value_):
         app = App.get_running_app()
-        value = _instance_.state == 'down'
-        app.data.set(_instance_.name, value)
+        app.data.set(_instance_.v_key, _value_)
         app.helper.save_need_check()
         
     def _on_text_input_validate(self, _instance_, _value_):
@@ -217,7 +215,6 @@ class ScreenSettingAxis(Screen):
             return
         with path.open(mode='r') as file:
             config = json.load(file)
-        names, values = [], []
         for name in config:
             value = config[name]
             if value == None:

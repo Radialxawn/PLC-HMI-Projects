@@ -1,0 +1,57 @@
+#:import hex kivy.utils.get_color_from_hex
+<PopupFaceOrigin>:
+    size_hint: 0.5, 0.5
+    auto_dismiss: False
+    BoxLayout:
+        orientation: 'vertical'
+        Widget:
+            size_hint_y: None
+            height: 10
+        BoxLayout:
+            id: main
+            orientation: 'horizontal'
+            spacing: 5
+            BoxLayout:
+                GridLayout:
+                    spacing: 5
+                    padding: 5
+                    cols: 3
+                    rows: 3
+                    Widget:
+                    Button:
+                        id: edge_top
+                        text: '↓'
+                    Widget:
+                    Button:
+                        id: edge_left
+                        text: '→'
+                    Button:
+                        id: edge_center
+                        text: '+'
+                    Button:
+                        id: edge_right
+                        text: '←'
+                    Widget:
+                    Button:
+                        id: edge_bot
+                        text: '↑'
+                    Widget:
+        Widget:
+            size_hint_y: None
+            height: 10
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 5
+            size_hint_y: None
+            height: 60
+            Button:
+                text: 'SET'
+                size_hint_x: None
+                width: 120
+                on_release: root._apply()
+            Widget:
+            Button:
+                text: 'THOÁT'
+                size_hint_x: None
+                width: 120
+                on_release: root._cancel()

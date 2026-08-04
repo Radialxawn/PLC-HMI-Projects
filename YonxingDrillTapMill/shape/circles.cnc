@@ -10,7 +10,7 @@ LET #h : LREAL := MAX{0.001, $VB$-$VT$}
 LET #whh : LREAL := MAX{#w, #h}*0.5
 LET #sc : LREAL := FLOOR{#whh/MAX{0.001, MIN{$VE$, #whh}}}
 LET #si : LREAL := #sc+1
-N0 G36 O$VSX$ D{0.5*#w/#r}
+N0 G36 O$VSX$ D{0.5*#w*{1-$VMODE$*2}/#r}
 N1 G36 O$VSY$ D{0.5*#h/#r}
 N2 G1 Z$VZ$
 N10 G1 X{{#si-1-#sc}*$VE$*#r/#whh}

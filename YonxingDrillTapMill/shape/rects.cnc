@@ -7,7 +7,8 @@ LET #si : LREAL := #sc+1
 LET #ai : LREAL := 0.0
 LET #bi : LREAL := 0.0
 LET #ri : LREAL := 0.0
-N0 G1 Z$VZ$
+N0 G36 O$VSX$ D{1-$VMODE$*2}
+N1 G1 Z$VZ$
 N10 G36 O#ai D{{#sc-#si+1}*$VE$*#a/#abh}
 N20 G36 O#bi D{{#sc-#si+1}*$VE$*#b/#abh}
 N30 G36 O#ri D{MAX{0.0001, #r*#ai/#a}}
