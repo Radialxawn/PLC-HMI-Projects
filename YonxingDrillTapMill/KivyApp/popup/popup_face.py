@@ -23,7 +23,6 @@ class PopupFace(Popup):
         self._delete_ = _delete_
         self._draw = Draw(1e-3, [0.5e-3, 10e-3])
         self._mouse = Mouse()
-        self.ids.face_org_set.id = 'all'
         self._face_org_set_property__data = {
             'ox': {'width': 80},
             'oy': {'width': 80},
@@ -57,7 +56,7 @@ class PopupFace(Popup):
                     text=data['label'],
                     size_hint_x=None,
                     width=width,
-                    on_press=self._face_org_set
+                    on_press=self._face_org_set_press,
                 )
                 button.id = property
                 button.disabled = input_disabled
@@ -72,22 +71,23 @@ class PopupFace(Popup):
                 )
                 label.bind(size=label.setter('text_size'))
                 box.add_widget(label)
-            input_view_local = None
             if 'local' in data:
-                input_view_local = UITextInputInteger(
+                input_view = UITextInputInteger(
                     halign='center',
                     size_hint_x=None,
                     width=width_head-width-box.spacing,
                     background_color=clhex("#659462ff"),
                     multiline=False,
                 ).data_set(
-                    _key_=property,
+                    _key_=data['local'],
                     _factor_=data['factor'],
                     _validate_=None,
                     _focus_=None,
                 )
-                input_view_local.disabled = True
-                box.add_widget(input_view_local)
+                input_view.disabled = True
+                box.add_widget(input_view)
+                name__input_view[input_view.v_key] = input_view
+                input_view.v_value_last = None
             input = UITextInputInteger(
                 halign='center',
                 multiline=False
@@ -116,7 +116,6 @@ class PopupFace(Popup):
                 name__input_view[input_view.v_key] = input_view
                 input_view.v_value_last = None
                 input.v_name_view = input_view.v_key
-                input_view.v_local = input_view_local
             self.ids.face_property.add_widget(box)
         self.ids.face_property.add_widget(Widget())
         for i in range(len(self._face_edit.z)):
@@ -181,24 +180,44 @@ class PopupFace(Popup):
         app = App.get_running_app()
         app.data.set('hmi.face_run', _value_)
     
-    def _face_org_set(self, _instance_):
-        popup = PopupFaceOrigin().set_data(
-            _face_edit_=self._face_edit,
-        )
-        popup.open()
-        return
+    def _face_org_set(self, _id_):
         app = App.get_running_app()
-        bid = _instance_.id
         for property in self._face_org_set_property__data:
             input = self._property__input[property]
             if not hasattr(input, 'v_name_view') or input.disabled:
                 continue
-            if bid == 'all' or (bid in self._face_org_set_property__data and bid == property):
+            if _id_ == 'all' or (_id_ in self._face_org_set_property__data and _id_ == property):
                 input_view = self._name__input_view[input.v_name_view]
                 value = app.data.get(input_view.v_key)
                 if value != None:
                     input.v_value_set(value)
                     self._on_text_input_validate(input, input.v_value_get())
+
+    def _face_org_set_press(self, _instance_):
+        self._face_org_set(_instance_.id)
+
+    def _face_org_set_popup(self):
+        popup = PopupFaceOrigin().set_data(
+            _name__input_view_=self._name__input_view,
+            _set_=self._face_org_set_popup_set,
+        )
+        popup.open()
+
+    def _face_org_set_popup_set(self, _position_):
+        if _position_ == None:
+            self._face_org_set('all')
+        else:
+            app = App.get_running_app()
+            propertys = ['ox', 'oy', 'oz']
+            for i, p in enumerate(_position_):
+                input = self._property__input[propertys[i]]
+                if p == None and hasattr(input, 'v_name_view') and not input.disabled:
+                    input_view = self._name__input_view[input.v_name_view]
+                    p = app.data.get(input_view.v_key)
+                if p != None:
+                    input.v_value_set(p)
+                    self._on_text_input_validate(input, input.v_value_get())
+            self._face_org_set('tool_offset')
 
     def _value_update(self, _dt_):
         app = App.get_running_app()
@@ -209,10 +228,6 @@ class PopupFace(Popup):
                 continue
             input_view.v_value_last = block.value
             input_view.v_value_set(block.value)
-            input_view_local = input_view.v_local
-            if input_view_local != None:
-                delta = block.value - self._face_edit[input_view_local.v_key]
-                input_view_local.v_value_set(delta)
         view_can_run = app.data.get('hmi.view_can_run')
         self.ids.face_run.disabled = not view_can_run
         self.ids.face_to_org.disabled = not view_can_run

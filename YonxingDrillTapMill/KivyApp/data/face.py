@@ -2,9 +2,9 @@ from data.shape import Shape
 
 class Face(object):
     property__data = {
-        'ox':            {'label': ' GỐC X',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[0]', 'local': True},
-        'oy':            {'label': ' GỐC Y',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[1]', 'local': True},
-        'oz':            {'label': ' GỐC Z',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[2]', 'local': True},
+        'ox':            {'label': ' GỐC X',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[0]', 'local': 'hmi.view_axis_tmp_local_micro[0]'},
+        'oy':            {'label': ' GỐC Y',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[1]', 'local': 'hmi.view_axis_tmp_local_micro[1]'},
+        'oz':            {'label': ' GỐC Z',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[2]', 'local': 'hmi.view_axis_tmp_local_micro[2]'},
         'tool_diameter': {'label': ' ĐƯỜNG KÍNH DAO',  'factor': 1e-3},
         'tool_offset':   {'label': ' DAO LỆCH CHUẨN',  'factor': -1e-3,  'name_view': 'hmi.view_tool_offset_micro[{}]'},
         'depth':         {'label': ' ĐỘ SÂU MẶC ĐỊNH', 'factor': 1e-3},

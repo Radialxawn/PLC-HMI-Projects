@@ -1,70 +1,52 @@
 from kivy.app import App
-from kivy.clock import Clock
+from data.face import Face
 from kivy.uix.popup import Popup
+from types import SimpleNamespace
 from kivy.utils import get_color_from_hex as clhex
 
 class PopupFaceOrigin(Popup):
-    def set_data(self, _face_edit_):
-        self._face_edit = _face_edit_
-        self._generate()
+    def set_data(self, _name__input_view_, _set_):
+        self._name__input_view = _name__input_view_
+        self._set_ = _set_
+        button__edge_data = {}
+        for id in [['edge_xn', 0], ['edge_xp', 0], ['edge_yn', 1], ['edge_yp', 1], ['edge_z', 2]]:
+            k = self.ids[id[0]]
+            v = SimpleNamespace(
+                id=id[0],
+                axis=id[1],
+                position=[0, 0, 0],
+                active=False,
+            )
+            k.bind(on_press=self._edge_press)
+            button__edge_data[k] = v
+        self._button__edge_data = button__edge_data
         return self
 
-    def _generate(self):
-        return
-
-    def on_open(self, *args):
-        if not hasattr(self, '_value_update_clock'):
-            self._value_update_clock = Clock.schedule_interval(self._value_update, 0.1)
-
-    def on_dismiss(self, *args):
-        if hasattr(self, '_value_update_clock'):
-            Clock.unschedule(self._value_update_clock)
-            delattr(self, '_value_update_clock')
-    
-    def _face_to_org(self, _value_):
+    def _edge_press(self, _instance_):
         app = App.get_running_app()
-        app.data.set('hmi.face_to_org', _value_)
-    
-    def _face_run(self, _value_):
-        app = App.get_running_app()
-        app.data.set('hmi.face_run', _value_)
-    
-    def _face_org_set(self, _instance_):
-        app = App.get_running_app()
-        bid = _instance_.id
-        for property in self._face_org_set_property__data:
-            input = self._property__input[property]
-            if not hasattr(input, 'v_name_view') or input.disabled:
-                continue
-            if bid == 'all' or (bid in self._face_org_set_property__data and bid == property):
-                input_view = self._name__input_view[input.v_name_view]
-                value = app.data.get(input_view.v_key)
-                if value != None:
-                    input.v_value_set(value)
-                    self._on_text_input_validate(input, input.v_value_get())
+        edge_data = self._button__edge_data[_instance_]
+        edge_data.active = not edge_data.active
+        edge_data.position = [
+            app.data.get(Face.property__data['ox']['name_view']),
+            app.data.get(Face.property__data['oy']['name_view']),
+            app.data.get(Face.property__data['oz']['name_view']),
+        ]
+        color = clhex("#6AA145") if edge_data.active else clhex("#5F5F5F")
+        _instance_.background_color = color
 
-    def _value_update(self, _dt_):
-        return
-        app = App.get_running_app()
-        for name in self._name__input_view:
-            input_view = self._name__input_view[name]
-            block = app.data.block(name)
-            if input_view.v_value_last == block.value:
-                continue
-            input_view.v_value_last = block.value
-            input_view.v_value_set(block.value)
-            input_view_local = input_view.v_local
-            if input_view_local != None:
-                delta = block.value - self._face_edit[input_view_local.v_key]
-                input_view_local.v_value_set(delta)
-        view_can_run = app.data.get('hmi.view_can_run')
-        self.ids.face_run.disabled = not view_can_run
-        self.ids.face_to_org.disabled = not view_can_run 
-
-    def _update_canvas(self, *args):
-        self._face_draw()
-
-    def _apply(self):
+    def _set(self):
+        ps = [[], [], []]
+        position = None
+        for button in self._button__edge_data:
+            v = self._button__edge_data[button]
+            if v.active:
+                ps[v.axis].append(v.position[v.axis])
+        for i, p in enumerate(ps):
+            if len(p) > 0:
+                if position == None:
+                    position = [None, None, None]
+                position[i] = round(sum(p)/len(p))
+        self._set_(position)
         self.dismiss()
 
     def _cancel(self):

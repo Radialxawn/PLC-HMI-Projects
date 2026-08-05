@@ -1,6 +1,7 @@
 #:import hex kivy.utils.get_color_from_hex
 <PopupFaceOrigin>:
-    size_hint: 0.5, 0.5
+    title: 'CHỌN CẠNH ĐỂ TÍNH GỐC'
+    size_hint: 0.3, 0.5
     auto_dismiss: False
     BoxLayout:
         orientation: 'vertical'
@@ -12,6 +13,7 @@
             orientation: 'horizontal'
             spacing: 5
             BoxLayout:
+                Widget:
                 GridLayout:
                     spacing: 5
                     padding: 5
@@ -28,7 +30,7 @@
                         id: edge_xn
                         text: 'X-'
                     Button:
-                        id: edge_center
+                        id: edge_z
                         text: 'Z'
                     Button:
                         id: edge_xp
@@ -38,6 +40,7 @@
                         id: edge_yn
                         text: 'Y-'
                     Widget:
+                Widget:
         Widget:
             size_hint_y: None
             height: 10
@@ -50,7 +53,7 @@
                 text: 'SET'
                 size_hint_x: None
                 width: 120
-                on_release: root._apply()
+                on_release: root._set()
             Widget:
             Button:
                 text: 'THOÁT'
