@@ -161,22 +161,32 @@ class Draw(object):
     
     def face(self, _face_, _pos_micro_, _color_):
         px, py = _pos_micro_[0], _pos_micro_[1]
-        Color(rgba=clhex("#000000ff"))
-        pxp, pyp, wp = self.micro_to_pixel(px, py, 50_000)
+        pxp, pyp, wp, ws = self.micro_to_pixel(px, py, 25_000, 10_000)
         poff = self.offset_pixel
         pxp += poff[0]
         pyp += poff[1]
-        zpl = 0
+        zl = 0
         for z, zs in zip(_face_.z, _face_.zs):
-            if z == 0 and zs == 0:
+            if z < zl:
                 continue
-            zp, zsp = self.micro_to_pixel(z, zs)
-            if zsp > 0:
-                for i in np.arange(zpl, zp, zsp):
-                    Rectangle(pos=[pxp-wp, pyp-i], size=[wp, 1])
-                Rectangle(pos=[pxp-wp, pyp-zp], size=[wp, 1])
+            single = zs == 0
+            if single:
+                zs = _face_.depth
+            zp, zsp, zpl = self.micro_to_pixel(z, zs, zl)
+            if single:
+                Color(rgba=clhex("#000000ff"))
+                Rectangle(pos=[pxp-wp*2, pyp-zp], size=[wp-ws, 1])
+                Color(rgba=clhex("#ff0000ff"))
+                Line(points=[pxp-wp-ws, pyp-zp, pxp-wp, pyp-zp-zsp], width=1)
+                Rectangle(pos=[pxp-wp, pyp-zp-zsp], size=[wp, 1])
+                zl += zs
             else:
-                Rectangle(pos=[pxp-wp, pyp-zp], size=[wp, 1])
-            zpl = zp
+                for i in np.arange(zpl, zp, zsp):
+                    Color(rgba=clhex("#000000ff"))
+                    Rectangle(pos=[pxp-wp*2, pyp-i], size=[wp-ws, 1])
+                    Color(rgba=clhex("#ff0000ff"))
+                    Line(points=[pxp-wp-ws, pyp-i, pxp-wp, pyp-min(i+zsp, zp)], width=1)
+                    Rectangle(pos=[pxp-wp, pyp-min(i+zsp, zp)], size=[wp, 1])
+                zl = z
         for shape in _face_.shape:
             self.shape(shape, [px + shape.x,  py + shape.y], _color_=_color_)

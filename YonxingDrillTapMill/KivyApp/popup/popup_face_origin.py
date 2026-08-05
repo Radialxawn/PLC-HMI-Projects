@@ -4,7 +4,7 @@ from kivy.uix.popup import Popup
 from kivy.utils import get_color_from_hex as clhex
 
 class PopupFaceOrigin(Popup):
-    def set_data(self, _face_edit_, _apply_):
+    def set_data(self, _face_edit_):
         self._face_edit = _face_edit_
         self._generate()
         return self
@@ -44,6 +44,7 @@ class PopupFaceOrigin(Popup):
                     self._on_text_input_validate(input, input.v_value_get())
 
     def _value_update(self, _dt_):
+        return
         app = App.get_running_app()
         for name in self._name__input_view:
             input_view = self._name__input_view[name]

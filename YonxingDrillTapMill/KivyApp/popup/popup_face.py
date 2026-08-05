@@ -183,7 +183,7 @@ class PopupFace(Popup):
     
     def _face_org_set(self, _instance_):
         popup = PopupFaceOrigin().set_data(
-            _face_edit_=self._face_edit,  
+            _face_edit_=self._face_edit,
         )
         popup.open()
         return
