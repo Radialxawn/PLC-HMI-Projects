@@ -1,0 +1,34 @@
+<PopupConfirm>:
+    title: 'XÁC NHẬN'
+    size_hint: None, None
+    size: 480, 240
+    auto_dismiss: False
+    BoxLayout:
+        orientation: 'vertical'
+        Widget:
+        Label:
+            id: message
+            halign: 'center'
+            valign: 'middle'
+            text_size: self.size
+        TextInput:
+            id: password
+            size_hint_y: None
+            height: 50
+            font_size: 30
+            halign: 'center'
+            valign: 'middle'
+            password: True
+            multiline: False
+        Widget:
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 5
+            size_hint_y: None
+            height: 60
+            Button:
+                text: 'CÓ'
+                on_release: root._confirm()
+            Button:
+                text: 'KHÔNG'
+                on_release: root._cancel()
