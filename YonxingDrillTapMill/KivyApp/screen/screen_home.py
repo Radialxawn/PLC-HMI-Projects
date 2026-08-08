@@ -62,8 +62,7 @@ class ScreenHome(Screen):
             for i in range(app.machine.problem_count):
                 self._name__hash.add(f'hmi.view_problem[{i}]')
                 self._name__hash.add(f'hmi.problem_fix[{i}]')
-            for name in ScreenSettingAxis.axis_name__data:
-                data = ScreenSettingAxis.axis_name__data[name]
+            for data in ScreenSettingAxis.axis_data:
                 self._name__hash.add('hmi.view_axis_overload[%d]' % (data['index']))
             self._index__face, self._index__face_cog = self._generate()
             self.ids.slider.bind(value=self._slider_value_change)

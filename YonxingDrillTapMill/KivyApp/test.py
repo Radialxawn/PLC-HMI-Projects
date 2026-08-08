@@ -12,7 +12,7 @@ machine = ScreenLoad.config_machine_load()
 def testa():
     data = Data(
         _address_ip_='192.168.2.3', _address_port_=4840,
-        _xml_path_windows_=r'D:/Github/PLC-HMI-Projects/YonxingDrillTapMill/MC500/MC500.Device.Application.xml',
+        _xml_path_windows_=Path(f'../MC500/MC500.Device.Application.xml'),
         _tag_head_='ns=4;s=|var|LS'
     )
     data.create()

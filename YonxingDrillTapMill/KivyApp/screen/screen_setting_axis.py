@@ -10,36 +10,37 @@ from kivy.uix.label import Label
 from core.ui import UIBoolInput
 
 class ScreenSettingAxis(Screen):
-    axis_name__data = {
-        'R-x':     {'index': 0,  'label': 'PHẢI: X'},
-        'RM-V-y':  {'index': 2,  'label': 'PHẢI: Y ĐỨNG'},
-        'RM-V-z':  {'index': 1,  'label': 'PHẢI: Z ĐỨNG'},
-        'RM-H-y':  {'index': 3,  'label': 'PHẢI: Y NGANG'},
-        'RM-H-z':  {'index': 4,  'label': 'PHẢI: Z NGANG'},
-        'L-x':     {'index': 5,  'label': 'TRÁI: X'},
-        'LDT-V-y': {'index': 7,  'label': 'TRÁI: Y'},
-        'LD-V-z':  {'index': 6,  'label': 'TRÁI: KHOAN Z ĐỨNG'},
-        'LD-L-z':  {'index': 10, 'label': 'TRÁI: KHOAN Z NGHIÊNG'},
-        'LT-V-z':  {'index': 8,  'label': 'TRÁI: TARO Z ĐỨNG'},
-        'LT-V-a':  {'index': 9,  'label': 'TRÁI: TARO XOAY ĐỨNG'},
-        'LT-L-z':  {'index': 11, 'label': 'TRÁI: TARO Z NGHIÊNG'},
-        'LT-L-a':  {'index': 12, 'label': 'TRÁI: TARO XOAY NGHIÊNG'},
-    }
+    axis_data = [
+        {'name': 'R-x',     'index': 0,  'label': 'PHẢI: X'},
+        {'name': 'RM-V-y',  'index': 2,  'label': 'PHẢI: Y ĐỨNG'},
+        {'name': 'RM-V-z',  'index': 1,  'label': 'PHẢI: Z ĐỨNG'},
+        {'name': 'RM-H-y',  'index': 3,  'label': 'PHẢI: Y NGANG'},
+        {'name': 'RM-H-z',  'index': 4,  'label': 'PHẢI: Z NGANG'},
+        {'name': 'L-x',     'index': 5,  'label': 'TRÁI: X'},
+        {'name': 'LDT-V-y', 'index': 7,  'label': 'TRÁI: Y'},
+        {'name': 'LD-V-z',  'index': 6,  'label': 'TRÁI: KHOAN Z ĐỨNG'},
+        {'name': 'LD-L-z',  'index': 10, 'label': 'TRÁI: KHOAN Z NGHIÊNG'},
+        {'name': 'LT-V-z',  'index': 8,  'label': 'TRÁI: TARO Z ĐỨNG'},
+        {'name': 'LT-V-a',  'index': 9,  'label': 'TRÁI: TARO XOAY ĐỨNG'},
+        {'name': 'LT-L-z',  'index': 11, 'label': 'TRÁI: TARO Z NGHIÊNG'},
+        {'name': 'LT-L-a',  'index': 12, 'label': 'TRÁI: TARO XOAY NGHIÊNG'},
+    ]
 
-    property__data = {
-        'max_rpm':                        {'label': 'Max RPM',               'factor': 1},
-        'gear_num':                       {'label': 'Gear num',              'factor': 1},
-        'gear_den':                       {'label': 'Gear den',              'factor': 1},
-        'gear_dir':                       {'label': 'Gear dir',              'factor': 1},
-        'home_torque_mNm':                {'label': 'Home torque',           'factor': 1e-3},
-        'home_encoder_value':             {'label': 'Home encoder',          'factor': 1},
-        'max_micro':                      {'label': 'Max travel',            'factor': 1e-3},
-        'overload_hold_torque_factor':    {'label': 'Hold torque factor',    'factor': 1e-3},
-        'overload_hold_torque_time_msec': {'label': 'Hold torque time',      'factor': 1e-3},
-        'overload_instant_torque_factor': {'label': 'Instant torque factor', 'factor': 1e-3},
-        'ramp_time_msec':                 {'label': 'Ramp time',             'factor': 1e-3},
-        'jerk_factor':                    {'label': 'Jerk',                  'factor': 1},
-    }
+    property_data = [
+        None,
+        {'name': 'max_rpm',                        'label': 'Max RPM',               'factor': 1},
+        {'name': 'gear_num',                       'label': 'Gear num',              'factor': 1},
+        {'name': 'gear_den',                       'label': 'Gear den',              'factor': 1},
+        {'name': 'gear_dir',                       'label': 'Gear dir',              'factor': 1},
+        {'name': 'home_torque_mNm',                'label': 'Home torque',           'factor': 1e-3},
+        {'name': 'home_encoder_value',             'label': 'Home encoder',          'factor': 1},
+        {'name': 'max_micro',                      'label': 'Max travel',            'factor': 1e-3},
+        {'name': 'overload_hold_torque_factor',    'label': 'Hold torque factor',    'factor': 1e-3},
+        {'name': 'overload_hold_torque_time_msec', 'label': 'Hold torque time',      'factor': 1e-3},
+        {'name': 'overload_instant_torque_factor', 'label': 'Instant torque factor', 'factor': 1e-3},
+        {'name': 'ramp_time_msec',                 'label': 'Ramp time',             'factor': 1e-3},
+        {'name': 'jerk_factor',                    'label': 'Jerk',                  'factor': 1},
+    ]
 
     def __init__(self, **kvargs):
         super(ScreenSettingAxis, self).__init__(**kvargs)
@@ -117,16 +118,7 @@ class ScreenSettingAxis(Screen):
 
     def _generate(self):
         app = App.get_running_app()
-        axis_name_array = []
-        axis_index_array = []
         label__data, name__input, name__value = {}, {}, {}
-        for name in ScreenSettingAxis.axis_name__data:
-            data = ScreenSettingAxis.axis_name__data[name]
-            axis_name_array.append(name)
-            axis_index_array.append(data['index'])
-        property_array = []
-        for property in ScreenSettingAxis.property__data:
-            property_array.append(property)
         axis_type__color = {
             'x': kivy.utils.get_color_from_hex('#ff4444ff'),
             'y': kivy.utils.get_color_from_hex('#95fe54ff'),
@@ -134,32 +126,34 @@ class ScreenSettingAxis(Screen):
             'a': kivy.utils.get_color_from_hex('#fff644ff'),
         }
         grid = self.ids.grid
-        grid.cols = len(ScreenSettingAxis.property__data) + 1
-        grid.rows = len(axis_name_array) + 1
-        grid.add_widget(Label(
-            text='Servo'
-        ))
-        for property in ScreenSettingAxis.property__data:
-            label = Label()
-            labelv = ScreenSettingAxis.property__data[property]['label']
-            labeld = [' | ' + labelv, 3, 10]
-            if len(labelv) <= labeld[2]:
-                label.text = labelv
-                labeld[2] = 0
-            label__data[label] = labeld
-            grid.add_widget(label)
-        for i in range(grid.cols):
-            for j in range(grid.rows - 1):
-                if j == 0:
+        grid.cols = len(ScreenSettingAxis.property_data)
+        grid.rows = len(ScreenSettingAxis.axis_data) + 1
+        #
+        for pdata in ScreenSettingAxis.property_data:
+            if pdata == None:
+                grid.add_widget(Label(
+                    text='Servo'
+                ))
+            else:
+                label = Label()
+                labelv = pdata['label']
+                labeld = [' | ' + labelv, 3, 10]
+                if len(labelv) <= labeld[2]:
+                    label.text = labelv
+                    labeld[2] = 0
+                label__data[label] = labeld
+                grid.add_widget(label)
+        #
+        for adata in ScreenSettingAxis.axis_data:
+            for pdata in ScreenSettingAxis.property_data:
+                if pdata == None:
                     grid.add_widget(Label(
-                        text=axis_name_array[i],
-                        color=axis_type__color[axis_name_array[i][-1]]
+                        text=adata['name'],
+                        color=axis_type__color[adata['name'][-1]],
                     ))
                 else:
                     input = None
-                    property = property_array[j - 1]
-                    data = ScreenSettingAxis.property__data[property]
-                    name = 'hmi.cf.%s[%d]' % (property, axis_index_array[i])
+                    name = 'hmi.cf.%s[%d]' % (pdata['name'], adata['index'])
                     if app.data.block(name).type == ua.VariantType.Boolean:
                         input = UIBoolInput().data_set(
                             _key_=name,
@@ -172,7 +166,7 @@ class ScreenSettingAxis(Screen):
                             multiline=False
                         ).data_set(
                             _key_=name,
-                            _factor_=data['factor'],
+                            _factor_=pdata['factor'],
                             _validate_=self._on_text_input_validate,
                             _focus_=None,
                         )
@@ -204,7 +198,7 @@ class ScreenSettingAxis(Screen):
         app.helper.save_need_check()
     
     def _config_axis_path(self):
-        return Path(Path(__file__).resolve().parent.parent, 'config/axis.json')
+        return Path(f'./config/axis.json')
 
     def _config_axis_load_confirm(self):
         config = {}
