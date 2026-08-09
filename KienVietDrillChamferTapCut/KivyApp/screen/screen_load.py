@@ -18,7 +18,7 @@ class ScreenLoad(Screen):
 
     @staticmethod
     def config_machine_load():
-        path = Path(Path(__file__).resolve().parent.parent, 'config/machine.json')
+        path = Path(Path(__file__).resolve().parent.parent, 'config/_machine.json')
         if not path.exists():
             raise Exception('No machine config')
         with path.open(mode='r') as file:

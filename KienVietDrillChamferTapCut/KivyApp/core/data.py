@@ -243,6 +243,9 @@ class Data(object):
                 inside = inside or name in name__hash
             self._name__block[name].active = inside
 
+    def all_name_get(self):
+        return list(self._name__block)
+
     ###################
     # DATA CONNECTION #
     ###################
