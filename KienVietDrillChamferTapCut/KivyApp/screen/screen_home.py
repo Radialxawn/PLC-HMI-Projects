@@ -11,18 +11,18 @@ from core.ui import UIBoolInput
 
 class ScreenHome(Screen):
     axis_list = [
-        {'name': 'DC-z',  'index': 0,  'label': ''},
-        {'name': 'D-x',   'index': 1,  'label': ''},
-        {'name': 'D-z',   'index': 2,  'label': ''},
-        {'name': 'DT-z',  'index': 3,  'label': ''},
-        {'name': 'DB-z',  'index': 4,  'label': ''},
-        {'name': 'C-y',   'index': 5,  'label': ''},
-        {'name': 'T-z',   'index': 6,  'label': ''},
-        {'name': 'C-a',   'index': 7,  'label': ''},
-        {'name': 'D-a',   'index': 8,  'label': ''},
-        {'name': 'DT-a',  'index': 9,  'label': ''},
-        {'name': 'DB-a',  'index': 10, 'label': ''},
-        {'name': 'T-a',   'index': 11, 'label': ''},
+        {'name': 'DragClamp-z',  'index': 0,  'label': ''},
+        {'name': 'Drag-x',       'index': 1,  'label': ''},
+        {'name': 'Drill-z',      'index': 2,  'label': ''},
+        {'name': 'DrillT-z',     'index': 3,  'label': ''},
+        {'name': 'DrillB-z',     'index': 4,  'label': ''},
+        {'name': 'Cut-y',        'index': 5,  'label': ''},
+        {'name': 'Tap-z',        'index': 6,  'label': ''},
+        {'name': 'Clamp-a',      'index': 7,  'label': ''},
+        {'name': 'Drill-a',      'index': 8,  'label': ''},
+        {'name': 'DrillT-a',     'index': 9,  'label': ''},
+        {'name': 'DrillB-a',     'index': 10, 'label': ''},
+        {'name': 'Tap-a',        'index': 11, 'label': ''},
     ]
 
     axis_stat = [
