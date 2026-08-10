@@ -95,7 +95,7 @@
    "hmi.cf.overload_instant_torque_factor[7]": 2907,
    "hmi.cf.ramp_time_msec[7]": 100,
    "hmi.cf.jerk_factor[7]": 30,
-   "hmi.cf.max_rpm[8]": 4000,
+   "hmi.cf.max_rpm[8]": 5000,
    "hmi.cf.gear_num[8]": 1000,
    "hmi.cf.gear_den[8]": 131072,
    "hmi.cf.gear_dir[8]": false,
