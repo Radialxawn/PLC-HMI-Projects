@@ -205,7 +205,7 @@ const plc = new Controller('FX');
 const hmi = new Controller('Weintek');
 
 /////GENERATE
-for ([k, v] of Object.entries({'MainRun':1, 'MainStop':2, 'CoverRun':6, 'SpinRun':5, 'FlushRun':15, 'CleanRun':7})) {
+for ([k, v] of Object.entries({'MainRun':1, 'MainStop':2, 'CoverRun':6, 'SpinRun':5, 'FlushRun':20, 'CleanRun':7})) {
    plc.tag_add(`${k}`, BOOL, M, Auto);
    plc.tag_add(`${k}I`, BOOL, X, v);
 }
@@ -229,7 +229,7 @@ for (k of ['Cover']) {
          plc.tag_add(`${k}${a}${b}TimerDelay`, INT, D, delay++);
       }
    }
-   for ([a, v] of Object.entries({'N':[11, 6], 'P':[-1, 7]})) {
+   for ([a, v] of Object.entries({'N':[11, 6], 'P':[17, 7]})) {
       if (v[0] != -1) {
          plc.tag_add(`${k}${a}I`, BOOL, X, v[0]);
       }
@@ -256,6 +256,7 @@ for (k of ['Spin']) {
    plc.tag_add(`${k}UnlockLO`, BOOL, Y, 3);
    plc.tag_add(`${k}UnlockRO`, BOOL, Y, 4);
    plc.tag_add(`${k}BlockO`, BOOL, Y, 16);
+   plc.tag_add(`${k}BlockPI`, BOOL, X, 15);
    for ([a, v] of Object.entries({'P':[10, 0]})) {
       plc.tag_add(`${k}${a}`, BOOL, M, Auto);
       plc.tag_add(`${k}${a}I`, BOOL, X, v[0]);
@@ -322,8 +323,8 @@ for (k of ['Time']) {
    }
 }
 for (k of ['Process']) {
-   plc.tag_add(`${k}DoorI`, BOOL, X, 16);
-   plc.tag_add(`${k}HumanI`, BOOL, X, 17);
+   plc.tag_add(`${k}DoorI`, BOOL, X, 21);
+   plc.tag_add(`${k}HumanI`, BOOL, X, 16);
    plc.tag_add(`${k}HumanEnterFlushCount`, INT, D, Auto);
    plc.tag_add(`${k}HumanCount`, INT, D, delay++);
    plc.tag_add(`${k}HumanCountTimer`, BOOL, TC, Auto);
