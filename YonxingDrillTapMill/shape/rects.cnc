@@ -8,11 +8,11 @@ LET #ai : LREAL := 0.0
 LET #bi : LREAL := 0.0
 LET #ri : LREAL := 0.0
 N0 G36 O$VSX$ D{1-$VMODE$*2}
-N1 G1 Z$VZ$
+N1 G1 Z$VZ$ F$VFV$
 N10 G36 O#ai D{{#sc-#si+1}*$VE$*#a/#abh}
 N20 G36 O#bi D{{#sc-#si+1}*$VE$*#b/#abh}
 N30 G36 O#ri D{MAX{0.0001, #r*#ai/#a}}
-N100 G1 X-#ai
+N100 G1 X-#ai F$VFH$
 N110 G1 Y#bi-#ri
 N120 G2 X-#ai+#ri Y#bi R#ri
 N130 G1 X#ai-#ri

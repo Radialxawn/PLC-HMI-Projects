@@ -3,8 +3,8 @@ LET #r : LREAL := MAX{0.001, {$VB$-$VT$}*0.5}
 LET #rc : LREAL := MAX{0.001, {$VC$-$VT$}*0.5}
 N3 G36 O$VSY$ D{1-$VMODE$*2}
 N4 G0 X#a
-N5 G1 Z$VZ$
-N6 G2 X#a-#r Y-#r R#r
+N5 G1 Z$VZ$ F$VFV$
+N6 G2 X#a-#r Y-#r R#r F$VFH$
 N7 G1 X-#a+#r
 N8 G2 Y#r R#r
 N9 G1 X#a-#r

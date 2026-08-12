@@ -1,23 +1,25 @@
+from data.shape import ShapeID
 from data.shape import Shape
 
 class Face(object):
     property__data = {
-        'ox':            {'label': ' GỐC X',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[0]', 'local': 'hmi.view_axis_tmp_local_micro[0]'},
-        'oy':            {'label': ' GỐC Y',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[1]', 'local': 'hmi.view_axis_tmp_local_micro[1]'},
-        'oz':            {'label': ' GỐC Z',           'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[2]', 'local': 'hmi.view_axis_tmp_local_micro[2]'},
-        'tool_diameter': {'label': ' ĐƯỜNG KÍNH DAO',  'factor': 1e-3},
-        'tool_offset':   {'label': ' DAO LỆCH CHUẨN',  'factor': -1e-3,  'name_view': 'hmi.view_tool_offset_micro[{}]'},
-        'depth':         {'label': ' ĐỘ SÂU MẶC ĐỊNH', 'factor': 1e-3},
-        'feed':          {'label': ' TỐC ĐỘ (mm/min)', 'factor': 1},
+        'ox':            {'label': ' GỐC X',              'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[0]', 'local': 'hmi.view_axis_tmp_local_micro[0]'},
+        'oy':            {'label': ' GỐC Y',              'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[1]', 'local': 'hmi.view_axis_tmp_local_micro[1]'},
+        'oz':            {'label': ' GỐC Z',              'factor': -1e-3, 'name_view': 'hmi.view_axis_tmp_micro[2]', 'local': 'hmi.view_axis_tmp_local_micro[2]'},
+        'tool_diameter': {'label': ' ĐƯỜNG KÍNH DAO',     'factor': 1e-3},
+        'tool_offset':   {'label': ' DAO LỆCH CHUẨN',     'factor': -1e-3,  'name_view': 'hmi.view_tool_offset_micro[{}]'},
+        'depth':         {'label': ' ĐỘ SÂU MẶC ĐỊNH',    'factor': 1e-3},
+        'feed_h':        {'label': ' TỐC ĐỘ XY (mm/min)', 'factor': 1},
+        'feed_v':        {'label': ' TỐC ĐỘ Z (mm/min)',  'factor': 1},
     }
 
     index__rule = {
-        0: {'property_exclude': [],                    'shape_exclude': ['tap']},
-        1: {'property_exclude': [],                    'shape_exclude': ['tap']},
-        2: {'property_exclude': ['tool_offset'],       'shape_exclude': ['tap']},
-        3: {'property_exclude': ['oy', 'tool_diameter', 'tool_offset'], 'shape_include': ['drill']},
-        4: {'property_exclude': ['tool_diameter','tool_offset'],        'shape_include': ['tap']},
-        5: {'property_exclude': ['oy', 'tool_diameter', 'tool_offset'], 'shape_include': ['tap']},
+        0: {'property_exclude': [],                                     'shape_exclude': [ShapeID.TAP]},
+        1: {'property_exclude': [],                                     'shape_exclude': [ShapeID.TAP]},
+        2: {'property_exclude': ['tool_offset'],                        'shape_exclude': [ShapeID.TAP]},
+        3: {'property_exclude': ['oy', 'tool_diameter', 'tool_offset'], 'shape_include': [ShapeID.DRILL]},
+        4: {'property_exclude': ['tool_diameter','tool_offset'],        'shape_include': [ShapeID.TAP]},
+        5: {'property_exclude': ['oy', 'tool_diameter', 'tool_offset'], 'shape_include': [ShapeID.TAP]},
     }
 
     def __init__(self, _index_, _z_count_, _shape_count_):
@@ -30,7 +32,8 @@ class Face(object):
         self.tool_diameter = 0
         self.tool_offset = 0
         self.depth = 0
-        self.feed = 0
+        self.feed_h = 0
+        self.feed_v = 0
         self.shape = []
         for _ in range(_shape_count_):
             self.shape.append(Shape())
@@ -98,7 +101,8 @@ class Face(object):
             self.zs[i] = min(self.z[i], v)
         self.tool_diameter = max(0, self.tool_diameter)
         self.depth = max(0, self.depth)
-        self.feed = max(1, self.feed)
+        self.feed_h = max(1, self.feed_h)
+        self.feed_v = max(1, self.feed_v)
         for shape in self.shape:
             shape.limit()
 

@@ -1,5 +1,29 @@
+from enum import Enum
 from kivy.app import App
 from core.helper import Helper
+
+class ShapeID(Enum):
+    NONE    = 0
+    FACEX   = 1
+    FACEY   = 2
+    DRILL   = 3
+    TAP     = 4
+    CIRCLE  = 5
+    CIRCLES = 6
+    RECT    = 7
+    RECTS   = 8
+    LOCKA   = 9
+    LOCKAF  = 10
+    LOCKB   = 11
+    LOCKBF  = 12
+    CT0     = 13
+    CT1     = 14
+    CT2     = 15
+    CT3     = 16
+    CT4     = 17
+    CT5     = 18
+    CT6     = 19
+    CT7     = 20
 
 class Shape(object):
     property__data = {
@@ -14,40 +38,29 @@ class Shape(object):
         'vmode': {'label': 'MODE', 'state_text': ['NGHỊCH', 'THUẬN']},
     }
 
-    shape_name__data = {
-        'none':     {'id': 0,  'label': '...',     'property__data': {}},
-        'drill':    {'id': 1,  'label': 'KHOAN',   'property__data': {'x': None, 'y': None,
-                'va': ' Z',
-                'vb': ' F'
-            },
-            'view_micro': 100_000
-        },
-        'tap':      {'id': 2,  'label': 'TARO',    'property__data': {'x': None, 'y': None,
-                'va': ' Z',
-                'vb': ' RPM'
-            },
-            'view_micro': 100_000
-        },
-        'circle':   {'id': 3,  'label': 'TRÒN',     'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vmode': None}},
-        'circles':  {'id': 4,  'label': 'TRÒN ĐẶC', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 've': 'BƯỚC', 'vmode': None}},
-        'rect':     {'id': 5,  'label': 'HỘP',      'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vmode': None}},
-        'rects':    {'id': 6,  'label': 'HỘP ĐẶC',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 've': 'BƯỚC', 'vmode': None}},
-        'locka':    {'id': 7,  'label': 'KHOÁ 1A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vmode': None}},
-        'lockaf':   {'id': 8,  'label': 'KHOÁ 1B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vmode': None}},
-        'lockb':    {'id': 9,  'label': 'KHOÁ 2A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None, 'vmode': None}},
-        'lockbf':   {'id': 10, 'label': 'KHOÁ 2B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None, 'vmode': None}},
+    shape_id__data = {
+        ShapeID.NONE:    {'label': '...',      'property__data': {}},
+        ShapeID.FACEX:   {'label': 'MẶT X',    'property__data': {'x': None, 'y': None, 'va': None, 'vb': None,             've': 'BƯỚC', 'vmode': None}},
+        ShapeID.FACEY:   {'label': 'MẶT Y',    'property__data': {'x': None, 'y': None, 'va': None, 'vb': None,             've': 'BƯỚC', 'vmode': None}},
+        ShapeID.DRILL:   {'label': 'KHOAN',    'property__data': {'x': None, 'y': None, 'va': ' Z', 'vb': ' F'},   'view_micro': 100_000},
+        ShapeID.TAP:     {'label': 'TARO',     'property__data': {'x': None, 'y': None, 'va': ' Z', 'vb': ' RPM'}, 'view_micro': 100_000},
+        ShapeID.CIRCLE:  {'label': 'TRÒN',     'property__data': {'x': None, 'y': None, 'va': None, 'vb': None,                           'vmode': None}},
+        ShapeID.CIRCLES: {'label': 'TRÒN ĐẶC', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None,             've': 'BƯỚC', 'vmode': None}},
+        ShapeID.RECT:    {'label': 'HỘP',      'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None,               'vmode': None}},
+        ShapeID.RECTS:   {'label': 'HỘP ĐẶC',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 've': 'BƯỚC', 'vmode': None}},
+        ShapeID.LOCKA:   {'label': 'KHOÁ 1A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None,               'vmode': None}},
+        ShapeID.LOCKAF:  {'label': 'KHOÁ 1B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None,               'vmode': None}},
+        ShapeID.LOCKB:   {'label': 'KHOÁ 2A',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None,   'vmode': None}},
+        ShapeID.LOCKBF:  {'label': 'KHOÁ 2B',  'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None, 'vd': None,   'vmode': None}},
         # custom
-        'custom_0': {'id': 11, 'label': 'CNC 1',   'property__data': {'x': None, 'y': None,
-            },
-            'view_micro': 100_000
-        },
-        'custom_1': {'id': 12, 'label': 'CNC 2',   'property__data': {'x': None, 'y': None,}},
-        'custom_2': {'id': 13, 'label': 'CNC 3',   'property__data': {'x': None, 'y': None,}},
-        'custom_3': {'id': 14, 'label': 'CNC 4',   'property__data': {'x': None, 'y': None,}},
-        'custom_4': {'id': 15, 'label': 'CNC 5',   'property__data': {'x': None, 'y': None,}},
-        'custom_5': {'id': 16, 'label': 'CNC 6',   'property__data': {'x': None, 'y': None,}},
-        'custom_6': {'id': 17, 'label': 'CNC 7',   'property__data': {'x': None, 'y': None,}},
-        'custom_7': {'id': 18, 'label': 'CNC 8',   'property__data': {'x': None, 'y': None,}},
+        ShapeID.CT0: {'label': 'CNC 1',   'property__data': {'x': None, 'y': None,}, 'view_micro': 100_000},
+        ShapeID.CT1: {'label': 'CNC 2',   'property__data': {'x': None, 'y': None,}},
+        ShapeID.CT2: {'label': 'CNC 3',   'property__data': {'x': None, 'y': None,}},
+        ShapeID.CT3: {'label': 'CNC 4',   'property__data': {'x': None, 'y': None,}},
+        ShapeID.CT4: {'label': 'CNC 5',   'property__data': {'x': None, 'y': None,}},
+        ShapeID.CT5: {'label': 'CNC 6',   'property__data': {'x': None, 'y': None,}},
+        ShapeID.CT6: {'label': 'CNC 7',   'property__data': {'x': None, 'y': None,}},
+        ShapeID.CT7: {'label': 'CNC 8',   'property__data': {'x': None, 'y': None,}},
     }
 
     def __init__(self):
@@ -98,29 +111,33 @@ class Shape(object):
         self.vd = max(0, self.vd)
         self.ve = max(0, self.ve)
         match self.id:
-            case 3: # circle
+            case ShapeID.FACEX.value:
+                self.ve = min(self.ve, self.vb*0.5)
+            case ShapeID.FACEY.value:
+                self.ve = min(self.ve, self.va*0.5)
+            case ShapeID.CIRCLE.value:
                 if self.va < self.vb:
                     self.va = int(max(self.vb*0.25, self.va))
                 elif self.vb < self.va:
                     self.vb = int(max(self.va*0.25, self.vb))
-            case 4: # circles
+            case ShapeID.CIRCLES.value:
                 if self.va < self.vb:
                     self.va = int(max(self.vb*0.25, self.va))
                 elif self.vb < self.va:
                     self.vb = int(max(self.va*0.25, self.vb))
                 self.ve = min(self.ve, max(self.va, self.vb)*0.5)
-            case 5: # rect
+            case ShapeID.RECT.value:
                 self.vc = int(min(self.va*0.5, self.vb*0.5, self.vc))
-            case 6: # rects
+            case ShapeID.RECTS.value:
                 self.vc = int(min(self.va*0.5, self.vb*0.5, self.vc))
                 self.ve = min(self.ve, max(self.va, self.vb)*0.5)
-            case 7: # locka
+            case ShapeID.LOCKA.value:
                 self.vb = int(min(self.va, self.vb))
-            case 8: # lockaf
+            case ShapeID.LOCKAF.value:
                 self.vb = int(min(self.va, self.vb))
-            case 9: # lockb
+            case ShapeID.LOCKB.value:
                 self.vb = int(min(self.va, self.vb))
-            case 10: # lockbf
+            case ShapeID.LOCKBF.value:
                 self.vb = int(min(self.va, self.vb))
         scid = Shape.get_custom_id(self.id)
         if scid >= 0:
@@ -132,41 +149,45 @@ class Shape(object):
         dx = _lx_ - self.x
         dy = _ly_ - self.y
         match self.id:
-            case 0:
+            case ShapeID.NONE.value:
                 return False
-            case 1: # drill
-                sa = Shape.shape_name__data['drill']['view_micro']
+            case ShapeID.FACEX.value:
+                return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, 0)
+            case ShapeID.FACEY.value:
+                return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, 0)
+            case ShapeID.DRILL.value:
+                sa = Shape.shape_id__data[ShapeID.DRILL]['view_micro']
                 return Shape._inside_local_circle(dx, dy, sa*0.5)
-            case 2: # tap
-                sa = Shape.shape_name__data['tap']['view_micro']
+            case ShapeID.TAP.value:
+                sa = Shape.shape_id__data[ShapeID.TAP]['view_micro']
                 return Shape._inside_local_circle(dx, dy, sa*0.5)
-            case 3: # circle
+            case ShapeID.CIRCLE.value:
                 return Shape._inside_local_ellipse(dx, dy, self.va, self.vb)
-            case 4: # circles
+            case ShapeID.CIRCLES.value:
                 return Shape._inside_local_ellipse(dx, dy, self.va, self.vb)
-            case 5: # rect
+            case ShapeID.RECT.value:
+                return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, 0)
+            case ShapeID.RECTS.value:
                 return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vc)
-            case 6: # rects
-                return Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vc)
-            case 7: # locka
+            case ShapeID.LOCKA.value:
                 inside_capsule = Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vb*0.5)
                 inside_circle = Shape._inside_local_circle(dx-(self.va-self.vc)*0.5, dy, self.vc*0.5)
                 return inside_capsule or inside_circle
-            case 8: # lockaf
+            case ShapeID.LOCKAF.value:
                 inside_capsule = Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vb*0.5)
                 inside_circle = Shape._inside_local_circle(dx+(self.va-self.vc)*0.5, dy, self.vc*0.5)
                 return inside_capsule or inside_circle
-            case 9: # lockb
+            case ShapeID.LOCKB.value:
                 ky = (self.vc - self.vb) * 0.5
                 inside_capsule = Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vb*0.5)
                 inside_rect = Shape._inside_local_rect_r(dx, dy+ky, self.vd, self.vc, 0)
                 return inside_capsule or inside_rect
-            case 10: # lockbf
+            case ShapeID.LOCKBF.value:
                 ky = (self.vc - self.vb) * 0.5
                 inside_capsule = Shape._inside_local_rect_r(dx, dy, self.va, self.vb, self.vb*0.5)
                 inside_rect = Shape._inside_local_rect_r(dx, dy-ky, self.vd, self.vc, 0)
                 return inside_capsule or inside_rect
-        sa = Shape.shape_name__data['custom_0']['view_micro']
+        sa = Shape.shape_id__data[ShapeID.CT0]['view_micro']
         return Shape._inside_local_rect_r(dx, dy, sa, sa, 0)
 
     @staticmethod
@@ -197,9 +218,18 @@ class Shape(object):
 
     @staticmethod
     def get_custom_id(_id_):
-        base_i_max = 10
+        base_i_max = ShapeID.CT0.value - 1
         if _id_ > base_i_max:
             _id_ -= base_i_max + 1
             return _id_
         return -1
-        
+
+    def default(self, _x_, _y_):
+        self.x = _x_
+        self.y = _y_
+        self.va = 50_000
+        self.vb = 50_000
+        self.vc = 50_000
+        self.vd = 50_000
+        self.ve = 5_000
+        self.vmode = False

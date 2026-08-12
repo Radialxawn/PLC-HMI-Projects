@@ -10,7 +10,7 @@ LET #h : LREAL := MAX{0.001, $VB$-$VT$}
 N9 G36 O$VSX$ D{0.5*#w*{1-$VMODE$*2}/#r}
 N10 G36 O$VSY$ D{0.5*#h/#r}
 N11 G0 X-#r
-N12 G1 Z$VZ$
-N13 G2 I#r
+N12 G1 Z$VZ$ F$VFV$
+N13 G2 I#r F$VFH$
 N14 G1 X0 Y0
 N15 G0 Z0

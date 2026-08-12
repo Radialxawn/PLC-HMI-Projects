@@ -3,6 +3,7 @@ from kivy.utils import get_color_from_hex as clhex
 from kivy.core.image import Image as CoreImage
 from core.helper import Helper
 from data.shape import Shape
+from data.shape import ShapeID
 import numpy as np
 
 class Draw(object):
@@ -71,21 +72,45 @@ class Draw(object):
         px += poff[0]
         py += poff[1]
         match _shape_.id:
-            case 1: # drill
+            case ShapeID.FACEX.value:
+                Rectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb])
+                Color(0, 0, 0, 1)
+                se = max(1, se)
+                sai = -sa * 0.5 * (1 - 2 * int(_shape_.vmode))
+                Line(ellipse=(px+sai-se*0.5, py-sb*0.5-se*0.5, se, se), width=1)
+                points = []
+                for sbi in np.arange(-sb*0.5, sb*0.5, se):
+                    points.append([px+sai, py+sbi])
+                    points.append([px-sai, py+sbi])
+                    sai = -sai
+                Line(points=points, width=1)
+            case ShapeID.FACEY.value:
+                Rectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb])
+                Color(0, 0, 0, 1)
+                se = max(1, se)
+                sbi = -sb * 0.5 * (1 - 2 * int(_shape_.vmode))
+                Line(ellipse=(px-sa*0.5-se*0.5, py+sbi-se*0.5, se, se), width=1)
+                points = []
+                for sai in np.arange(-sa*0.5, sa*0.5, se):
+                    points.append([px+sai, py+sbi])
+                    points.append([px+sai, py-sbi])
+                    sbi = -sbi
+                Line(points=points, width=1)
+            case ShapeID.DRILL.value:
                 texture = CoreImage('texture/drill.png').texture
-                sa, = self.micro_to_pixel(Shape.shape_name__data['drill']['view_micro'])
+                sa, = self.micro_to_pixel(Shape.shape_id__data[ShapeID.DRILL]['view_micro'])
                 Rectangle(texture=texture, pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
-            case 2: # tap
+            case ShapeID.TAP.value:
                 texture = CoreImage('texture/tap.png').texture
-                sa, = self.micro_to_pixel(Shape.shape_name__data['tap']['view_micro'])
+                sa, = self.micro_to_pixel(Shape.shape_id__data[ShapeID.TAP]['view_micro'])
                 Rectangle(texture=texture, pos=[px-sa*0.5, py-sa*0.5], size=[sa, sa])
-            case 3: # circle
+            case ShapeID.CIRCLE.value:
                 Ellipse(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb])
                 Color(1, 1, 1, 1)
                 sa -= 4
                 sb -= 4
                 Ellipse(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb])
-            case 4: # circles
+            case ShapeID.CIRCLES.value:
                 Ellipse(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb])
                 Color(0, 0, 0, 1)
                 abh = max(sa, sb)
@@ -94,14 +119,14 @@ class Draw(object):
                     sai = i * sa / abh
                     sbi = i * sb / abh
                     Line(ellipse=(px-sai*0.5, py-sbi*0.5, sai, sbi), width=1)
-            case 5: # rect
+            case ShapeID.RECT.value:
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sc])
                 Color(1, 1, 1, 1)
                 sa -= 4
                 sb -= 4
                 sc -= 2
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sc])
-            case 6: # rects
+            case ShapeID.RECTS.value:
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sc])
                 Color(0, 0, 0, 1)
                 abh = max(sa, sb)
@@ -111,7 +136,7 @@ class Draw(object):
                     sbi = i * sb / abh
                     sci = sc * sai / sa
                     Line(rounded_rectangle=(px-sai*0.5, py-sbi*0.5, sai, sbi, sci), width=1)
-            case 7: # locka
+            case ShapeID.LOCKA.value:
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Ellipse(pos=[px+(sa-2*sc)*0.5, py-sc*0.5], size=[sc, sc])
                 Color(1, 1, 1, 1)
@@ -120,7 +145,7 @@ class Draw(object):
                 sc -= 4
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Ellipse(pos=[px+(sa-2*sc)*0.5, py-sc*0.5], size=[sc, sc])
-            case 8: # lockaf
+            case ShapeID.LOCKAF.value:
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Ellipse(pos=[px-sa*0.5, py-sc*0.5], size=[sc, sc])
                 Color(1, 1, 1, 1)
@@ -129,7 +154,7 @@ class Draw(object):
                 sc -= 4
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Ellipse(pos=[px-sa*0.5, py-sc*0.5], size=[sc, sc])
-            case 9: # lockb
+            case ShapeID.LOCKB.value:
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Rectangle(pos=[px-sd*0.5, py-sc*0.5-(sc-sb)*0.5], size=[sd, sc])
                 Color(1, 1, 1, 1)
@@ -139,7 +164,7 @@ class Draw(object):
                 sd -= 4
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Rectangle(pos=[px-sd*0.5, py-sc*0.5-(sc-sb)*0.5], size=[sd, sc])
-            case 10: # lockbf
+            case ShapeID.LOCKBF.value:
                 RoundedRectangle(pos=[px-sa*0.5, py-sb*0.5], size=[sa, sb], radius=[sb*0.5])
                 Rectangle(pos=[px-sd*0.5, py-sc*0.5+(sc-sb)*0.5], size=[sd, sc])
                 Color(1, 1, 1, 1)
@@ -152,7 +177,7 @@ class Draw(object):
         scid = Shape.get_custom_id(_shape_.id)
         if scid >= 0:
             image, pixel_per_mm = Helper.cnc_preview_image_get(_index_=scid, _image_=True)
-            sa, = self.micro_to_pixel(Shape.shape_name__data['custom_0']['view_micro'])
+            sa, = self.micro_to_pixel(Shape.shape_id__data[ShapeID.CT0]['view_micro'])
             if image != None:
                 if pixel_per_mm != None:
                     sa, = self.micro_to_pixel(image.width * 1e3 / pixel_per_mm)

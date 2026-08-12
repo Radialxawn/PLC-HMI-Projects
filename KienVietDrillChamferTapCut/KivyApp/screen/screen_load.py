@@ -32,11 +32,20 @@ class ScreenLoad(Screen):
             app.data.create()
             app.auto_connect_start()
             app.machine = ScreenLoad.config_machine_load()
-        for i in range(100):
+        while app.data.connect_state() != 100:
             if self.skip:
                 break
-            time.sleep(0.01)
-            Clock.schedule_once(lambda _, p=i+1: self._update_progress(p))
+            time.sleep(0.5)
+        state_key = 'hmi.view_state[0]'
+        app.data.block_active({state_key})
+        state = 0
+        while state != 100:
+            if self.skip:
+                break
+            state = app.data.get(state_key)
+            state = 0 if state == None else state
+            Clock.schedule_once(lambda _: self._update_progress(state))
+            time.sleep(0.1)
         Clock.schedule_once(self._transition_to_main)
 
     def _update_progress(self, _value_):

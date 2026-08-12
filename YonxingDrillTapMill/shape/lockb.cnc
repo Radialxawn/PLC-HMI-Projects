@@ -4,8 +4,8 @@ LET #h : LREAL := MAX{0.001, $VC$-$VB$*0.5-$VT$*0.5}
 LET #w : LREAL := MAX{0.001, {$VD$-$VT$}*0.5}
 N4 G36 O$VSX$ D{1-$VMODE$*2}
 N5 G0 X#a
-N6 G1 Z$VZ$
-N7 G2 X#a-#r Y-#r R#r
+N6 G1 Z$VZ$ F$VFV$
+N7 G2 X#a-#r Y-#r R#r F$VFH$
 N8 G1 X-#a+#r
 N9 G2 Y#r R#r
 N10 G1 X#a-#r

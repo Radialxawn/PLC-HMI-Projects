@@ -7,6 +7,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from core.ui import UITextInputInteger
 from kivy.uix.widget import Widget
+from data.shape import ShapeID
 from kivy.uix.label import Label
 from core.ui import UIBoolInput
 from data.shape import Shape
@@ -32,13 +33,13 @@ class PopupShape(Popup):
         shape_id_selector = self.ids.shape_id_selector
         #
         rule = self._rule_
-        shape_names = ['none']
-        for shape_name in Shape.shape_name__data:
-            add = ('shape_include' in rule and shape_name in rule['shape_include'] or
-                   'shape_exclude' in rule and shape_name not in rule['shape_exclude'])
-            if add and shape_name not in shape_names:
-                shape_names.append(shape_name)
-        shape_id_selector.values = [Shape.shape_name__data[sn]['label'] for sn in shape_names]
+        shape_ids = [ShapeID.NONE]
+        for shape_id in Shape.shape_id__data:
+            add = ('shape_include' in rule and shape_id in rule['shape_include'] or
+                   'shape_exclude' in rule and shape_id not in rule['shape_exclude'])
+            if add and shape_id not in shape_ids:
+                shape_ids.append(shape_id)
+        shape_id_selector.values = [Shape.shape_id__data[id]['label'] for id in shape_ids]
         #
         self.ids.shape_property.width = 180
         for property in Shape.property__data:
@@ -105,7 +106,7 @@ class PopupShape(Popup):
     def _on_shape_id_selector(self, _instance_):
         if self._ignore_shape_id_selector:
             return
-        self._shape_edit.id = self._label_to_id(_instance_.text)
+        self._shape_edit.id = self._label_to_id(_instance_.text).value
         self._shape_id_changed = True
         self._update_canvas()
 
@@ -140,23 +141,23 @@ class PopupShape(Popup):
         self._shape_id_changed = False
     
     def _label_to_id(self, _value_):
-        for shape_name in Shape.shape_name__data:
-            data = Shape.shape_name__data[shape_name]
+        for shape_id in Shape.shape_id__data:
+            data = Shape.shape_id__data[shape_id]
             if data['label'] == _value_:
-                return data['id']
+                return shape_id
         return None
 
     def _id_to_label(self, _value_):
-        for shape_name in Shape.shape_name__data:
-            data = Shape.shape_name__data[shape_name]
-            if data['id'] == _value_:
+        for shape_id in Shape.shape_id__data:
+            data = Shape.shape_id__data[shape_id]
+            if shape_id.value == _value_:
                 return data['label']
         return None
 
     def _id_to_data(self, _value_):
-        for shape_name in Shape.shape_name__data:
-            data = Shape.shape_name__data[shape_name]
-            if data['id'] == _value_:
+        for shape_id in Shape.shape_id__data:
+            data = Shape.shape_id__data[shape_id]
+            if shape_id.value == _value_:
                 return data
         return None
 

@@ -212,7 +212,7 @@ class ScreenHome(Screen):
     def _config_path(self, _type_):
         return Path(Path(__file__).resolve().parent.parent, f'config/{_type_}.json')
 
-    def _config_axis_load_confirm(self):
+    def _config_load_confirm(self):
         app = App.get_running_app()
         for t in ['axis', 'machine']:
             config = {}
@@ -229,14 +229,14 @@ class ScreenHome(Screen):
                 app.data.set(name, value)
         app.helper.save_need_check()
 
-    def _config_axis_load(self):
+    def _config_load(self):
         app = App.get_running_app()
         app.helper.show_popup_confirm(
             _message_='LẤY DỮ LIỆU TRÊN HMI?',
-            _confirm_=self._config_axis_load_confirm
+            _confirm_=self._config_load_confirm
         )
     
-    def _config_axis_save_confirm(self):
+    def _config_save_confirm(self):
         app = App.get_running_app()
         machine = set()
         for k in self._config_name__hash:
@@ -246,6 +246,8 @@ class ScreenHome(Screen):
             config = {}
             for name in t[1]:
                 block = app.data.block(name)
+                if block.value == None:
+                    continue
                 if block.type == ua.VariantType.Boolean:
                     config[name] = block.value == 1
                 else:
@@ -253,9 +255,9 @@ class ScreenHome(Screen):
             with open(self._config_path(t[0]), 'w', encoding='utf-8') as file:
                 json.dump(config, file, indent=3)
 
-    def _config_axis_save(self):
+    def _config_save(self):
         app = App.get_running_app()
         app.helper.show_popup_confirm(
             _message_='LƯU DỮ LIỆU VÀO HMI?',
-            _confirm_=self._config_axis_save_confirm
+            _confirm_=self._config_save_confirm
         )
