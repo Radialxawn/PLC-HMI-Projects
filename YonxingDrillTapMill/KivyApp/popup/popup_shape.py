@@ -107,6 +107,8 @@ class PopupShape(Popup):
         if self._ignore_shape_id_selector:
             return
         self._shape_edit.id = self._label_to_id(_instance_.text).value
+        self._shape_edit.default()
+        self._shape_edit_limit()
         self._shape_id_changed = True
         self._update_canvas()
 

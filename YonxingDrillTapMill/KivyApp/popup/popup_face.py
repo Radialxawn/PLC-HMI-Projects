@@ -327,8 +327,9 @@ class PopupFace(Popup):
                     if shape != None:
                         if shape.id == 0:
                             pos = self._mouse.selected_object_pos
-                            shape.default(pos[0], pos[1])
-                        self._shape_open(shape)
+                            shape.x = pos[0]
+                            shape.y = pos[1]
+                        self._shape_open(_shape_=shape)
                 return True
         return super().on_touch_up(touch)
     
@@ -371,6 +372,6 @@ class PopupFace(Popup):
             _shape_=_shape_,
             _rule_=self._rule_,
             _apply_=self._shape_apply,
-            _delete_=self._shape_delete
+            _delete_=self._shape_delete,
         )
         popup.open()

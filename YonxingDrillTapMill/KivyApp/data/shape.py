@@ -112,9 +112,9 @@ class Shape(object):
         self.ve = max(0, self.ve)
         match self.id:
             case ShapeID.FACEX.value:
-                self.ve = min(self.ve, self.vb*0.5)
+                self.ve = max(100, min(self.ve, self.vb*0.5))
             case ShapeID.FACEY.value:
-                self.ve = min(self.ve, self.va*0.5)
+                self.ve = max(100, min(self.ve, self.va*0.5))
             case ShapeID.CIRCLE.value:
                 if self.va < self.vb:
                     self.va = int(max(self.vb*0.25, self.va))
@@ -224,12 +224,29 @@ class Shape(object):
             return _id_
         return -1
 
-    def default(self, _x_, _y_):
-        self.x = _x_
-        self.y = _y_
-        self.va = 50_000
-        self.vb = 50_000
-        self.vc = 50_000
-        self.vd = 50_000
-        self.ve = 5_000
-        self.vmode = False
+    def default(self):
+        match self.id:
+            case ShapeID.FACEX.value:
+                self.va, self.vb, self.ve = 50_000, 25_000, 5_000
+            case ShapeID.FACEY.value:
+                self.va, self.vb, self.ve = 25_000, 50_000, 5_000
+            case ShapeID.DRILL.value:
+                self.va, self.vb = 10_000, 600_000
+            case ShapeID.TAP.value:
+                self.va, self.vb = 10_000, 900_000
+            case ShapeID.CIRCLE.value:
+                self.va, self.vb = 50_000, 50_000
+            case ShapeID.CIRCLES.value:
+                self.va, self.vb, self.ve = 50_000, 50_000, 5_000
+            case ShapeID.RECT.value:
+                self.va, self.vb, self.vc = 50_000, 50_000, 5_000
+            case ShapeID.RECTS.value:
+                self.va, self.vb, self.vc, self.ve = 50_000, 50_000, 5_000, 5_000
+            case ShapeID.LOCKA.value:
+                self.va, self.vb, self.vc = 80_000, 20_000, 35_000
+            case ShapeID.LOCKAF.value:
+                self.va, self.vb, self.vc = 80_000, 20_000, 35_000
+            case ShapeID.LOCKB.value:
+                self.va, self.vb, self.vc, self.vd = 80_000, 20_000, 30_000, 35_000
+            case ShapeID.LOCKBF.value:
+                self.va, self.vb, self.vc, self.vd = 80_000, 20_000, 30_000, 35_000

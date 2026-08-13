@@ -5,7 +5,7 @@ LET #e : LREAL := MAX{0.001, MIN{$VE$, #w}}
 LET #sc : LREAL := FLOOR{#w/#e}
 LET #si : LREAL := #sc+1
 LET #ai : LREAL := 0
-LET #bi : LREAL := -#b
+LET #bi : LREAL := #b
 N0 G36 O$VSY$ D{1-$VMODE$*2}
 N1 G0 X-#a
 N2 G0 Y-#b
