@@ -262,11 +262,7 @@ for (k of ['Spin']) {
       plc.tag_add(`${k}${a}I`, BOOL, X, v[0]);
       plc.tag_add(`${k}${a}O`, BOOL, Y, v[1]);
    }
-   for (a of ['Block']) {
-      plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
-      plc.tag_add(`${k}${a}TimerDelay`, INT, D, delay++);
-   }
-   for (a of ['Fail']) {
+   for (a of ['WaitBlock', 'WaitEnd', 'Fail']) {
       plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
       plc.tag_add(`${k}${a}TimerDelay`, INT, D, delay++);
    }
@@ -329,6 +325,8 @@ for (k of ['Process']) {
    plc.tag_add(`${k}HumanCount`, INT, D, delay++);
    plc.tag_add(`${k}HumanCountTimer`, BOOL, TC, Auto);
    plc.tag_add(`${k}HumanCountTimerDelay`, INT, D, delay++);
+   plc.tag_add(`${k}HumanDenoiseTimer`, BOOL, TC, Auto);
+   plc.tag_add(`${k}HumanDenoiseTimerDelay`, INT, D, delay++);
    plc.tag_add(`${k}FlushCount`, INT, D, delay++);
    plc.tag_add(`${k}Count`, INT, D, delay++);
    plc.tag_add(`${k}CountTarget`, INT, D, delay++);
