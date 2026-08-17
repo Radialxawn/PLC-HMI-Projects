@@ -42,8 +42,8 @@ class Shape(object):
         ShapeID.NONE:    {'label': '...',      'property__data': {}},
         ShapeID.FACEX:   {'label': 'MẶT X',    'property__data': {'x': None, 'y': None, 'va': None, 'vb': None,             've': 'BƯỚC', 'vmode': None}},
         ShapeID.FACEY:   {'label': 'MẶT Y',    'property__data': {'x': None, 'y': None, 'va': None, 'vb': None,             've': 'BƯỚC', 'vmode': None}},
-        ShapeID.DRILL:   {'label': 'KHOAN',    'property__data': {'x': None, 'y': None, 'va': ' Z', 'vb': ' F'},   'view_micro': 100_000},
-        ShapeID.TAP:     {'label': 'TARO',     'property__data': {'x': None, 'y': None, 'va': ' Z', 'vb': ' RPM'}, 'view_micro': 100_000},
+        ShapeID.DRILL:   {'label': 'KHOAN',    'property__data': {'x': None, 'y': None, 'va': ' Z', 'vb': ' F', 'vc': ' R', 've': 'BƯỚC'}, 'view_micro': 100_000},
+        ShapeID.TAP:     {'label': 'TARO',     'property__data': {'x': None, 'y': None, 'va': ' Z', 'vb': ' RPM',           've': 'BƯỚC'}, 'view_micro': 100_000},
         ShapeID.CIRCLE:  {'label': 'TRÒN',     'property__data': {'x': None, 'y': None, 'va': None, 'vb': None,                           'vmode': None}},
         ShapeID.CIRCLES: {'label': 'TRÒN ĐẶC', 'property__data': {'x': None, 'y': None, 'va': None, 'vb': None,             've': 'BƯỚC', 'vmode': None}},
         ShapeID.RECT:    {'label': 'HỘP',      'property__data': {'x': None, 'y': None, 'va': None, 'vb': None, 'vc': None,               'vmode': None}},
@@ -111,6 +111,11 @@ class Shape(object):
         self.vd = max(0, self.vd)
         self.ve = max(0, self.ve)
         match self.id:
+            case ShapeID.DRILL.value:
+                self.vc = max(0, min(self.vc, 5_000))
+                self.ve = max(100, min(self.ve, self.va))
+            case ShapeID.TAP.value:
+                self.ve = max(100, min(self.ve, self.va))
             case ShapeID.FACEX.value:
                 self.ve = max(100, min(self.ve, self.vb*0.5))
             case ShapeID.FACEY.value:
@@ -231,9 +236,9 @@ class Shape(object):
             case ShapeID.FACEY.value:
                 self.va, self.vb, self.ve = 25_000, 50_000, 5_000
             case ShapeID.DRILL.value:
-                self.va, self.vb = 10_000, 600_000
+                self.va, self.vb, self.vc, self.ve = 10_000, 600_000, 0, 10_000
             case ShapeID.TAP.value:
-                self.va, self.vb = 10_000, 900_000
+                self.va, self.vb, self.ve = 10_000, 900_000, 10_000
             case ShapeID.CIRCLE.value:
                 self.va, self.vb = 50_000, 50_000
             case ShapeID.CIRCLES.value:
