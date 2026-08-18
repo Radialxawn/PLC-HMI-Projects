@@ -1,5 +1,5 @@
 LET #a : LREAL := MAX{0.001, {$VA$-$VT$}*0.5}
-LET #b : LREAL := MAX{0.001, {$VB$-$VT$}*0.5}
+LET #b : LREAL := MAX{0, {$VB$-$VT$}*0.5}
 LET #w : LREAL := #b*2
 LET #e : LREAL := MAX{0.001, MIN{$VE$, #w}}
 LET #sc : LREAL := FLOOR{#w/#e}
