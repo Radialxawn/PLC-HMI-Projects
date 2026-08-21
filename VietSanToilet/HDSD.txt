@@ -1,0 +1,34 @@
+Chế độ hoạt động: X3(NO) Thủ công, X4(NO) Tự động
+	Thủ công:
+		X5(NO):		↑True -> [Xoay bồn cầu] -> không thể kích hoạt khi đang [Xả bồn cầu] hoặc [Nắp chụp ở dưới]
+		X20(NO):	↑True -> [Xả bồn cầu] -> không thể kích hoạt khi đang [Xoay bồn cầu]
+		X6(NO):		↑True -> [Nắp chụp đi xuống] -> không thể kích hoạt khi đang [Xoay bồn cầu] hoặc cảm biến xoay bồn cầu X10 = False
+					↓False -> [Nắp chụp đi lên] -> không thể kích hoạt khi đang [Rửa]
+		X7(NO):		↑True -> [Rửa] -> không thể kích hoạt khi đang [Xoay bồn cầu] hoặc [Nắp chụp ở trên] hoặc [Đang xả bồn cầu]
+	Tự động:
+		X1(NO):		↑True -> [Chạy quy trình] -> không thể kích hoạt khi đang [Xoay bồn cầu] hoặc [Xả bồn cầu] hoặc [Rửa]
+		Các bước tự vận hành:
+			1 - Có người đi vào kích hoạt cảm biến ↑X16 = True, nếu người ở trong khoảng [Delay đếm người (giây)] sau đó rời đi ↓X16 = False, sẽ được tính là một người dùng, nếu người này chưa [Xả bồn cầu] sẽ tự động kích hoạt [Xả bồn cầu].
+			2 - Khi số người dùng đạt đến hoặc vượt qua [Số lần dùng để kích hoạt] và đóng cửa ↑X21(NO) = True -> [Chạy quy trình]
+		Các thông số trên HMI:
+			[Delay đếm người (giây)]
+			[Số lần dùng để kích hoạt]
+			[Thời gian (s)]: Phun, Ngâm
+				Thời gian phun và ngâm của các dung dịch A, B, C
+Báo lỗi: Y17(NO):
+	Khi bảng báo lỗi màu cam hiện ra -> Xem xét, khắc phục, ấn OK để xoá lỗi
+	0: Nắp chụp đi lên quá thời gian
+	1: Nắp chụp đi xuống quá thời gian
+		Xem khung thông số [Nắp chụp] trên HMI
+		Kiểm tra cảm biến
+	2: Xoay bồn cầu quá thời gian
+	3: Thanh cản bồn cầu quá thời gian
+		Xem khung thông số [Bồn cầu ↻] trên HMI
+		Kiểm tra cảm biến
+	5: Cạn dung dịch A (Nước)
+	6: Cạn dung dịch B
+	7: Cạn dung dịch C
+		Xem khung thông số [Bơm nước] trên HMI
+		Đổ thêm dung dịch vào các bình
+		Xem giá trị [Cảm biến cạn]
+		Cảm biến cạn tắt -> Ấn OK để xoá lỗi
