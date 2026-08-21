@@ -277,6 +277,10 @@ for (k of ['Flush']) {
          plc.tag_add(`${k}${a}${b}TimerDelay`, INT, D, delay++);
       }
    }
+   for (a of ['Wait']) {
+      plc.tag_add(`${k}${a}Timer`, BOOL, TC, Auto);
+      plc.tag_add(`${k}${a}TimerDelay`, INT, D, delay++);
+   }
 }
 for (k of ['Clean']) {
    for (a of ['Pump']) {
