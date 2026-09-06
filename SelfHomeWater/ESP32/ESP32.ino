@@ -1,7 +1,8 @@
 #include <Wire.h>
+#include <WiFi.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <WiFi.h>
+#include <Adafruit_ADS1X15.h>
 
 //////////
 //SCREEN//
@@ -39,6 +40,8 @@ const long server_timeout = 2000;
 /////////
 const int input_run = 36;
 const int input_stop = 39;
+Adafruit_ADS1115 input_adc;
+float input_adc_voltage[] = {0, 0, 0, 0};
 //////////
 //OUTPUT//
 //////////
@@ -63,6 +66,7 @@ void _setup_input_output() {
 
 void _setup_i2c() {
   screen.begin(SSD1306_SWITCHCAPVCC, screen_address);
+  input_adc.begin();
 }
 
 void setup() {
@@ -75,6 +79,13 @@ void setup() {
 ////////////////
 //PROCESS-LOOP//
 ////////////////
+void _loop_input() {
+  for (int i = 0; i < 4; i++) {
+    int16_t adc = input_adc.readADC_SingleEnded(i);
+    input_adc_voltage[i] = input_adc.computeVolts(adc);
+  }
+}
+
 String _get_wifi_signal_strength(int32_t rssi) {
   if (rssi <= -90) {
     return "[---]";
@@ -206,6 +217,13 @@ void _loop_server(){
             } else {
               client.println("<p><a href=\"/pump/off\"><button class=\"button button2\">OFF</button></a></p>");
             }
+
+            // Display adc voltage
+            client.println("<p>ADC0: " + String(input_adc_voltage[0], 5) + "</p>");
+            client.println("<p>ADC1: " + String(input_adc_voltage[1], 5) + "</p>");
+            client.println("<p>ADC2: " + String(input_adc_voltage[2], 5) + "</p>");
+            client.println("<p>ADC3: " + String(input_adc_voltage[3], 5) + "</p>");
+
             client.println("</body></html>");
             
             // The HTTP response ends with another blank line
@@ -228,6 +246,7 @@ void _loop_server(){
 }
 
 void loop() {
+  _loop_input();
   _loop_wifi_connect();
   _loop_screen_update();
   _loop_server();
