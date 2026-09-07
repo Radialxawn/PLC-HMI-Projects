@@ -20,6 +20,8 @@ const long screen_time_update_interval = 10;
 ///////////////
 float screen_view_wifi_x = 0;
 float screen_view_wifi_x_v_pps = 10; // pixel per sec
+float screen_view_button_x = 0;
+float screen_view_button_x_v_pps = -10;
 ////////
 //WIFI//
 ////////
@@ -38,8 +40,10 @@ const long server_timeout = 2000;
 /////////
 //INPUT//
 /////////
-const int input_run = 36;
-const int input_stop = 39;
+const int input_run = 34;
+const int input_stop = 35;
+bool input_run_state = false;
+bool input_stop_state = false;
 Adafruit_ADS1115 input_adc;
 float input_adc_voltage[] = {0, 0, 0, 0};
 //////////
@@ -48,8 +52,17 @@ float input_adc_voltage[] = {0, 0, 0, 0};
 String output_led_state = "off";
 String output_pump_state = "off";
 const int output_led = 2;
-const int output_pump = 26;
-
+const int output_pump = 25;
+////////
+//PUMP//
+////////
+unsigned long pump_time_to_stop = 0;
+const long pump_time_on_max = 10*60*1000;
+float pump_amp_v_offset = -0.01;
+unsigned long pump_amp_cycle_time_start = 0;
+float pump_amp_peak_l = 0;
+float pump_amp_peak_h = 0;
+float pump_amp_rms = 0;
 /////////////////
 //PROCESS-SETUP//
 /////////////////
@@ -80,6 +93,8 @@ void setup() {
 //PROCESS-LOOP//
 ////////////////
 void _loop_input() {
+  input_run_state = digitalRead(input_run);
+  input_stop_state = digitalRead(input_stop);
   for (int i = 0; i < 4; i++) {
     int16_t adc = input_adc.readADC_SingleEnded(i);
     input_adc_voltage[i] = input_adc.computeVolts(adc);
@@ -113,35 +128,56 @@ void _loop_wifi_connect() {
   server.begin();
 }
 
+float _mapf(float x, float in_min, float in_max, float out_min, float out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+int _text_x_move(const String &str, float &x, float &v_pps, float dt) {
+  int16_t x1, y1;
+  uint16_t text_width, text_height;
+  screen.getTextBounds(str, 0, 0, &x1, &y1, &text_width, &text_height);
+  x += v_pps * dt;
+  if (v_pps > 0) {
+    if (x + text_width > SCREEN_WIDTH) {
+      v_pps = -v_pps;
+    }
+  } else {
+    if (x < 1) {
+      v_pps = -v_pps;
+    }
+  }
+  int rx = constrain(x, 0, SCREEN_WIDTH - text_width);
+  return rx;
+}
+
 void _loop_screen_update() {
   unsigned long time_current = millis();
   if (time_current < screen_time_update_next) {
     return;
   }
   screen_time_update_next = time_current + screen_time_update_interval;
+  float dt = screen_time_update_interval * 1e-3;
   screen.clearDisplay();
   screen.setTextSize(1);
   screen.setTextColor(SSD1306_WHITE);
   // WIFI
-  int16_t x1, y1;
-  uint16_t text_width, text_height;
   int32_t rssi = WiFi.RSSI();
   String wifi_signal = WiFi.localIP().toString() + " " + _get_wifi_signal_strength(rssi);
-  screen.getTextBounds(wifi_signal, 0, 0, &x1, &y1, &text_width, &text_height);
-  screen_view_wifi_x += screen_view_wifi_x_v_pps * screen_time_update_interval * 1e-3;
-  if (screen_view_wifi_x_v_pps > 0) {
-    if (screen_view_wifi_x + text_width > SCREEN_WIDTH) {
-      screen_view_wifi_x_v_pps = -screen_view_wifi_x_v_pps;
-    }
-  } else {
-    if (screen_view_wifi_x < 1) {
-      screen_view_wifi_x_v_pps = -screen_view_wifi_x_v_pps;
-    }
-  }
-  int x = constrain(screen_view_wifi_x, 0, SCREEN_WIDTH - text_width);
-  screen.setCursor(x, 0);
+  int wifi_x = _text_x_move(wifi_signal, screen_view_wifi_x, screen_view_wifi_x_v_pps, dt);
+  screen.setCursor(wifi_x, 0);
   screen.println(wifi_signal);
+  // BUTTON STATE
+  String button_state = "Run: " + String(input_run_state) + " | Stop: " + String(input_stop_state);
+  int button_x = _text_x_move(button_state, screen_view_button_x, screen_view_button_x_v_pps, dt);
+  screen.setCursor(button_x, 8);
+  screen.println(button_state);
   // WATER LEVEL
+  int water_level = round(_mapf(input_adc_voltage[0], 0, 5, 0, 128));
+  screen.fillRect(128-water_level, 16, water_level, 7, SSD1306_WHITE);
+  // PUMP
+  int pump_amp = round(_mapf(pump_amp_rms, 0, 20, 0, 128));
+  screen.fillRect(128-pump_amp, 24, pump_amp, 7, SSD1306_WHITE);
+  //
   screen.display();
 }
 
@@ -245,9 +281,41 @@ void _loop_server(){
   }
 }
 
+void _loop_pump() {
+  bool pump = digitalRead(output_pump);
+  if (pump) {
+    if (input_stop_state || millis() > pump_time_to_stop) {
+      digitalWrite(output_pump, LOW);
+    }
+  } else {
+    if (input_run_state) {
+      digitalWrite(output_pump, HIGH);
+      pump_time_to_stop = millis() + pump_time_on_max;
+    }
+  }
+  //
+  float amp = _mapf(input_adc_voltage[0] + pump_amp_v_offset, 0, 5, -20, 20);
+  long dt = millis() - pump_amp_cycle_time_start;
+  if (dt < 500) {
+    if (amp < pump_amp_peak_l) {
+      pump_amp_peak_l = amp;
+    }
+    if (amp > pump_amp_peak_h) {
+      pump_amp_peak_h = amp;
+    }
+  } else {
+    float peak_to_peak = pump_amp_peak_h - pump_amp_peak_l;
+    pump_amp_rms = peak_to_peak * 0.35355;
+    pump_amp_peak_l = 0;
+    pump_amp_peak_h = 0;
+    pump_amp_cycle_time_start = millis();
+  }
+}
+
 void loop() {
   _loop_input();
   _loop_wifi_connect();
   _loop_screen_update();
   _loop_server();
+  _loop_pump();
 }
