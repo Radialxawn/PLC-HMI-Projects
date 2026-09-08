@@ -1,5 +1,7 @@
 #include <Wire.h>
 #include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_ADS1X15.h>
@@ -32,11 +34,93 @@ const long wifi_time_retry_interval = 5000;
 //////////
 //SERVER//
 //////////
-WiFiServer server(80);
-String server_header;
-unsigned long server_time_current = millis();
-unsigned long server_time_last = 0; 
-const long server_timeout = 2000;
+AsyncWebServer server(80);
+bool server_begin_done = false;
+
+const char* PARAM_INPUT_1 = "output";
+const char* PARAM_INPUT_2 = "state";
+
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE HTML><html>
+<head>
+  <title>ESP Web Server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <style>
+    html {font-family: Arial; display: inline-block; text-align: center;}
+    h2 {font-size: 3.0rem;}
+    p {font-size: 3.0rem;}
+    body {max-width: 600px; margin:0px auto; padding-bottom: 25px;}
+    .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
+    .switch input {display: none}
+    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 6px}
+    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 3px}
+    input:checked+.slider {background-color: #b30000}
+    input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
+  </style>
+</head>
+<body>
+  <h2>Home Water</h2>
+  %BUTTONPLACEHOLDER%
+<script>function toggleCheckbox(element) {
+  var xhr = new XMLHttpRequest();
+  if(element.checked){ xhr.open("GET", "/update?output="+element.id+"&state=1", true); }
+  else { xhr.open("GET", "/update?output="+element.id+"&state=0", true); }
+  xhr.send();
+}
+</script>
+</body>
+</html>
+)rawliteral";
+
+String _server_processor(const String& var){
+  if(var == "BUTTONPLACEHOLDER"){
+    String buttons = "";
+    buttons += "<h4>LED</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " + _server_output_state(2) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>PUMP</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"25\" " + _server_output_state(25) + "><span class=\"slider\"></span></label>";
+    return buttons;
+  }
+  return String();
+}
+
+String _server_output_state(int output){
+  if(digitalRead(output)){
+    return "checked";
+  }
+  else {
+    return "";
+  }
+}
+
+void _server_begin() {
+  if (server_begin_done) {
+    return;
+  }
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/html", index_html, _server_processor);
+  });
+  server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage1;
+    String inputMessage2;
+    // GET input1 value on <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
+    if (request->hasParam(PARAM_INPUT_1) && request->hasParam(PARAM_INPUT_2)) {
+      inputMessage1 = request->getParam(PARAM_INPUT_1)->value();
+      inputMessage2 = request->getParam(PARAM_INPUT_2)->value();
+      digitalWrite(inputMessage1.toInt(), inputMessage2.toInt());
+    }
+    else {
+      inputMessage1 = "No message sent";
+      inputMessage2 = "No message sent";
+    }
+    Serial.print("GPIO: ");
+    Serial.print(inputMessage1);
+    Serial.print(" - Set to: ");
+    Serial.println(inputMessage2);
+    request->send(200, "text/plain", "OK");
+  });
+  server.begin();
+  server_begin_done = true;
+}
 /////////
 //INPUT//
 /////////
@@ -58,11 +142,16 @@ const int output_pump = 25;
 ////////
 unsigned long pump_time_to_stop = 0;
 const long pump_time_on_max = 10*60*1000;
-float pump_amp_v_offset = -0.01;
+float pump_amp_v_offset = 0;
+float pump_amp_sensor_f = 20;
 unsigned long pump_amp_cycle_time_start = 0;
 float pump_amp_peak_l = 0;
 float pump_amp_peak_h = 0;
 float pump_amp_rms = 0;
+float pump_water_sensor_f = 1000;
+float pump_water_mm = 0;
+float pump_water_mm_l = 600;
+float pump_water_mm_h = 900;
 /////////////////
 //PROCESS-SETUP//
 /////////////////
@@ -95,7 +184,7 @@ void setup() {
 void _loop_input() {
   input_run_state = digitalRead(input_run);
   input_stop_state = digitalRead(input_stop);
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 2; i++) {
     int16_t adc = input_adc.readADC_SingleEnded(i);
     input_adc_voltage[i] = input_adc.computeVolts(adc);
   }
@@ -124,8 +213,7 @@ void _loop_wifi_connect() {
   wifi_time_retry_next = time_current + wifi_time_retry_interval;
   WiFi.disconnect();
   WiFi.begin(wifi_ssid, wifi_password);
-  server.close();
-  server.begin();
+  _server_begin();
 }
 
 float _mapf(float x, float in_min, float in_max, float out_min, float out_max) {
@@ -171,130 +259,27 @@ void _loop_screen_update() {
   int button_x = _text_x_move(button_state, screen_view_button_x, screen_view_button_x_v_pps, dt);
   screen.setCursor(button_x, 8);
   screen.println(button_state);
-  // WATER LEVEL
-  int water_level = round(_mapf(input_adc_voltage[0], 0, 5, 0, 128));
-  screen.fillRect(128-water_level, 16, water_level, 7, SSD1306_WHITE);
   // PUMP
-  int pump_amp = round(_mapf(pump_amp_rms, 0, 20, 0, 128));
-  screen.fillRect(128-pump_amp, 24, pump_amp, 7, SSD1306_WHITE);
+  bool pump = digitalRead(output_pump);
+  int width = pump ? 7 : 15;
+  int pump_water = round(_mapf(pump_water_mm, 0, pump_water_sensor_f, 0, 128));
+  screen.fillRect(128-pump_water, 16, pump_water, width, SSD1306_WHITE);
+  if (pump) {
+    int pump_amp = round(_mapf(pump_amp_rms, 0, pump_amp_sensor_f * 0.5, 0, 128));
+    screen.fillRect(128-pump_amp, 24, pump_amp, 5, SSD1306_WHITE);
+    long pump_time_remain = constrain(pump_time_to_stop - time_current, 0, pump_time_on_max);
+    int pump_time = round(_mapf(pump_time_remain, 0, pump_time_on_max, 0, 128));
+    screen.fillRect(128-pump_time, 30, pump_time, 1, SSD1306_WHITE);
+  }
   //
   screen.display();
 }
 
-void _loop_server(){
-  if (WiFi.status() != WL_CONNECTED) {
-    return;
-  }
-  WiFiClient client = server.available();   // Listen for incoming clients
-  if (client) {                             // If a new client connects,
-    server_time_current = millis();
-    server_time_last = server_time_current;
-    String currentLine = "";                // make a String to hold incoming data from the client
-    while (client.connected() && server_time_current - server_time_last <= server_timeout) {  // loop while the client's connected
-      server_time_current = millis();
-      if (client.available()) {             // if there's bytes to read from the client,
-        char c = client.read();             // read a byte, then
-        Serial.write(c);                    // print it out the serial monitor
-        server_header += c;
-        if (c == '\n') {                    // if the byte is a newline character
-          // if the current line is blank, you got two newline characters in a row.
-          // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
-            // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-            // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println("Connection: close");
-            client.println();
-            
-            // turns the GPIOs on and off
-            if (server_header.indexOf("GET /led/on") >= 0) {
-              output_led_state = "on";
-              digitalWrite(output_led, HIGH);
-            } else if (server_header.indexOf("GET /led/off") >= 0) {
-              output_led_state = "off";
-              digitalWrite(output_led, LOW);
-            } else if (server_header.indexOf("GET /pump/on") >= 0) {
-              output_pump_state = "on";
-              digitalWrite(output_pump, HIGH);
-            } else if (server_header.indexOf("GET /pump/off") >= 0) {
-              output_pump_state = "off";
-              digitalWrite(output_pump, LOW);
-            }
-            
-            // Display the HTML web page
-            client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-            client.println("<link rel=\"icon\" href=\"data:,\">");
-            // CSS to style the on/off buttons 
-            // Feel free to change the background-color and font-size attributes to fit your preferences
-            client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
-            client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
-            client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            client.println(".button2 {background-color: #555555;}</style></head>");
-            
-            // Web Page Heading
-            client.println("<body><h1>Home Water</h1>");
-            
-            // Display current state, and ON/OFF buttons for LED  
-            client.println("<p>LED - State " + output_led_state + "</p>");
-            // If the output_led_state is off, it displays the ON button       
-            if (output_led_state=="off") {
-              client.println("<p><a href=\"/led/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/led/off\"><button class=\"button button2\">OFF</button></a></p>");
-            } 
-               
-            // Display current state, and ON/OFF buttons for PUMP  
-            client.println("<p>PUMP - State " + output_pump_state + "</p>");
-            // If the output_pump_state is off, it displays the ON button       
-            if (output_pump_state=="off") {
-              client.println("<p><a href=\"/pump/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/pump/off\"><button class=\"button button2\">OFF</button></a></p>");
-            }
-
-            // Display adc voltage
-            client.println("<p>ADC0: " + String(input_adc_voltage[0], 5) + "</p>");
-            client.println("<p>ADC1: " + String(input_adc_voltage[1], 5) + "</p>");
-            client.println("<p>ADC2: " + String(input_adc_voltage[2], 5) + "</p>");
-            client.println("<p>ADC3: " + String(input_adc_voltage[3], 5) + "</p>");
-
-            client.println("</body></html>");
-            
-            // The HTTP response ends with another blank line
-            client.println();
-            // Break out of the while loop
-            break;
-          } else { // if you got a newline, then clear currentLine
-            currentLine = "";
-          }
-        } else if (c != '\r') {  // if you got anything else but a carriage return character,
-          currentLine += c;      // add it to the end of the currentLine
-        }
-      }
-    }
-    // Clear the header variable
-    server_header = "";
-    // Close the connection
-    client.stop();
-  }
-}
-
 void _loop_pump() {
-  bool pump = digitalRead(output_pump);
-  if (pump) {
-    if (input_stop_state || millis() > pump_time_to_stop) {
-      digitalWrite(output_pump, LOW);
-    }
-  } else {
-    if (input_run_state) {
-      digitalWrite(output_pump, HIGH);
-      pump_time_to_stop = millis() + pump_time_on_max;
-    }
-  }
-  //
-  float amp = _mapf(input_adc_voltage[0] + pump_amp_v_offset, 0, 5, -20, 20);
+  // Water level
+  pump_water_mm = _mapf(input_adc_voltage[0], 0, 5, 0, pump_water_sensor_f);
+  // Pump amp
+  float amp = _mapf(input_adc_voltage[1] + pump_amp_v_offset, 0, 5, -pump_amp_sensor_f, pump_amp_sensor_f);
   long dt = millis() - pump_amp_cycle_time_start;
   if (dt < 500) {
     if (amp < pump_amp_peak_l) {
@@ -310,12 +295,23 @@ void _loop_pump() {
     pump_amp_peak_h = 0;
     pump_amp_cycle_time_start = millis();
   }
+  // Pump action
+  bool pump = digitalRead(output_pump);
+  if (pump) {
+    if (input_stop_state || millis() > pump_time_to_stop || pump_water_mm > pump_water_mm_h) {
+      digitalWrite(output_pump, LOW);
+    }
+  } else {
+    if (input_run_state) {
+      digitalWrite(output_pump, HIGH);
+      pump_time_to_stop = millis() + pump_time_on_max;
+    }
+  }
 }
 
 void loop() {
   _loop_input();
   _loop_wifi_connect();
   _loop_screen_update();
-  _loop_server();
   _loop_pump();
 }
