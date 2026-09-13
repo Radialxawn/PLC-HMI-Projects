@@ -6,7 +6,8 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_ADS1X15.h>
 #include <Preferences.h>
-#include <Arduino_JSON.h>
+#include <ArduinoJson.h>
+#include <ArduinoJson.hpp>
 
 /////////
 //CONST//
@@ -21,36 +22,37 @@ Preferences config;
 String config_wifi_ssid = "";
 String config_wifi_pass = "";
 int config_water_level_max_mm = 900;
-int config_pump_duration_min = 10;
 int config_pump_begin_24hour = 9;
 int config_pump_end_24hour = 17;
 int config_pump_interval_min = 120;
+int config_pump_duration_min = 10;
 
 void _config_load() {
   config.begin("config", true);
   config_wifi_ssid = config.getString("config_wifi_ssid", "SUONG");
   config_wifi_pass = config.getString("config_wifi_pass", "11111111");
   config_water_level_max_mm = config.getInt("config_water_level_max_mm", 900);
-  config_pump_duration_min = config.getInt("config_pump_duration_min", 10);
   config_pump_begin_24hour = config.getInt("config_pump_begin_24hour", 9);
   config_pump_end_24hour = config.getInt("config_pump_end_24hour", 17);
   config_pump_interval_min = config.getInt("config_pump_interval_min", 120);
+  config_pump_duration_min = config.getInt("config_pump_duration_min", 10);
   config.end();
 }
 
 void _config_save() {
   config_water_level_max_mm = constrain(config_water_level_max_mm, 600, 900);
-  config_pump_duration_min = constrain(config_pump_duration_min, 10, 20);
   config_pump_begin_24hour = constrain(config_pump_begin_24hour, 8, 11);
   config_pump_end_24hour = constrain(config_pump_end_24hour, 13, 18);
   config_pump_interval_min = constrain(config_pump_interval_min, 60, 180);
+  config_pump_duration_min = constrain(config_pump_duration_min, 10, 20);
   config.begin("config", false);
   config.putString("config_wifi_ssid", config_wifi_ssid);
   config.putString("config_wifi_pass", config_wifi_pass);
   config.putInt("config_water_level_max_mm", config_water_level_max_mm);
-  config.putInt("config_pump_duration_min", config_pump_duration_min);
   config.putInt("config_pump_begin_24hour", config_pump_begin_24hour);
+  config.putInt("config_pump_end_24hour", config_pump_end_24hour);
   config.putInt("config_pump_interval_min", config_pump_interval_min);
+  config.putInt("config_pump_duration_min", config_pump_duration_min);
   config.end();
 }
 
@@ -79,7 +81,7 @@ void _state_save() {
 const byte screen_address = 0x3C;
 Adafruit_SSD1306 screen(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 unsigned long screen_update_last_ms = 0;
-const int screen_update_interval_ms = 10;
+const int screen_update_interval_ms = 20;
 ///////////////
 //SCREEN-VIEW//
 ///////////////
@@ -124,6 +126,7 @@ float pump_water_level_mm = 0;
 //////////
 AsyncWebServer server(80);
 bool server_begin_done = false;
+String server_receive = "";
 
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
@@ -133,15 +136,11 @@ const char index_html[] PROGMEM = R"rawliteral(
   <link rel="icon" href="data:,">
   <style>
     html {font-family: Arial; display: inline-block; text-align: center;}
-    h2 {font-size: 2.0rem;}
-    p {font-size: 2.0rem;}
+    h2 {font-size: 1.5rem;}
+    p {font-size: 1.5rem;}
+    input {font-size: 1.5rem;}
+    button {font-size: 1.5rem;}
     body {max-width: 600px; margin:0px auto; padding-bottom: 25px;}
-    .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
-    .switch input {display: none}
-    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 6px}
-    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 3px}
-    input:checked+.slider {background-color: #b30000}
-    input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
   </style>
 </head>
 <body>
@@ -161,7 +160,39 @@ const char index_html[] PROGMEM = R"rawliteral(
     <span id="pump_time_remain">--</span>
     <span>sec</span>
   </p>
+  <h2>Configuration <button onclick="dataSet()">Save</button></h2>
+  <p>
+    <span>Water Level Max</span>
+    <input type="number" id="cf_water_level_max" style="width: 4ch" onfocus="cf_focus(this)">
+    <span><sup>mm</sup>
+  </p>
+  <p>
+    <span>Pump from</span>
+    <input type="number" id="cf_pump_begin" style="width: 3ch" onfocus="cf_focus(this)">
+    <span><sup>h</sup> to</span>
+    <input type="number" id="cf_pump_end" style="width: 3ch" onfocus="cf_focus(this)">
+    <span><sup>h</sup> each</span>
+    <input type="number" id="cf_pump_interval" style="width: 4ch" onfocus="cf_focus(this)">
+    <span><sup>min</sup> for</span>
+    <input type="number" id="cf_pump_duration" style="width: 3ch" onfocus="cf_focus(this)">
+    <span><sup>min</sup>
+  </p>
 <script>
+cf = {
+  'cf_water_level_max': false,
+  'cf_pump_begin': false,
+  'cf_pump_end': false,
+  'cf_pump_interval': false,
+  'cf_pump_duration': false,
+}
+function cf_focus(field) {
+  cf[field.id] = true;
+}
+function cf_reset() {
+  for (let k in cf) {
+    cf[k] = false;
+  }
+}
 function dataGet() {
   fetch('/api/data')
     .then(response => response.json())
@@ -169,20 +200,48 @@ function dataGet() {
       document.getElementById('water_level').innerText = data.water_level;
       document.getElementById('pump_current').innerText = data.pump_current.toFixed(3);
       document.getElementById('pump_time_remain').innerText = (data.pump_time_remain*1e-3).toFixed(0);
-  });
+      for (let k in cf) {
+        if (!cf[k]) {
+          document.getElementById(k).value = data[k];
+        }
+      }
+    });
 }
 setInterval(dataGet, 500);
+function dataSet() {
+  data = {
+    cf_water_level_max: parseInt(document.getElementById('cf_water_level_max').value),
+    cf_pump_begin: parseInt(document.getElementById('cf_pump_begin').value),
+    cf_pump_end: parseInt(document.getElementById('cf_pump_end').value),
+    cf_pump_interval: parseInt(document.getElementById('cf_pump_interval').value),
+    cf_pump_duration: parseInt(document.getElementById('cf_pump_duration').value)
+  }
+  fetch('/api/data', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+    .then(response => response.json())
+    .then(data => cf_reset())
+    .catch(error => console.error('Error:', error));
+}
 </script>
 </body>
 </html>
 )rawliteral";
 
 String _server_data_json_get() {
-  JSONVar doc;
+  JsonDocument doc;
   doc["water_level"] = round(pump_water_level_mm);
   doc["pump_current"] = pump_current_amp;
   doc["pump_time_remain"] = pump_time_remain_ms;
-  String result = JSON.stringify(doc);
+  doc["cf_water_level_max"] = config_water_level_max_mm;
+  doc["cf_pump_begin"] = config_pump_begin_24hour;
+  doc["cf_pump_end"] = config_pump_end_24hour;
+  doc["cf_pump_interval"] = config_pump_interval_min;
+  doc["cf_pump_duration"] = config_pump_duration_min;
+  String result;
+  serializeJson(doc, result);
   return result;
 }
 
@@ -196,6 +255,38 @@ void _server_begin() {
   server.on("/api/data", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send_P(200, "application/json", _server_data_json_get().c_str());
   });
+  server.on("/api/data", HTTP_POST,
+    [](AsyncWebServerRequest *request) {
+      request->send(200, "text/plain", "POST request received");
+    },
+    NULL,
+    [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      if (index == 0) {
+        server_receive = "";
+      }
+      for (size_t i = 0; i < len; i++) {
+        server_receive += (char)data[i];
+      }
+      if (index + len == total) {
+        JsonDocument doc;
+        DeserializationError error = deserializeJson(doc, server_receive);
+        if (!error) {
+          const char* status = doc["status"];
+          //
+          if (doc["cf_water_level_max"].is<int>()) { config_water_level_max_mm = doc["cf_water_level_max"]; }
+          if (doc["cf_pump_begin"].is<int>()) { config_pump_begin_24hour = doc["cf_pump_begin"]; }
+          if (doc["cf_pump_end"].is<int>()) { config_pump_end_24hour = doc["cf_pump_end"]; }
+          if (doc["cf_pump_interval"].is<int>()) { config_pump_interval_min = doc["cf_pump_interval"]; }
+          if (doc["cf_pump_duration"].is<int>()) { config_pump_duration_min = doc["cf_pump_duration"]; }
+          _config_save();
+          //
+          request->send(200, "application/json", "{\"success\":true}");
+        } else {
+          request->send(400, "text/plain", "Invalid JSON");
+        }
+      }
+    }
+  );
   server.begin();
   server_begin_done = true;
 }
@@ -224,6 +315,9 @@ void setup() {
   _setup_i2c();
   _config_load();
   delay(1000);
+  screen.ssd1306_command(SSD1306_SETCONTRAST);
+  screen.ssd1306_command(128);
+  screen.display();
 }
 
 ////////////////
@@ -317,12 +411,12 @@ void _loop_screen_update() {
   screen.println(button_state);
   // PUMP
   bool pump = digitalRead(output_pump_pin);
-  int width = pump ? 7 : 15;
+  int width = pump ? 10 : 15;
   int water_level = round(_mapf(pump_water_level_mm, 0, config_water_level_max_mm, 0, 128));
   screen.fillRect(128-water_level, 16, water_level, width, SSD1306_WHITE);
   if (pump) {
     int pump_current = round(_mapf(pump_current_amp, 0, pump_sensor_factor*c_peak_peak_to_rms, 0, 128));
-    screen.fillRect(128-pump_current, 24, pump_current, 5, SSD1306_WHITE);
+    screen.fillRect(128-pump_current, 27, pump_current, 2, SSD1306_WHITE);
     unsigned long pump_duration_ms = config_pump_duration_min * c_min_to_ms;
     int pump_time_remain = round(_mapf(pump_time_remain_ms, 0, pump_duration_ms, 0, 128));
     screen.fillRect(128-pump_time_remain, 30, pump_time_remain, 1, SSD1306_WHITE);
