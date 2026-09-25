@@ -19,23 +19,23 @@ const float c_peak_peak_to_rms = 0.35355;
 //CONFIG//
 //////////
 Preferences config;
-String config_wifi_ssid = "";
-String config_wifi_pass = "";
-int config_water_level_max_mm = 900;
-int config_pump_begin_24hour = 9;
-int config_pump_end_24hour = 17;
-int config_pump_interval_min = 120;
-int config_pump_duration_min = 10;
+String config_wifi_ssid = "";         const char* config_wifi_ssid_key = "wifi_ssid";
+String config_wifi_pass = "";         const char* config_wifi_pass_key = "wifi_pass";
+int config_water_level_max_mm = 900;  const char* config_water_level_max_mm_key = "w_l_max_mm";
+int config_pump_begin_24hour = 9;     const char* config_pump_begin_24hour_key = "p_begin_24";
+int config_pump_end_24hour = 17;      const char* config_pump_end_24hour_key = "p_end_24";
+int config_pump_interval_min = 120;   const char* config_pump_interval_min_key = "p_itv_min";
+int config_pump_duration_min = 10;    const char* config_pump_duration_min_key = "p_drt_min";
 
 void _config_load() {
   config.begin("config", true);
-  config_wifi_ssid = config.getString("config_wifi_ssid", "SUONG");
-  config_wifi_pass = config.getString("config_wifi_pass", "11111111");
-  config_water_level_max_mm = config.getInt("config_water_level_max_mm", 900);
-  config_pump_begin_24hour = config.getInt("config_pump_begin_24hour", 9);
-  config_pump_end_24hour = config.getInt("config_pump_end_24hour", 17);
-  config_pump_interval_min = config.getInt("config_pump_interval_min", 120);
-  config_pump_duration_min = config.getInt("config_pump_duration_min", 10);
+  config_wifi_ssid = config.getString(config_wifi_ssid_key, "SUONG");
+  config_wifi_pass = config.getString(config_wifi_pass_key, "11111111");
+  config_water_level_max_mm = config.getInt(config_water_level_max_mm_key, 900);
+  config_pump_begin_24hour = config.getInt(config_pump_begin_24hour_key, 9);
+  config_pump_end_24hour = config.getInt(config_pump_end_24hour_key, 17);
+  config_pump_interval_min = config.getInt(config_pump_interval_min_key, 120);
+  config_pump_duration_min = config.getInt(config_pump_duration_min_key, 10);
   config.end();
 }
 
@@ -46,13 +46,13 @@ void _config_save() {
   config_pump_interval_min = constrain(config_pump_interval_min, 60, 180);
   config_pump_duration_min = constrain(config_pump_duration_min, 10, 20);
   config.begin("config", false);
-  config.putString("config_wifi_ssid", config_wifi_ssid);
-  config.putString("config_wifi_pass", config_wifi_pass);
-  config.putInt("config_water_level_max_mm", config_water_level_max_mm);
-  config.putInt("config_pump_begin_24hour", config_pump_begin_24hour);
-  config.putInt("config_pump_end_24hour", config_pump_end_24hour);
-  config.putInt("config_pump_interval_min", config_pump_interval_min);
-  config.putInt("config_pump_duration_min", config_pump_duration_min);
+  config.putString(config_wifi_ssid_key, config_wifi_ssid);
+  config.putString(config_wifi_pass_key, config_wifi_pass);
+  config.putInt(config_water_level_max_mm_key, config_water_level_max_mm);
+  config.putInt(config_pump_begin_24hour_key, config_pump_begin_24hour);
+  config.putInt(config_pump_end_24hour_key, config_pump_end_24hour);
+  config.putInt(config_pump_interval_min_key, config_pump_interval_min);
+  config.putInt(config_pump_duration_min_key, config_pump_duration_min);
   config.end();
 }
 
