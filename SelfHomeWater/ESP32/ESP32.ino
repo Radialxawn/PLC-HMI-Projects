@@ -14,7 +14,7 @@
 /////////
 const long c_min_to_ms = 60000;
 const float c_peak_peak_to_rms = 0.35355;
-
+const long c_restart_interval_min = 180;
 //////////
 //CONFIG//
 //////////
@@ -461,6 +461,10 @@ void _loop_pump() {
 }
 
 void loop() {
+  if (millis() >= c_restart_interval_min * c_min_to_ms) {
+    ESP.restart();
+    return;
+  }
   _loop_input();
   _loop_wifi_connect();
   _loop_screen_update();
